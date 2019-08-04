@@ -6,7 +6,7 @@ export function initialize() {
   return {
     store,
     primaryKey,
-    relationship,
+    relationship: relationship.bind(null, store),
     find: find.bind(null, store),
     add: add.bind(null, store),
     remove: remove.bind(null, store),

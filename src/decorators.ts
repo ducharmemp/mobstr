@@ -70,6 +70,7 @@ export function indexed(target: any, propertyKey: string | symbol, descriptor?: 
 export function relationship(store: ReturnType<typeof createStore>, type, options = {}) {
   return function(target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
     ensureMeta(target);
+    console.log(type);
     target.__meta__.relationships[propertyKey] = {
       type: type(),
       keys: [],
@@ -97,6 +98,6 @@ export function relationship(store: ReturnType<typeof createStore>, type, option
           );
         }
       }
-    )
+    );
   }
 }
