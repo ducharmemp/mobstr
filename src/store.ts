@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-import { flatMap, chain } from 'lodash';
+import { flatMap, chain, head, get } from 'lodash';
 
 import { ensureMeta } from './decorators';
 
@@ -17,49 +17,80 @@ export function createStore() {
   });
 }
 
-export function add(store: ReturnType<typeof createStore>, entity: any | any[]) {
+export function add(store: ReturnType<typeof createStore>, entity: any) {
   ensureMeta(entity);
-  store.collections[entity.__meta__.collectionName] = (
-    store.collections[entity.__meta__.keys]
+  const currentCollection = entity.__meta__.collectionName,
+    currentKey = entity.__meta__.key;
+  store.collections[currentCollection] = (
+    store.collections[currentCollection]
     || new Map()
   );
-  store.collections[entity.__meta__.collectionName].set(entity.__meta__.keys, entity);
+  store.collections[currentCollection].set(
+    entity[currentKey], entity
+  );
 }
 
 export function remove(store: ReturnType<typeof createStore>, entity: any) {
   ensureMeta(entity);
+  const primaryKey = entity.__meta__.key,
+   currentCollection = entity.__meta__.collectionName;
   (
-    store.collections[entity.__meta__.collectionName]
+    store.collections[currentCollection]
     || new Map()
-  ).delete(entity.__meta__.keys);
+  ).delete(entity[primaryKey]);
 }
 
 export function find(
   store: ReturnType<typeof createStore>,
-  entity,
-  findClause = (entry) => entity.__meta__.keys === entry.__meta__.keys,
+  entityClass,
+  findClause = (entry) => entry,
 ) {
-  return Array.from(store.collections[entity.__meta__.collectionName].values()).filter(findClause);
+  ensureMeta(entityClass);
+  const currentCollection = entityClass.__meta__.collectionName;
+  return Array.from(
+    (
+      store.collections[currentCollection]
+      || new Map()
+    ).values()
+  ).filter(findClause);
 }
 
-export function join(store: ReturnType<typeof createStore>, entityClass: any, childClass: any) {
-  const entities = Array.from(store.collections[entityClass.__meta__.collectionName].values()),
-    children = Array.from(store.collections[childClass.__meta__.collectionName].values());
+/**
+ *
+ *
+ * @export
+ * @param {ReturnType<typeof createStore>} store
+ * @param {*} entityClass
+ * @param {*} childClass
+ * @returns
+ */
+// FIXME: This doesn't exactly work like I'd want it to
+export function join(store: ReturnType<typeof createStore>, entityClass: any, childClass: any, onClause) {
+  const entityCollectionName = entityClass.__meta__.collectionName,
+    entities = Array.from(store.collections[entityCollectionName].values()),
+    entityRelationShips = entityClass.__meta__.relationships,
+
+    childCollectionName = childClass.__meta__.collectionName,
+    childCollection = store.collections[childCollectionName];
 
   return flatMap(entities, (entity) => {
-    return children
-      .filter((child) => {
-        const relationships = chain(entity.__meta__.relationships)
-          .values()
-          .filter((relationship) => relationship.type === childClass)
-          .flatMap((relationship) => relationship.keys)
-          .value();
+    console.log(entityRelationShips)
+    const children = chain(entityRelationShips)
+      .values()
+      .filter((relationship) => relationship.type === childClass)
+      .flatMap((relationship) => relationship.keys)
+      .value();
+    console.log({ children });
+    const relationships = chain(entityRelationShips)
+      .values()
+      .filter((relationship) => console.log({relationship}) as any || relationship.type === childClass)
+      .flatMap((relationship) => console.log(relationship.keys) as any || relationship.keys)
+      .value();
 
-        return relationships.find(
-          (value) => child.__meta__.keys === value
-        );
-      })
-      .map((child) => [entity, child]);
-  });
+      return relationships.map(
+        (relationshipKey) => childCollection.get(relationshipKey)
+      );
+    })
+      // .map((child) => [entity, child]);
 }
 

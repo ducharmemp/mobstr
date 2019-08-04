@@ -2,7 +2,10 @@
   "name": "mobxt",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "test": "mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
     "test:watch": "mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts --watch",
@@ -13,6 +16,7 @@
   "dependencies": {
     "lodash": "^4.17.15",
     "mobx": "^5.13.0",
+    "mobx-react": "^6.1.1",
     "reflect-metadata": "^0.1.13",
     "uuid": "^3.3.2"
   },

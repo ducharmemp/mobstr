@@ -57,11 +57,13 @@ describe('Integration', () => {
     }
 
     const f = new Foo(),
-      b = new Bar();
+      b = new Bar(),
+      b2 = new Bar();
     add(store, f);
     add(store, b);
+    add(store, b2);
     f.friends = [b];
-    expect(join(store, Foo, Bar)).to.have.length(1);
+    expect(join(store, Foo, Bar)).to.have.length(2);
   });
 
   it('should allow a collection class to access a relationship', () => {

@@ -1,4 +1,4 @@
-import { createStore, add, remove } from './store';
+import { createStore, add, remove, find } from './store';
 import { primaryKey, relationship } from './decorators';
 
 export function initialize() {
@@ -7,6 +7,7 @@ export function initialize() {
     store,
     primaryKey,
     relationship,
+    find: find.bind(null, store),
     add: add.bind(null, store),
     remove: remove.bind(null, store),
   }
