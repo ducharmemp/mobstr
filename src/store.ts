@@ -1,7 +1,7 @@
 import { observable } from 'mobx';
 import { flatMap, chain, head, get } from 'lodash';
 
-import { ensureMeta } from './decorators';
+import { ensureMeta } from "./utils";
 
 /**
  *
@@ -17,6 +17,11 @@ export function createStore() {
   });
 }
 
+/**
+ * 
+ * @param store 
+ * @param entity 
+ */
 export function add(store: ReturnType<typeof createStore>, entity: any) {
   ensureMeta(entity);
   const currentCollection = entity.__meta__.collectionName,
@@ -30,6 +35,11 @@ export function add(store: ReturnType<typeof createStore>, entity: any) {
   );
 }
 
+/**
+ * 
+ * @param store 
+ * @param entity 
+ */
 export function remove(store: ReturnType<typeof createStore>, entity: any) {
   ensureMeta(entity);
   const primaryKey = entity.__meta__.key.get(),
@@ -40,6 +50,12 @@ export function remove(store: ReturnType<typeof createStore>, entity: any) {
   ).delete(entity[primaryKey]);
 }
 
+/**
+ * 
+ * @param store 
+ * @param entityClass 
+ * @param findClause 
+ */
 export function find(
   store: ReturnType<typeof createStore>,
   entityClass,
@@ -56,7 +72,7 @@ export function find(
 }
 
 /**
- *
+ * Joins two collections based on their applicable relationships.
  *
  * @export
  * @param {ReturnType<typeof createStore>} store
@@ -65,7 +81,7 @@ export function find(
  * @returns
  */
 // FIXME: This doesn't exactly work like I'd want it to
-export function join(store: ReturnType<typeof createStore>, entityClass: any, childClass: any, onClause) {
+export function join(store: ReturnType<typeof createStore>, entityClass: any, childClass: any, onClause?) {
   const entityCollectionName = entityClass.__meta__.collectionName,
     entities = Array.from(store.collections[entityCollectionName].values()),
     entityRelationShips = entityClass.__meta__.relationships,

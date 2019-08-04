@@ -1,33 +1,21 @@
 import 'reflect-metadata';
 
-import { v4 as uuid } from 'uuid';
 import { observable, extendObservable, remove } from 'mobx';
 import { createStore, add } from './store';
+import { ensureMeta } from './utils';
 
 /**
+ * Defines a primary key for the current target. This primary key will be used for uniquely identifying the object in the store,
+ * as well as identifying the entity in any relationships. Each model *must* have a primary key for identification purposes.
  *
- *
- * @export
- * @param {*} target
- */
-export function ensureMeta(target: any) {
-  target.constructor.__meta__ = target.constructor.__meta__ || observable({
-    collectionName: target.constructor.name,
-    relationships: {} as Record<string | symbol, { type: string; keys: string[], options: Record<string, any> }>,
-    indexes: [],
-  });
-  target.__meta__ = target.__meta__ || observable({
-    collectionName: target.constructor.name,
-    name: uuid(),
-    indexes: [],
-    key: observable.box(null),
-    relationships: {} as Record<string | symbol, { type: string; keys: string[], options: Record<string, any> }>
-  });
-}
-
-/**
- *
- *
+ * Note: currently the primary key *must* be a single value. This is due to limitations in the internal storage mechanism of ES6 Maps.
+ * 
+ * @example
+ * class FooModel {
+ *  @primaryKey
+ *  id: string = uuid();
+ * }
+ * 
  * @export
  * @param {*} target
  * @param {(string | symbol)} propertyKey
@@ -46,7 +34,7 @@ export function primaryKey(target: any, propertyKey: string | symbol, descriptor
 }
 
 /**
- *
+ * Creates an indexed value in the store. This will be used for fast lookups in the case of specialized filters. Currently not implemented.
  *
  * @export
  * @param {*} target
@@ -59,7 +47,24 @@ export function indexed(target: any, propertyKey: string | symbol, descriptor?: 
 }
 
 /**
- *
+ * Describes a relationship to another model. The related model will be referenced by its primary key for accessing purposes.
+ * 
+ * @example
+ * class BarModel {
+ *  @primaryKey
+ *  id: string = uuid();
+ * }
+ * 
+ * class FooModel {
+ *  @primaryKey
+ *  id: string = uuid();
+ *  
+ *  @relationship(type => BarModel)
+ *  friends: Bar[];
+ * }
+ * 
+ * const f = new FooModel();
+ * f.friends.push(new BarModel());
  *
  * @export
  * @param {ReturnType<typeof createStore>} store

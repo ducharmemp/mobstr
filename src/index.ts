@@ -1,6 +1,9 @@
 import { createStore, add, remove, find } from './store';
 import { primaryKey, relationship } from './decorators';
 
+/**
+ * Intializes a store and provides helper methods bound to that store for convenience.
+ */
 export function initialize() {
   const store = createStore();
   return {
