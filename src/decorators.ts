@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { v4 as uuid } from 'uuid';
-import { observable, extendObservable, toJS } from 'mobx';
+import { observable, extendObservable, decorate } from 'mobx';
 import { createStore, add } from './store';
 
 /**
@@ -20,7 +20,7 @@ export function ensureMeta(target: any) {
     collectionName: target.constructor.name,
     name: uuid(),
     indexes: [],
-    key: null,
+    key: observable.box(null),
     relationships: {} as Record<string | symbol, { type: string; keys: string[], options: Record<string, any> }>
   });
 }
@@ -42,7 +42,7 @@ export function primaryKey(target: any, propertyKey: string | symbol, descriptor
     }
   );
   target.__meta__.indexes.push(propertyKey);
-  target.__meta__.key = propertyKey;
+  target.__meta__.key.set(propertyKey);
 }
 
 /**
@@ -70,14 +70,13 @@ export function indexed(target: any, propertyKey: string | symbol, descriptor?: 
 export function relationship(store: ReturnType<typeof createStore>, type, options = {}) {
   return function(target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
     ensureMeta(target);
-    console.log(type);
     target.__meta__.relationships[propertyKey] = {
       type: type(),
       keys: [],
       options
     };
 
-    extendObservable(
+    decorate(
       target,
       {
         get [propertyKey]() {
@@ -85,14 +84,19 @@ export function relationship(store: ReturnType<typeof createStore>, type, option
             propertyCollectionName = currentRelationship.type.__meta__.collectionName,
             propertyCollection = store.collections[propertyCollectionName];
 
-          return currentRelationship.keys.map(
-            (primaryKey) => propertyCollection.get(primaryKey)
-          ).filter(value => !!value);
+          const returnRelationship = observable(
+            currentRelationship.keys.map(
+              (primaryKey) => propertyCollection.get(primaryKey)
+            ).filter(value => !!value)
+          );
+
+          return returnRelationship;
         },
 
         set [propertyKey](values) {
           const currentRelationship = target.__meta__.relationships[propertyKey];
           values.map((value) => add(store, value));
+          console.log("SET")
           currentRelationship.keys = values.map(
             (value) => value[value.__meta__.key]
           );

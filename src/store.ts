@@ -20,7 +20,7 @@ export function createStore() {
 export function add(store: ReturnType<typeof createStore>, entity: any) {
   ensureMeta(entity);
   const currentCollection = entity.__meta__.collectionName,
-    currentKey = entity.__meta__.key;
+    currentKey = entity.__meta__.key.get();
   store.collections[currentCollection] = (
     store.collections[currentCollection]
     || new Map()
@@ -32,7 +32,7 @@ export function add(store: ReturnType<typeof createStore>, entity: any) {
 
 export function remove(store: ReturnType<typeof createStore>, entity: any) {
   ensureMeta(entity);
-  const primaryKey = entity.__meta__.key,
+  const primaryKey = entity.__meta__.key.get(),
    currentCollection = entity.__meta__.collectionName;
   (
     store.collections[currentCollection]
@@ -74,13 +74,11 @@ export function join(store: ReturnType<typeof createStore>, entityClass: any, ch
     childCollection = store.collections[childCollectionName];
 
   return flatMap(entities, (entity) => {
-    console.log(entityRelationShips)
     const children = chain(entityRelationShips)
       .values()
       .filter((relationship) => relationship.type === childClass)
       .flatMap((relationship) => relationship.keys)
       .value();
-    console.log({ children });
     const relationships = chain(entityRelationShips)
       .values()
       .filter((relationship) => console.log({relationship}) as any || relationship.type === childClass)
