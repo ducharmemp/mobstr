@@ -1,0 +1,29 @@
+{
+  "name": "mobxt",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
+    "test:watch": "mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts --watch",
+    "start": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "mobx": "^5.13.0",
+    "reflect-metadata": "^0.1.13",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.7",
+    "@types/reflect-metadata": "^0.1.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
+    "ts-node": "^8.3.0",
+    "tsconfig-paths": "^3.8.0",
+    "typescript": "^3.5.3"
+  }
+}
