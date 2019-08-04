@@ -1,7 +1,8 @@
 {
   "name": "mobxt",
   "version": "0.1.0",
-  "description": "",
+  "description": "Object relational mapper for MobX stores",
+  
   "main": "dist/index.js",
   "files": [
     "/dist"
@@ -12,7 +13,7 @@
     "start": "tsc --watch"
   },
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "lodash": "^4.17.15",
     "mobx": "^5.13.0",

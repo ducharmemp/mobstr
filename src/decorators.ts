@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { v4 as uuid } from 'uuid';
-import { observable, extendObservable, decorate } from 'mobx';
+import { observable, extendObservable, remove } from 'mobx';
 import { createStore, add } from './store';
 
 /**
@@ -35,14 +35,14 @@ export function ensureMeta(target: any) {
  */
 export function primaryKey(target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
   ensureMeta(target);
+  target.__meta__.indexes.push(propertyKey);
+  target.__meta__.key.set(propertyKey);
   extendObservable(
     target,
     {
-      propertyKey,
+      [propertyKey]: propertyKey,
     }
   );
-  target.__meta__.indexes.push(propertyKey);
-  target.__meta__.key.set(propertyKey);
 }
 
 /**
@@ -76,32 +76,42 @@ export function relationship(store: ReturnType<typeof createStore>, type, option
       options
     };
 
-    decorate(
-      target,
-      {
-        get [propertyKey]() {
-          const currentRelationship = target.__meta__.relationships[propertyKey],
-            propertyCollectionName = currentRelationship.type.__meta__.collectionName,
-            propertyCollection = store.collections[propertyCollectionName];
+    const decorator = {
+      get [propertyKey](): ReturnType<typeof type>[] {
+        const currentRelationship = target.__meta__.relationships[propertyKey],
+          propertyCollectionName = currentRelationship.type.__meta__.collectionName,
+          propertyCollection = store.collections[propertyCollectionName];
 
-          const returnRelationship = observable(
-            currentRelationship.keys.map(
-              (primaryKey) => propertyCollection.get(primaryKey)
-            ).filter(value => !!value)
-          );
+        const returnRelationship = observable(
+          currentRelationship.keys.map(
+            (primaryKey) => propertyCollection.get(primaryKey)
+          ).filter(value => !!value)
+        );
 
-          return returnRelationship;
-        },
+        returnRelationship.observe(
+          (changes) => {
+            changes.added.map(change => add(store, change));
+            changes.removed.map(change => remove(store, change));
+          }
+        )
 
-        set [propertyKey](values) {
-          const currentRelationship = target.__meta__.relationships[propertyKey];
-          values.map((value) => add(store, value));
-          console.log("SET")
-          currentRelationship.keys = values.map(
-            (value) => value[value.__meta__.key]
-          );
-        }
+        return returnRelationship;
+      },
+
+      set [propertyKey](values) {
+        const currentRelationship = target.__meta__.relationships[propertyKey];
+        values.map((value) => add(store, value));
+        currentRelationship.keys = values.map(
+          (value) => value[value.__meta__.key]
+        );
       }
+    }
+
+    const extended = extendObservable(
+      target,
+      decorator
     );
+
+    return extended;
   }
 }
