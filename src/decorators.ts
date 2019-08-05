@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { observable, extendObservable, remove } from 'mobx';
+import { observable, extendObservable, remove, action } from 'mobx';
 import { createStore, add } from './store';
 import { ensureMeta } from './utils';
 
@@ -25,12 +25,6 @@ export function primaryKey(target: any, propertyKey: string | symbol, descriptor
   ensureMeta(target);
   target.__meta__.indexes.push(propertyKey);
   target.__meta__.key.set(propertyKey);
-  extendObservable(
-    target,
-    {
-      [propertyKey]: propertyKey,
-    }
-  );
 }
 
 /**
@@ -95,7 +89,10 @@ export function relationship(store: ReturnType<typeof createStore>, type, option
 
         returnRelationship.observe(
           (changes) => {
-            changes.added.map(change => add(store, change));
+            changes.added.map(action(change => {
+              currentRelationship.keys.push(change[change.__meta__.key.get()])
+              add(store, change)
+            }));
             changes.removed.map(change => remove(store, change));
           }
         )

@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import { flatMap, chain, head, get } from 'lodash';
 
 import { ensureMeta } from "./utils";
@@ -9,46 +9,46 @@ import { ensureMeta } from "./utils";
  * @export
  * @returns
  */
-export function createStore() {
+export const createStore = action(() => {
   return observable({
     collections: {} as Record<string, Map<string, any>>,
     primaryKeys: new Map(),
     indexes: new Map(),
   });
-}
+});
 
 /**
  * 
  * @param store 
  * @param entity 
  */
-export function add(store: ReturnType<typeof createStore>, entity: any) {
+export const add = action((store: ReturnType<typeof createStore>, entity: any) => {
   ensureMeta(entity);
   const currentCollection = entity.__meta__.collectionName,
     currentKey = entity.__meta__.key.get();
   store.collections[currentCollection] = (
     store.collections[currentCollection]
-    || new Map()
+    || observable.map()
   );
   store.collections[currentCollection].set(
     entity[currentKey], entity
   );
-}
+});
 
 /**
  * 
  * @param store 
  * @param entity 
  */
-export function remove(store: ReturnType<typeof createStore>, entity: any) {
+export const remove = action((store: ReturnType<typeof createStore>, entity: any) => {
   ensureMeta(entity);
   const primaryKey = entity.__meta__.key.get(),
    currentCollection = entity.__meta__.collectionName;
   (
     store.collections[currentCollection]
-    || new Map()
+    || observable.map()
   ).delete(entity[primaryKey]);
-}
+});
 
 /**
  * 
@@ -56,20 +56,20 @@ export function remove(store: ReturnType<typeof createStore>, entity: any) {
  * @param entityClass 
  * @param findClause 
  */
-export function find(
+export const find = action((
   store: ReturnType<typeof createStore>,
   entityClass,
   findClause = (entry) => entry,
-) {
+) => {
   ensureMeta(entityClass);
   const currentCollection = entityClass.__meta__.collectionName;
   return Array.from(
     (
       store.collections[currentCollection]
-      || new Map()
+      || observable.map()
     ).values()
   ).filter(findClause);
-}
+});
 
 /**
  * Joins two collections based on their applicable relationships.
@@ -81,7 +81,7 @@ export function find(
  * @returns
  */
 // FIXME: This doesn't exactly work like I'd want it to
-export function join(store: ReturnType<typeof createStore>, entityClass: any, childClass: any, onClause?) {
+export const join = action((store: ReturnType<typeof createStore>, entityClass: any, childClass: any, onClause?) => {
   const entityCollectionName = entityClass.__meta__.collectionName,
     entities = Array.from(store.collections[entityCollectionName].values()),
     entityRelationShips = entityClass.__meta__.relationships,
@@ -106,5 +106,4 @@ export function join(store: ReturnType<typeof createStore>, entityClass: any, ch
       );
     })
       // .map((child) => [entity, child]);
-}
-
+});
