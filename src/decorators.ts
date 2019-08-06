@@ -1,8 +1,9 @@
 import 'reflect-metadata';
 
-import { observable, extendObservable, remove, action } from 'mobx';
+import { observable, remove, action } from 'mobx';
 import { createStore, add } from './store';
-import { ensureMeta } from './utils';
+import { Meta } from './meta';
+import { ensureMeta, ensureRelationship } from './utils';
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely identifying the object in the store,
@@ -66,20 +67,28 @@ export function indexed(target: any, propertyKey: string | symbol, descriptor?: 
  * @param {*} [options={}]
  * @returns
  */
-export function relationship(store: ReturnType<typeof createStore>, type, options = {}) {
-  return function(target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor) {
+export function relationship(
+  store: ReturnType<typeof createStore>,
+  type: any, 
+  options = {}
+) {
+  return function(target: any, propertyKey: string | symbol, descriptor?: PropertyDescriptor): any {
     ensureMeta(target);
-    target.__meta__.relationships[propertyKey] = {
+    ensureMeta(type());
+    (target as Meta).__meta__.relationships[propertyKey as string] = {
       type: type(),
       keys: [],
       options
     };
 
-    const decorator = {
-      get [propertyKey](): ReturnType<typeof type>[] {
-        const currentRelationship = target.__meta__.relationships[propertyKey],
-          propertyCollectionName = currentRelationship.type.__meta__.collectionName,
-          propertyCollection = store.collections[propertyCollectionName];
+    return observable({
+      get(): ReturnType<typeof type>[] {
+        ensureMeta(this);
+        ensureRelationship(this, propertyKey as string, type, options);
+
+        const currentRelationship = (this as unknown as Meta).__meta__.relationships[propertyKey as string],
+          propertyCollectionName = (currentRelationship.type as Meta).__meta__.collectionName,
+          propertyCollection = store.collections[propertyCollectionName as string];
 
         const returnRelationship = observable(
           currentRelationship.keys.map(
@@ -89,31 +98,31 @@ export function relationship(store: ReturnType<typeof createStore>, type, option
 
         returnRelationship.observe(
           (changes) => {
-            changes.added.map(action(change => {
-              currentRelationship.keys.push(change[change.__meta__.key.get()])
-              add(store, change)
-            }));
-            changes.removed.map(change => remove(store, change));
+            if (changes.type === 'splice') {
+              changes.added.map(action((change: any) => {
+                currentRelationship.keys.push(change[change.__meta__.key.get()])
+                add(store, change)
+              }));
+              changes.removed.map(change => remove(store, change));
+            } else {
+              // TODO: ???? What to do with IArrayChange?
+            }
           }
         )
 
         return returnRelationship;
       },
 
-      set [propertyKey](values) {
-        const currentRelationship = target.__meta__.relationships[propertyKey];
+      set(values: any[]) {
+        ensureMeta(this);
+        ensureRelationship(this, propertyKey as string, type, options);
+
+        const currentRelationship = (this as unknown as Meta).__meta__.relationships[propertyKey as string];
         values.map((value) => add(store, value));
-        currentRelationship.keys = values.map(
+        currentRelationship.keys = observable.array(values.map(
           (value) => value[value.__meta__.key]
-        );
+        ));
       }
-    }
-
-    const extended = extendObservable(
-      target,
-      decorator
-    );
-
-    return extended;
+    });
   }
 }

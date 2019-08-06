@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { observable } from 'mobx';
+import { Meta } from './meta';
 
 /**
  * 
@@ -8,26 +9,29 @@ import { observable } from 'mobx';
  * @param {*} target
  */
 export function ensureMeta(target: any) {
-  if (target.constructor) {
-    target.constructor.__meta__ = target.constructor.__meta__ || observable({
-      collectionName: target.constructor.name,
+  if (!target.hasOwnProperty('__meta__')) {
+    (target as Meta).__meta__ = observable({
+      collectionName: target.name || target.constructor.name,
+      indexes: [],
+      key: observable.box(null),
+      // Spread the values already present in the prototype
+      ...target.__meta__ || {},
       relationships: {} as Record<string | symbol, {
         type: string;
         keys: string[];
         options: Record<string, any>;
-      }>,
-      indexes: [],
-    });
+      }>
+    }) as any;
   }
-  target.__meta__ = target.__meta__ || observable({
-    collectionName: target.constructor.name,
-    name: uuid(),
-    indexes: [],
-    key: observable.box(null),
-    relationships: {} as Record<string | symbol, {
-      type: string;
-      keys: string[];
-      options: Record<string, any>;
-    }>
-  });
+}
+
+export function ensureRelationship(target: any, propertyKey: string, type: any, options: any) {
+  (target as unknown as Meta).__meta__.relationships[propertyKey] = (
+    (target as unknown as Meta).__meta__.relationships[propertyKey]
+    || observable({
+      type: type(),
+      keys: observable.array([]),
+      options,
+    })
+  );
 }

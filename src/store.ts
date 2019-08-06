@@ -1,6 +1,7 @@
-import { observable, action } from 'mobx';
-import { flatMap, chain, head, get } from 'lodash';
+import { observable, action, toJS } from 'mobx';
+import { flatMap, chain } from 'lodash';
 
+import { Meta } from './meta';
 import { ensureMeta } from "./utils";
 
 /**
@@ -11,7 +12,7 @@ import { ensureMeta } from "./utils";
  */
 export const createStore = action(() => {
   return observable({
-    collections: {} as Record<string, Map<string, any>>,
+    collections: {} as Record<string | symbol | number, Map<string | symbol | number, any>>,
     primaryKeys: new Map(),
     indexes: new Map(),
   });
@@ -58,18 +59,32 @@ export const remove = action((store: ReturnType<typeof createStore>, entity: any
  */
 export const find = action((
   store: ReturnType<typeof createStore>,
-  entityClass,
-  findClause = (entry) => entry,
+  entityClass: any,
+  findClause: (arg0: any) => any = (entry: any) => entry,
 ) => {
   ensureMeta(entityClass);
-  const currentCollection = entityClass.__meta__.collectionName;
+  const currentCollection = (entityClass as Meta).__meta__.collectionName;
   return Array.from(
     (
-      store.collections[currentCollection]
+      store.collections[currentCollection as string]
       || observable.map()
     ).values()
   ).filter(findClause);
 });
+
+export const findOne = action((
+  store: ReturnType<typeof createStore>,
+  entityClass: any,
+  primaryKey: ReturnType<Meta['__meta__']['key']['get']>,
+) => {
+  ensureMeta(entityClass);
+  const currentCollection = (entityClass as Meta).__meta__.collectionName;
+  return (
+    store.collections[currentCollection as string]
+    || observable.map()
+  ).get(primaryKey as string);
+});
+
 
 /**
  * Joins two collections based on their applicable relationships.
@@ -80,30 +95,23 @@ export const find = action((
  * @param {*} childClass
  * @returns
  */
-// FIXME: This doesn't exactly work like I'd want it to
-export const join = action((store: ReturnType<typeof createStore>, entityClass: any, childClass: any, onClause?) => {
+export const join = action((store: ReturnType<typeof createStore>, entityClass: any, joinClass: any) => {
+  ensureMeta(entityClass);
+  ensureMeta(joinClass);
   const entityCollectionName = entityClass.__meta__.collectionName,
-    entities = Array.from(store.collections[entityCollectionName].values()),
-    entityRelationShips = entityClass.__meta__.relationships,
+    entityCollection = Array.from(store.collections[entityCollectionName].values()),
 
-    childCollectionName = childClass.__meta__.collectionName,
+    childCollectionName = joinClass.__meta__.collectionName,
     childCollection = store.collections[childCollectionName];
+    
 
-  return flatMap(entities, (entity) => {
-    const children = chain(entityRelationShips)
-      .values()
-      .filter((relationship) => relationship.type === childClass)
-      .flatMap((relationship) => relationship.keys)
-      .value();
-    const relationships = chain(entityRelationShips)
-      .values()
-      .filter((relationship) => console.log({relationship}) as any || relationship.type === childClass)
-      .flatMap((relationship) => console.log(relationship.keys) as any || relationship.keys)
-      .value();
+  return flatMap(entityCollection, ((entity) => {
+    const joinRelationships = Object.values(
+      (entity as Meta).__meta__.relationships
+    ).filter(({ type }) => type === joinClass);
 
-      return relationships.map(
-        (relationshipKey) => childCollection.get(relationshipKey)
-      );
-    })
-      // .map((child) => [entity, child]);
+    return flatMap(joinRelationships, (({ keys }) => {
+      return keys.map((key) => [entity, childCollection.get(key)]);
+    }));
+  }));
 });
