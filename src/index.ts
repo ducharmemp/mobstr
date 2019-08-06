@@ -1,5 +1,5 @@
 import {
-    createStore, add, remove, find,
+    createStore, addOne, removeOne, findAll, addAll, removeAll, findOne,
 } from './store';
 import { primaryKey, relationship } from './decorators';
 
@@ -12,8 +12,11 @@ export default function initialize() {
         store,
         primaryKey,
         relationship: relationship.bind(null, store),
-        find: find.bind(null, store),
-        add: add.bind(null, store),
-        remove: remove.bind(null, store),
+        findAll: findAll.bind(null, store),
+        findOne: findOne.bind(null, store),
+        addOne: addOne.bind(null, store),
+        addAll: addAll.bind(null, store),
+        removeOne: removeOne.bind(null, store),
+        removeAll: removeAll.bind(null, store),
     };
 }

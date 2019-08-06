@@ -1,5 +1,5 @@
 import { observable, remove, action } from 'mobx';
-import { createStore, add } from './store';
+import { createStore, addOne } from './store';
 import { Meta } from './meta';
 import { ensureMeta, ensureRelationship } from './utils';
 
@@ -105,7 +105,7 @@ export function relationship(
                                 currentRelationship.keys.push(
                                     change[change.__meta__.key.get()],
                                 );
-                                add(store, change);
+                                addOne(store, change);
                             }));
                             changes.removed.forEach((change) => {
                                 currentRelationship.keys.replace(
@@ -132,7 +132,7 @@ export function relationship(
                 const currentRelationship = (
                     (this as unknown as Meta).__meta__.relationships[propertyKey as string]
                 );
-                values.map(value => add(store, value));
+                values.map(value => addOne(store, value));
                 currentRelationship.keys = observable.array(values.map(
                     value => value[value.__meta__.key],
                 ));

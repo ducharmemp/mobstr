@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { v4 as uuid } from 'uuid';
 import { computed } from 'mobx';
 
-import { createStore, add, remove, join, find, findOne } from '@src/store';
+import { createStore, addOne, removeOne, join, findAll, findOne } from '@src/store';
 import { primaryKey, relationship } from '@src/decorators';
 
 describe('Integration', () => {
@@ -20,7 +20,7 @@ describe('Integration', () => {
       friends: Bar = [];
     }
 
-    add(store, new Foo());
+    addOne(store, new Foo());
   });
 
   it('should allow removal of a collection class', () => {
@@ -37,8 +37,8 @@ describe('Integration', () => {
     }
 
     const f = new Foo()
-    add(store, f);
-    remove(store, f);
+    addOne(store, f);
+    removeOne(store, f);
   });
 
   it('should allow join of a collection class to another collection class', () => {
@@ -63,10 +63,10 @@ describe('Integration', () => {
       b2 = new Bar(),
       b3 = new Bar();
 
-    add(store, f);
-    add(store, f2);
-    add(store, b);
-    add(store, b2);
+    addOne(store, f);
+    addOne(store, f2);
+    addOne(store, b);
+    addOne(store, b2);
     f.friends = [b, b3];
     f2.friends.push(b2);
     expect(join(store, Foo, Bar)).to.have.length(3);
@@ -90,8 +90,8 @@ describe('Integration', () => {
 
     const f = new Foo(),
       b = new Bar();
-    add(store, f);
-    add(store, b);
+    addOne(store, f);
+    addOne(store, b);
     f.friends = [b];
     expect(f.friends).to.have.length(1);
   });
@@ -114,10 +114,10 @@ describe('Integration', () => {
 
     const f = new Foo(),
       b = new Bar();
-    add(store, f);
-    expect(find(store, f)).to.have.length(1);
-    remove(store, f);
-    expect(find(store, f)).to.have.length(0);
+    addOne(store, f);
+    expect(findAll(store, f)).to.have.length(1);
+    removeOne(store, f);
+    expect(findAll(store, f)).to.have.length(0);
   });
 
   it('should allow the user to find a single item by key from a collection', () => {
@@ -129,7 +129,7 @@ describe('Integration', () => {
     }
 
     const f = new Foo();
-    add(store, f);
+    addOne(store, f);
     expect(findOne(store, Foo, f.id)).to.have.property('id', f.id);
   });
 
@@ -152,10 +152,10 @@ describe('Integration', () => {
     const f = new Foo(),
       b = new Bar();
 
-    add(store, f);
+    addOne(store, f);
     f.friends.push(b);
     expect(f.friends).to.have.lengthOf(1);
-    remove(store, b);
+    removeOne(store, b);
     expect(f.friends).to.have.lengthOf(0);
   });
 
@@ -178,11 +178,11 @@ describe('Integration', () => {
     const f = new Foo(),
       b = new Bar();
 
-    add(store, f);
+    addOne(store, f);
     f.friends.push(b);
     expect(f.friends).to.have.lengthOf(1);
-    remove(store, f);
-    expect(find(store, Bar)).to.have.lengthOf(1);
+    removeOne(store, f);
+    expect(findAll(store, Bar)).to.have.lengthOf(1);
   });
 
 
@@ -214,7 +214,7 @@ describe('Integration', () => {
       bar = new Bar(),
       baz = new Baz();
 
-    add(store, f);
+    addOne(store, f);
     f.friends.push(bar);
     f.enemies.push(baz);
     expect(f.friends).to.have.lengthOf(1);
@@ -242,8 +242,8 @@ describe('Integration', () => {
       f2 = new Foo(),
       b = new Bar();
 
-    add(store, f);
-    add(store, f2);
+    addOne(store, f);
+    addOne(store, f2);
     f.friends.push(b);
     expect(f.friends).to.have.lengthOf(1);
     expect(f2.friends).to.have.lengthOf(0);
@@ -272,8 +272,8 @@ describe('Integration', () => {
       f2 = new Foo(),
       b = new Bar();
 
-    add(store, f);
-    add(store, f2);
+    addOne(store, f);
+    addOne(store, f2);
     f.friends.push(b);
     expect(f.friends).to.have.lengthOf(1);
     f.friends.pop();
@@ -304,7 +304,7 @@ describe('Integration', () => {
     const f = new Foo(),
       b = new Bar();
 
-    add(store, f);
+    addOne(store, f);
     f.friends.push(b);
     expect(f.friendIds).to.have.lengthOf(1);
   });
