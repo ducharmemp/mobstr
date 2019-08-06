@@ -1,5 +1,5 @@
 {
-  "name": "mobxt",
+  "name": "mobstr",
   "version": "0.1.0",
   "description": "Object relational mapper for MobX stores",
   "main": "dist/index.js",
