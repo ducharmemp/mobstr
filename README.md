@@ -1,6 +1,6 @@
-# MobXT
+# MobStr
 
-MobXT is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual bookkeeping of object relationships.
+MobStr is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual bookkeeping of object relationships.
 
 While developing projects, I found myself maintaining more bookkeepping maps and objects than I enjoyed, and had to remember to invalidate certain relationships with objects to avoid having dangling references to objects within the maps. I also disliked the overall method that I had to use to find the related objects. Too often I find myself accidentally slipping in attributes that are meant to achieve faster performance for lookup to my store objects. This works for a time, but then my model becomes polluted with extra attributes that I need to keep in sync and the model deviates further from my actual intention.
 
@@ -9,7 +9,7 @@ With this project, I hope to separate the concerns of managing a centralized sto
 ## Why not mobx-state-tree instead of developing this solution?
 I wanted to tinker a bit with how far I could take this project while punting on features such as state snapshots and state rewinding. I haven't been in a debugging situation where it was helpful for me personally so MobX-state-tree has a bit too much complexity for my taste. All told, this project is about 100 lines of actual code (so far!), with most of the actual code lying in the decorators to set up meta attributes and maintain bookkeeping, so it should achieve a very similar result to mobx-state-tree while cutting down on the complexity.
 
-## What is this __meta__ attribute attatched to my objects?
+## What is this `__meta__` attribute attatched to my objects?
 MobXT needs to maintain records of primary keys names, collection names, and related objects *somewhere*, so shoving them into the added objects was a short-term solution to get up and running. Eventually I hope to separate these meta attributes from the actual models and store that information in the central store in order to avoid any confusion in console.log outputs or object inspection.
 
 ## Why decorators?
