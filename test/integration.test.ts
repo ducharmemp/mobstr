@@ -250,4 +250,32 @@ describe('Integration', () => {
     expect(f2.friends).to.have.lengthOf(1);
     expect(f.friends).to.have.lengthOf(1);
   });
+
+  it('should allow popping of entity from a relationship', () => {
+    const store = createStore();
+
+    class Bar {
+      @primaryKey
+      id: string = uuid();
+    }
+
+    class Foo {
+      @primaryKey
+      id: string = uuid();
+
+      @relationship(store, (type: any) => Bar)
+      friends: Bar[] = [];
+    }
+
+    const f = new Foo(),
+      f2 = new Foo(),
+      b = new Bar();
+
+    add(store, f);
+    add(store, f2);
+    f.friends.push(b);
+    expect(f.friends).to.have.lengthOf(1);
+    f.friends.pop();
+    expect(f.friends).to.have.lengthOf(0);
+  });
 })

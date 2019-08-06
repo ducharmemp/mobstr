@@ -1,6 +1,6 @@
-import 'reflect-metadata';
+import { pull } from 'lodash';
 
-import { observable, remove, action } from 'mobx';
+import { observable, remove, action, IObservableArray, computed } from 'mobx';
 import { createStore, add } from './store';
 import { Meta } from './meta';
 import { ensureMeta, ensureRelationship } from './utils';
@@ -103,7 +103,11 @@ export function relationship(
                 currentRelationship.keys.push(change[change.__meta__.key.get()])
                 add(store, change)
               }));
-              changes.removed.map(change => remove(store, change));
+              changes.removed.map(change => {
+                pull(currentRelationship.keys, change[change.__meta__.key.get()]);
+                // FIXME: This would be the proper place to track cascades
+                remove(store, change)
+              });
             } else {
               // TODO: ???? What to do with IArrayChange?
             }
