@@ -10,7 +10,7 @@ import { Meta } from './meta';
  */
 export function ensureMeta(target: any) {
   if (!target.hasOwnProperty('__meta__')) {
-    (target as Meta).__meta__ = observable({
+    (target as Meta).__meta__ = {
       collectionName: target.name || target.constructor.name,
       indexes: [],
       key: observable.box(null),
@@ -21,17 +21,17 @@ export function ensureMeta(target: any) {
         keys: string[];
         options: Record<string, any>;
       }>
-    }) as any;
+    } as any;
   }
 }
 
 export function ensureRelationship(target: any, propertyKey: string, type: any, options: any) {
   (target as unknown as Meta).__meta__.relationships[propertyKey] = (
     (target as unknown as Meta).__meta__.relationships[propertyKey]
-    || observable({
+    || {
       type: type(),
       keys: observable.array([]),
       options,
-    })
+    }
   );
 }

@@ -1,6 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from 'chai';
 import { v4 as uuid } from 'uuid';
+import { computed } from 'mobx';
 
 import { createStore, add, remove, join, find, findOne } from '@src/store';
 import { primaryKey, relationship } from '@src/decorators';
@@ -277,5 +278,34 @@ describe('Integration', () => {
     expect(f.friends).to.have.lengthOf(1);
     f.friends.pop();
     expect(f.friends).to.have.lengthOf(0);
+  });
+
+  it('should allow computed property values on models', () => {
+    const store = createStore();
+
+    class Bar {
+      @primaryKey
+      id: string = uuid();
+    }
+
+    class Foo {
+      @primaryKey
+      id: string = uuid();
+
+      @relationship(store, (type: any) => Bar)
+      friends: Bar[] = [];
+
+      @computed
+      get friendIds() {
+        return this.friends.map((friend) => friend.id);
+      }
+    }
+
+    const f = new Foo(),
+      b = new Bar();
+
+    add(store, f);
+    f.friends.push(b);
+    expect(f.friendIds).to.have.lengthOf(1);
   });
 })
