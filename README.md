@@ -132,6 +132,10 @@ async function getAllCompanies(companyIds) {
 // Top level await for illustrative purposes only
 addAll(await getAllCompanies([1, 2, 3, 4))
 findOne(Company, 1).employees.push(new Employee());
+
+...
+// Maybe we want to show a table of the company in one column with an employee in the other
+join(Company, Employees).map((company, employee) => [company.id, employee.id])
 ```
 
 ## Running the tests
