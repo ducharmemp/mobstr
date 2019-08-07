@@ -86,8 +86,9 @@ import createStore from 'mobstr';
 const {
     relationship,
     primaryKey,
-    find,
-    remove
+    addAll,
+    findOne,
+    removeOne,
 } = createStore();
 
 class Employee {
@@ -127,6 +128,10 @@ async function getAllCompanies(companyIds) {
     
     return companyData.map(company => Object.assign(new Company(), company));
 }
+
+// Top level await for illustrative purposes only
+addAll(await getAllCompanies([1, 2, 3, 4))
+findOne(Company, 1).employees.push(new Employee());
 ```
 
 ## Running the tests
