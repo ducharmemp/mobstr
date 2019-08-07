@@ -122,6 +122,7 @@ describe("#integration", () => {
     const f = new Foo();
     const b = new Bar();
     addOne(store, f);
+    // This works because we have meta attributes on all classes. Having one instance means you can get *all* instances
     expect(findAll(store, f)).to.have.length(1);
     removeOne(store, f);
     expect(findAll(store, f)).to.have.length(0);
