@@ -97,7 +97,7 @@ At this time, no. There are plenty of ORMs for REST interfaces and GrahQL interf
   <summary><b>Can I store arbitrary objects without a prototype in the store without defining a model?</b></summary>
 Not exactly, at least not yet. I hope to make that a 1.0 feature. However, the likelihood of allowing similar definitions of `relationship` and `primaryKey` is uncertain at this time, due to the need for type names for storage purposes. It's entirely possible that this library could also offer a `collection` wrapper that would allow similar semantics for plain old objects.
  
-At this time, the recommended way to use POJOs in this library similar to this example code:
+At this time, the recommended way to use POJOs in this library is similar to this example code:
 
 ```js
 class Foo {
