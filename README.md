@@ -92,6 +92,7 @@ const {
 
 class Employee {
     @primaryKey
+    id = uuid()
 }
 
 class Company {
