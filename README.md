@@ -56,7 +56,7 @@ At this time, the recommended way to use POJOs in this library similar to this e
 ```js
 class Foo {
     @primaryKey
-    id: string = uuid();
+    id = uuid();
     
     @observable
     someProperty = []
@@ -75,6 +75,58 @@ function apiCallResult(returnValue) {
 ```
 
 </details>
+
+## Examples
+You can find some comprehensive toy examples in tests/integration.test.ts. Below is an example of real-world(ish) example using a fetch to get a company name and the a list of employees from that company.
+
+```js
+import { observable, computed } from 'mobx';
+import createStore from 'mobstr';
+
+const {
+    relationship,
+    primaryKey,
+    find,
+    remove
+} = createStore();
+
+class Employee {
+    @primaryKey
+}
+
+class Company {
+    @primaryKey
+    id = uuid()
+    
+    name;
+    
+    @observable
+    affiliates = []
+    
+    @relationship(type => Employee)
+    employees = [];
+    
+    @computed
+    get employeeIds() { return this.employees.map(employee => employee.id); }
+}
+
+async function getAllCompanies(companyIds) {
+    const companyData = await Promise.all(
+      companyIds.map(companyId => fetch(`/url/for/company/${companyId}`)
+    );
+    companyData.forEach(company => {
+      // Get all of the employee objects from the DB
+      const employees = await Promise.all(
+        company.employees.map(employee => fetch(`/url/for/company/employee/${employee}`))
+      );
+      
+      // Note that this would overwrite any existing employees with the same ID in the data store, so make sure your IDs are unique!
+      company.employees = employees.map(employee => Object.assign(new Employee(), employee))      
+    });
+    
+    return companyData.map(company => Object.assign(new Company(), company));
+}
+```
 
 ## Running the tests
 
