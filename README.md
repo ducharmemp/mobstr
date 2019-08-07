@@ -8,8 +8,10 @@ With this project, I hope to separate the concerns of managing a centralized sto
 
 ## Technical Details
 <details>
-  <summary><b>Why not mobx-state-tree instead of developing this solution?</b></summary>
-I wanted to tinker a bit with how far I could take this project while punting on features such as state snapshots and state rewinding. I haven't been in a debugging situation where it was helpful for me personally so MobX-state-tree has a bit too much complexity for my taste. All told, this project is about 200 lines of actual code (so far!), with most of the actual code lying in the decorators to set up meta attributes and maintain book-keeping, so it should achieve a very similar result to mobx-state-tree while cutting down on the complexity. LOC isn't a great metric for complexity or scope but it's what I have on hand.
+  <summary><b>Why not mobx-state-tree or other existing libraries instead of developing this solution?</b></summary>
+I wanted to tinker a bit with how far I could take this project while punting on features such as state snapshots and state rewinding. I haven't been in a debugging situation where it was helpful for me personally, so MobX-state-tree and others have a bit too much complexity for my taste.
+  
+All told, this project is about 200 lines of actual code (so far!), with most of the actual code lying in the decorators to set up meta attributes and maintain book-keeping, so it should achieve a very similar result to mobx-state-tree while cutting down on the complexity. LOC isn't a great metric for complexity or scope but it's what I have on hand.  
 </details>
 
 <details>
