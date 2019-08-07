@@ -1,7 +1,7 @@
-import { observable, remove, action, extendObservable } from 'mobx';
-import { createStore, addOne } from './store';
-import { Meta } from './meta';
-import { ensureMeta, ensureRelationship } from './utils';
+import { observable, remove, action, extendObservable } from "mobx";
+import { createStore, addOne } from "./store";
+import { Meta } from "./meta";
+import { ensureMeta, ensureRelationship } from "./utils";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -23,9 +23,9 @@ import { ensureMeta, ensureRelationship } from './utils';
  * @param {PropertyDescriptor} [descriptor]
  */
 export function primaryKey(target: any, propertyKey: string | symbol) {
-    ensureMeta(target);
-    target.__meta__.indicies.push(propertyKey);
-    target.__meta__.key.set(propertyKey);
+  ensureMeta(target);
+  target.__meta__.indicies.push(propertyKey);
+  target.__meta__.key.set(propertyKey);
 }
 
 /**
@@ -38,8 +38,8 @@ export function primaryKey(target: any, propertyKey: string | symbol) {
  * @param {PropertyDescriptor} [descriptor]
  */
 export function indexed(target: any, propertyKey: string | symbol) {
-    ensureMeta(target);
-    (target as Meta).__meta__.indicies.push(propertyKey);
+  ensureMeta(target);
+  (target as Meta).__meta__.indicies.push(propertyKey);
 }
 
 /**
@@ -70,73 +70,71 @@ export function indexed(target: any, propertyKey: string | symbol) {
  * @returns
  */
 export function relationship(
-    store: ReturnType<typeof createStore>,
-    type: any,
-    options = {},
+  store: ReturnType<typeof createStore>,
+  type: any,
+  options = {}
 ) {
-    return function (target: any, propertyKey: string | symbol): any {
-        ensureMeta(target);
-        ensureMeta(type());
-        ensureRelationship(target, propertyKey as string, type, options);
+  return function(target: any, propertyKey: string | symbol): any {
+    ensureMeta(target);
+    ensureMeta(type());
+    ensureRelationship(target, propertyKey as string, type, options);
 
-        return observable({
-            get(): ReturnType<typeof type>[] {
-                ensureMeta(this);
-                ensureRelationship(this, propertyKey as string, type, options);
+    return observable({
+      get(): ReturnType<typeof type>[] {
+        ensureMeta(this);
+        ensureRelationship(this, propertyKey as string, type, options);
 
-                const currentRelationship = (
-                    (this as unknown as Meta).__meta__.relationships[propertyKey as string]
+        const currentRelationship = ((this as unknown) as Meta).__meta__
+          .relationships[propertyKey as string];
+        const propertyCollectionName = (currentRelationship.type as Meta)
+          .__meta__.collectionName;
+        const propertyCollection =
+          store.collections[propertyCollectionName as string];
+
+        const returnRelationship = observable(
+          currentRelationship.keys
+            .map(currentPrimaryKey => propertyCollection.get(currentPrimaryKey))
+            .filter(value => !!value)
+        );
+
+        returnRelationship.observe(changes => {
+          if (changes.type === "splice") {
+            changes.added.map(
+              action((change: any) => {
+                currentRelationship.keys.push(
+                  change[change.__meta__.key.get()]
                 );
-                const propertyCollectionName = (
-                    (currentRelationship.type as Meta).__meta__.collectionName
-                );
-                const propertyCollection = store.collections[propertyCollectionName as string];
-
-                const returnRelationship = observable(
-                    currentRelationship.keys.map(
-                        currentPrimaryKey => propertyCollection.get(currentPrimaryKey),
-                    ).filter(value => !!value),
-                );
-
-                returnRelationship.observe(
-                    (changes) => {
-                        if (changes.type === 'splice') {
-                            changes.added.map(action((change: any) => {
-                                currentRelationship.keys.push(
-                                    change[change.__meta__.key.get()],
-                                );
-                                addOne(store, change);
-                            }));
-                            changes.removed.forEach((change) => {
-                                currentRelationship.keys.replace(
-                                    currentRelationship.keys.filter(
-                                        key => key !== change[change.__meta__.key.get()],
-                                    ),
-                                );
-                                // FIXME: This would be the proper place to track cascades
-                                remove(store, change);
-                            });
-                        } else {
-                            // TODO: ???? What to do with IArrayChange?
-                        }
-                    },
-                );
-
-                return returnRelationship;
-            },
-
-            set(values: any[]) {
-                ensureMeta(this);
-                ensureRelationship(this, propertyKey as string, type, options);
-
-                const currentRelationship = (
-                    (this as unknown as Meta).__meta__.relationships[propertyKey as string]
-                );
-                values.map(value => addOne(store, value));
-                currentRelationship.keys = observable.array(values.map(
-                    value => value[value.__meta__.key],
-                ));
-            },
+                addOne(store, change);
+              })
+            );
+            changes.removed.forEach(change => {
+              currentRelationship.keys.replace(
+                currentRelationship.keys.filter(
+                  key => key !== change[change.__meta__.key.get()]
+                )
+              );
+              // FIXME: This would be the proper place to track cascades
+              remove(store, change);
+            });
+          } else {
+            // TODO: ???? What to do with IArrayChange?
+          }
         });
-    };
+
+        return returnRelationship;
+      },
+
+      set(values: any[]) {
+        ensureMeta(this);
+        ensureRelationship(this, propertyKey as string, type, options);
+
+        const currentRelationship = ((this as unknown) as Meta).__meta__
+          .relationships[propertyKey as string];
+        values.map(value => addOne(store, value));
+        currentRelationship.keys = observable.array(
+          values.map(value => value[value.__meta__.key])
+        );
+      }
+    });
+  };
 }

@@ -4,7 +4,6 @@ import sinon from "sinon";
 
 import { indexed, primaryKey, relationship } from "../../src/decorators";
 import { Meta } from "@src/meta";
-import { createStore } from "@src/store";
 
 describe("#decorators", (): void => {
   describe("#indexed", (): void => {
@@ -23,8 +22,8 @@ describe("#decorators", (): void => {
     });
   });
 
-  describe('#primaryKey', (): void => {
-    it('should set an attribute to the __meta__.key', (): void => {
+  describe("#primaryKey", (): void => {
+    it("should set an attribute to the __meta__.key", (): void => {
       class Foo {
         @primaryKey
         attrib: number = 0;
@@ -32,12 +31,12 @@ describe("#decorators", (): void => {
 
       const f = new Foo();
 
-      expect((f as unknown as Meta).__meta__.key.get()).to.equal('attrib');
+      expect(((f as unknown) as Meta).__meta__.key.get()).to.equal("attrib");
     });
   });
 
-  describe('#relationship', (): void => {
-    it('should set a relationship to the __meta__.key', (): void => {
+  describe("#relationship", (): void => {
+    it("should set a relationship to the __meta__.key", (): void => {
       class Bar {
         @primaryKey
         id: number = 0;
@@ -53,7 +52,10 @@ describe("#decorators", (): void => {
 
       const f = new Foo();
 
-      expect((f as unknown as Meta).__meta__.relationships).to.have.property('friends').that.has.property('type').that.is.eql(Bar);
+      expect(((f as unknown) as Meta).__meta__.relationships)
+        .to.have.property("friends")
+        .that.has.property("type")
+        .that.is.eql(Bar);
     });
   });
 });
