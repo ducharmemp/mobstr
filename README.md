@@ -50,6 +50,30 @@ At this time, no. There are plenty of ORMs for REST interfaces and GrahQL interf
 <details>
   <summary><b>Can I store arbitrary objects without a prototype in the store without defining a model?</b></summary>
 Not exactly, at least not yet. I hope to make that a 1.0 feature. However, the likelihood of allowing similar definitions of `relationship` and `primaryKey` is uncertain at this time, due to the need for type names for storage purposes. It's entirely possible that this library could also offer a `collection` wrapper that would allow similar semantics for plain old objects.
+ 
+At this time, the recommended way to use POJOs in this library similar to this example code:
+
+```js
+class Foo {
+    @primaryKey
+    id: string = uuid();
+    
+    @observable
+    someProperty = []
+}
+
+// returnValue = { status: 200, data: {id: '1234', someProperty: [1, 2, 3, 4] }}
+function apiCallResult(returnValue) {
+    // Validate
+    ...
+    // Dump the result into a new instance of the model
+    const f = Object.assign(new Foo(), returnValue.data);
+    add(f);
+    return f;
+}
+
+```
+
 </details>
 
 ## Running the tests
