@@ -6,9 +6,23 @@
   "files": [
     "/dist"
   ],
+  "nyc": {
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**"
+    ],
+    "reporter": [
+      "html",
+      "text"
+    ],
+    "all": true
+  },
   "scripts": {
-    "test": "mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
-    "test:watch": "mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts --watch",
+    "test": "nyc mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
+    "test:watch": "nyc mocha -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts --watch",
     "start": "tsc --watch"
   },
   "author": "",
@@ -17,14 +31,13 @@
     "lodash": "^4.17.15",
     "mobx": "^5.13.0",
     "mobx-react": "^6.1.1",
-    "reflect-metadata": "^0.1.13",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/lodash": "^4.14.136",
     "@types/mocha": "^5.2.7",
-    "@types/reflect-metadata": "^0.1.0",
+    "@types/sinon": "^7.0.13",
     "@types/uuid": "^3.4.5",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
@@ -35,6 +48,10 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
     "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "prettier": "^1.18.2",
+    "sinon": "^7.4.1",
+    "source-map-support": "^0.5.13",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
     "typescript": "^3.5.3"

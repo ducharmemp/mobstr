@@ -1,4 +1,4 @@
-import { observable, remove, action } from 'mobx';
+import { observable, remove, action, extendObservable } from 'mobx';
 import { createStore, addOne } from './store';
 import { Meta } from './meta';
 import { ensureMeta, ensureRelationship } from './utils';
@@ -24,7 +24,7 @@ import { ensureMeta, ensureRelationship } from './utils';
  */
 export function primaryKey(target: any, propertyKey: string | symbol) {
     ensureMeta(target);
-    target.__meta__.indexes.push(propertyKey);
+    target.__meta__.indicies.push(propertyKey);
     target.__meta__.key.set(propertyKey);
 }
 
@@ -39,7 +39,7 @@ export function primaryKey(target: any, propertyKey: string | symbol) {
  */
 export function indexed(target: any, propertyKey: string | symbol) {
     ensureMeta(target);
-    target.__meta__.indexes.push(propertyKey);
+    (target as Meta).__meta__.indicies.push(propertyKey);
 }
 
 /**

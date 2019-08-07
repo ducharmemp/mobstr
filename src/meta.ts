@@ -2,7 +2,6 @@ import { IObservableValue, IObservableArray } from 'mobx';
 
 export interface Meta {
     __meta__: {
-        name: string;
         key: IObservableValue<string | symbol | number | null>;
 
         collectionName: string | symbol | number;
@@ -11,6 +10,6 @@ export interface Meta {
             keys: IObservableArray<string>;
             options: Record<string, any>;
         }>;
-        indexes: (string | symbol | number)[];
+        indicies: IObservableArray<string | symbol | number>;
     };
 }

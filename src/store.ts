@@ -13,7 +13,7 @@ import { ensureMeta } from './utils';
 export const createStore = action(() => observable({
     collections: {} as Record<string | symbol | number, Map<string | symbol | number, any>>,
     primaryKeys: new Map(),
-    indexes: new Map(),
+    indicies: new Map(),
 }));
 
 /**

@@ -11,7 +11,7 @@ export function ensureMeta(target: any) {
     if (!Object.prototype.hasOwnProperty.call(target, '__meta__')) {
         (target as Meta).__meta__ = {
             collectionName: target.name || target.constructor.name,
-            indexes: [],
+            indicies: observable.array([]),
             key: observable.box(null),
             // Spread the values already present in the prototype, we want to maintain the constructor name
             ...target.__meta__ || {},
@@ -20,11 +20,11 @@ export function ensureMeta(target: any) {
                 keys: string[];
                 options: Record<string, any>;
             }>,
-        } as any;
+        } as Meta['__meta__'];
     }
 }
 
-export function ensureRelationship(target: any, propertyKey: string, type: any, options: any) {
+export function ensureRelationship(target: any, propertyKey: string, type: () => any, options: any) {
     (target as unknown as Meta).__meta__.relationships[propertyKey] = (
         (target as unknown as Meta).__meta__.relationships[propertyKey]
     || {
