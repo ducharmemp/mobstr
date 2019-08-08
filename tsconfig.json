@@ -69,7 +69,6 @@
   },
   "include": [
     "src/**/*",
-    "test/**/*"
   ],
   "exclude": [
     ".git",

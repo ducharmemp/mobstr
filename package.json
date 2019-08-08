@@ -1,8 +1,12 @@
 {
-  "name": "mobstr",
+  "name": "@ducharmemp/mobstr",
   "version": "0.1.0",
   "description": "Object relational mapper for MobX stores",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ducharmemp/mobstr.git"
+  },
   "files": [
     "/dist"
   ],
@@ -23,9 +27,12 @@
   "scripts": {
     "test": "nyc mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
     "test:watch": "nyc mocha -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts --watch",
-    "start": "tsc --watch"
+    "start": "npm run build -- --watch",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "prepublish": "npm run clean && npm run build"
   },
-  "author": "",
+  "author": "Matthew P DuCharme",
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "lodash": "^4.17.15",
