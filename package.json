@@ -30,8 +30,8 @@
     "instrument": true
   },
   "scripts": {
-    "test": "nyc mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
-    "test:watch": "nyc mocha -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts --watch",
+    "test": "nyc mocha -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts",
+    "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
     "build": "tsc",
     "clean": "rm -rf dist",
