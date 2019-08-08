@@ -30,7 +30,7 @@
     "instrument": true
   },
   "scripts": {
-    "test": "nyc mocha -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts",
+    "test": "nyc mocha --recursive --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=coverage/mocha/test-results.xml -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
     "build": "tsc",
@@ -41,9 +41,7 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "lodash": "^4.17.15",
-    "mobx": "^5.13.0",
-    "mobx-react": "^6.1.1",
-    "uuid": "^3.3.2"
+    "mobx": "^5.13.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -60,12 +58,14 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
     "mocha": "^6.2.0",
+    "mocha-junit-reporter": "^1.23.1",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
     "sinon": "^7.4.1",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "uuid": "^3.3.2"
   }
 }

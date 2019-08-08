@@ -3,3 +3,5 @@ dist
 .vscode
 coverage
 .nyc_output
+reports
+coverage
