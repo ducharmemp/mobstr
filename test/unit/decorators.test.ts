@@ -57,5 +57,28 @@ describe("#decorators", (): void => {
         .that.has.property("type")
         .that.is.eql(Bar);
     });
+
+    it('should allow an options parameter to be passed into the relationship', (): void => {
+      class Bar {
+        @primaryKey
+        id: number = 0;
+      }
+
+      class Foo {
+        @primaryKey
+        attrib: number = 0;
+
+        // TODO: Fill out options with cascade options
+        @relationship(sinon.fake() as any, () => Bar, {})
+        friends: Bar[] = [];
+      }
+
+      const f = new Foo();
+
+      expect(((f as unknown) as Meta).__meta__.relationships)
+        .to.have.property("friends")
+        .that.has.property("options")
+        .that.is.empty;
+    });
   });
 });

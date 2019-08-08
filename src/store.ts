@@ -46,7 +46,7 @@ export const addOne = action(
  */
 export const addAll = action(
   <T>(store: ReturnType<typeof createStore>, entities: T[]) => {
-    entities.forEach(addOne.bind(null, store));
+    entities.forEach((entity) => addOne(store, entity));
   }
 );
 
