@@ -57,7 +57,7 @@ With this project, I hope to separate the concerns of managing a centralized sto
 * Simple and direct query API to find/delete entries from the data store
 * Declarative API for describing object models in a manner similar to other data stores
 * Relationship cascades and auto-cleanup for removed objects
-* Separation of concerns for managing object models and API queries (no sagas/thunks)
+* Separation of concerns for managing object models and RESTful/GraphQL API queries (no sagas/thunks)
 * Update objects directly without the need for complex copy operations
 
 ## Technical Details
