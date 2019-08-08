@@ -1,5 +1,5 @@
 # MobStr
-[![CircleCI](https://circleci.com/gh/ducharmemp/mobstr.svg?style=svg)](https://circleci.com/gh/ducharmemp/mobstr) [![CodeCov](https://codecov.io/gh/ducharmemp/mobstr/branch/master/graph/badge.svg)](https://codecov.io/gh/ducharmemp/mobstr) ![NPM](https://img.shields.io/npm/v/@ducharmemp/mobstr)
+[![CircleCI](https://circleci.com/gh/ducharmemp/mobstr.svg?style=svg)](https://circleci.com/gh/ducharmemp/mobstr) [![CodeCov](https://codecov.io/gh/ducharmemp/mobstr/branch/master/graph/badge.svg)](https://codecov.io/gh/ducharmemp/mobstr) [![npm version](https://img.shields.io/npm/v/@ducharmemp/mobstr)](https://www.npmjs.com/package/@ducharmemp/mobstr "View this project on npm")
 
 MobStr is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual book-keeping of object relationships.
 
