@@ -22,7 +22,12 @@
       "html",
       "text"
     ],
-    "all": true
+    "require": [
+      "ts-node/register"
+    ],
+    "all": true,
+    "sourcemap": true,
+    "instrument": true
   },
   "scripts": {
     "test": "nyc mocha -r ts-node/register -r tsconfig-paths/register test/**/*.test.ts",
