@@ -13,9 +13,12 @@ MobStr is a project designed to provide an ORM-like interface to a MobX store. T
 ## Technical Details
 <details>
   <summary><b>Rationale</b></summary>
-While developing projects, I found myself maintaining more maps and objects for relationship maintenance than I enjoyed, and had to remember to invalidate those relationships with objects to avoid having dangling references to deleted objects. I also disliked the overall method that I had to use to find the related objects. Too often I find myself accidentally slipping in attributes that are meant to achieve faster performance for lookup to my store objects, such as maps or objects. This works for a time, but then my model becomes polluted with extra attributes that I need to keep in sync and the model deviates further from my actual intention. Additionally, it's actually fairly easy to make certain guarantees that MobX provides invalid by complete accident, especially when copying string keys from observable objects into another observable. The answer is to leverage `computed` or `autorun` or other reaction-based functions, but this library *should* abstract over those to the point where the user doesn't need to necessarily worry about committing error-prone code in these specialized cases.
+  While developing projects, I found myself maintaining more maps and objects for relationship maintenance than I enjoyed, and had to remember to invalidate those relationships with objects to avoid having dangling references to deleted objects. I also disliked the overall method that I had to use to find the related objects. Too often I find myself accidentally slipping in attributes that are meant to achieve faster performance for lookup to my store objects, such as maps or objects. This works for a time, but then my model becomes polluted with extra attributes that I need to keep in sync and the model deviates further from my actual intention.<br><br>
 
-There do exist other solutions in the MobX examples and they are perfectly valid, but they require passing around parent contexts and there isn't an out of the box solution for saying "I have all of these models that I know are related to parents, but I just want these without looping through all of the parents". The code to implement the following example:
+  Additionally, it's actually fairly easy to make certain guarantees that MobX provides invalid by complete accident, especially when copying string keys from observable objects into another observable. The answer is to leverage `computed` or `autorun` or other reaction-based functions, but this library *should* abstract over those to the point where the user doesn't need to necessarily worry about committing error-prone code in these specialized cases.<br><br>
+
+
+  There do exist other solutions in the MobX examples and they are perfectly valid, but they require passing around parent contexts and there isn't an out of the box solution for saying "I have all of these models that I know are related to parents, but I just want these without looping through all of the parents". Consider this example store code loosely lifted from the MobX documentation:
 
 ```js
 class ToDo {
@@ -60,7 +63,7 @@ class Parent {
     }
 }
 ```
-The overall approach is still the same (flatMap with a greater depth to get all Steps from all ToDos), but it would be nice to simply query for all of the steps that currently exist, or all ofthe ToDos that currently exist without having to traverse the parent contexts.
+The overall approach is still the same (flatMap with a greater depth to get all Steps from all ToDos), but it would be nice to simply query for all of the steps that currently exist in isolation, or all ofthe ToDos that currently exist without having to traverse the parent contexts.
 
 
 With this project, I hope to separate the concerns of managing a centralized store with an accessible syntax for describing model relationships and model structure. Eventually I also hope to integrate nice-to-have features, such as index only lookups, complex primary key structures, and relationship cascade options.
