@@ -23,7 +23,7 @@ class Parent {
 }
 ```
 
-Requires only a simple flatmap to achieve, but more complicated relationships would easily become more cumbersome. For example, take the following code snippet:
+Requires only a simple flatmap to achieve the desired output of a list of all ToDos, but more complicated relationships would easily become more cumbersome. For example, take the following code snippet:
 
 ```js
 class Step {}
@@ -48,10 +48,17 @@ class Parent {
     }
 }
 ```
-The overall approach is still the same (flatMap with a greater depth), but it would be nice to simply query for all of the steps that currently exist, or all ofthe ToDos that currently exist without having to traverse the parent contexts.
+The overall approach is still the same (flatMap with a greater depth to get all Steps from all ToDos), but it would be nice to simply query for all of the steps that currently exist, or all ofthe ToDos that currently exist without having to traverse the parent contexts.
 
 
-With this project, I hope to separate the concerns of managing a centralized store with an accessible syntax for describing model relationships and model structure. Eventually I also hope to integrate nice-to-have features, such as index only lookups, complex primary key structures, and relationship cascades.
+With this project, I hope to separate the concerns of managing a centralized store with an accessible syntax for describing model relationships and model structure. Eventually I also hope to integrate nice-to-have features, such as index only lookups, complex primary key structures, and relationship cascade options.
+
+## Benefits
+* Simple and direct query API to find/delete entries from the data store
+* Declarative API for describing object models in a manner similar to other data stores
+* Relationship cascades and auto-cleanup for removed objects
+* Separation of concerns for managing object models and API queries (no sagas/thunks)
+* Update objects directly without the need for complex copy operations
 
 ## Technical Details
 <details>
