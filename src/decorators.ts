@@ -115,7 +115,7 @@ export function relationship(
                   key => key !== change[change.__meta__.key.get()]
                 )
               );
-              // FIXME: This would be the proper place to track cascades
+              // FIXME: This would be the proper place to track cascades on the relationship.
               remove(store, change);
             });
           } else {

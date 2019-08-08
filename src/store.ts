@@ -70,6 +70,7 @@ export const removeOne = action(
 
     const currentCollection = ((entity as unknown) as Meta).__meta__
       .collectionName;
+    // TODO: Delete all object references if we're deleting something that has a cascade
     (store.collections[currentCollection as string] || observable.map()).delete(
       // TODO: Properly type this, we need to check this beforehand to make sure that we can handle composite keys
       (entity[primaryKey] as unknown) as string | number | symbol
