@@ -11,6 +11,8 @@ import { primaryKey, relationship } from "./decorators";
 
 /**
  * Intializes a store and provides helper methods bound to that store for convenience.
+ * Note: calling this function multiple times will have no side effects, multiple stores will
+ * be returned for use by the user.
  */
 export default function initialize() {
   const store = createStore();

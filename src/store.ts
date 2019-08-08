@@ -5,7 +5,8 @@ import { Meta } from "./meta";
 import { ensureMeta } from "./utils";
 
 /**
- *
+ * Creates a store for use with decorators and other helper functions. Meant to be used as a singleton,
+ * but can also be used to create multiple distinct storage areas.
  *
  * @export
  * @returns
@@ -22,7 +23,8 @@ export const createStore = action(() =>
 );
 
 /**
- *
+ * Adds a single entity to a collection in the store. If a collection does not exist in the
+ * store object, it will be created.
  *
  * @param store
  * @param entity
@@ -55,7 +57,9 @@ export const addAll = action(
 );
 
 /**
- *
+ * Removes the given entity from the store. This function will cause an auto-cascade on all relationships
+ * referencing this object. 
+ * 
  * @param store
  * @param entity
  */
@@ -74,7 +78,9 @@ export const removeOne = action(
 );
 
 /**
- *
+ * Removes all given entities from the store in bulk. Entities can be homogenous in type
+ * or multiple types.
+ * 
  * @param store
  * @param entities
  */
@@ -84,6 +90,25 @@ export const removeAll = action(
   }
 );
 
+/**
+ * Finds a single entry in the store by a given primaryKey. This can be useful in
+ * situations where you know the primary key but don't wish to keep an object reference around,
+ * such as in callback functions or factory functions.
+ *
+ * @example
+ * class Foo {
+ *  @primaryKey
+ *  id = uuid();
+ * }
+ * 
+ * const foo = new Foo();
+ * addOne(foo);
+ * findOne(Foo, foo.id);
+ * 
+ * @param store
+ * @param entityClass
+ * @param primaryKey
+ */
 export const findOne = action(
   <T>(
     store: ReturnType<typeof createStore>,
@@ -100,7 +125,18 @@ export const findOne = action(
 );
 
 /**
- *  Finds all entieis in the store by a given findClause
+ * Finds all entities in the store by a given findClause that acts as a filter. Default
+ * filter is the identity function, which ensures that all entities will be returned.  
+ * 
+ * @example
+ * class Foo {
+ *  @primaryKey
+ *  id = uuid();
+ * }
+ * 
+ * const foos = [new Foo(), new Foo(), new Foo()];
+ * addAll(foos);
+ * findAll(Foo) === foos;
  *
  * @param store
  * @param entityClass
@@ -125,6 +161,28 @@ export const findAll = action(
 
 /**
  * Joins two collections based on their applicable relationships.
+ * Currently only works for left joins based on the parent entity.
+ * 
+ * @example
+ * class Bar {
+ *   @primaryKey
+ *   id = uuid();
+ * }
+ * 
+ * class Foo {
+ *   @primaryKey
+ *   id = uuid();
+ * 
+ *   @relationship(type => Bar)
+ *   friends = []
+ * }
+ * 
+ * const f = new Foo();
+ * f.push(new Bar(), new Bar(), new Bar());
+ * // Works:
+ * join(Foo, Bar);
+ * // Doesn't work
+ * join(Bar, Foo);
  *
  * @export
  * @param {ReturnType<typeof createStore>} store

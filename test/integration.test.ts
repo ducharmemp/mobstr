@@ -76,7 +76,11 @@ describe("#integration", () => {
     addOne(store, b2);
     f.friends = [b, b3];
     f2.friends.push(b2);
-    expect(join(store, Foo, Bar)).to.have.length(3);
+    const joined = join(store, Foo, Bar);
+    expect(joined).to.have.length(3);
+    expect(joined[0]).to.eql([f, b]);
+    expect(joined[1]).to.eql([f, b3]);
+    expect(joined[2]).to.eql([f2, b2]);
   });
 
   it("should allow a collection class to access a relationship", () => {

@@ -97,6 +97,8 @@ export function relationship(
             .filter(value => !!value)
         );
 
+        // Set up the observation function to watch and see if the user modifies the list after we grant
+        // the borrow
         returnRelationship.observe(changes => {
           if (changes.type === "splice") {
             changes.added.map(
