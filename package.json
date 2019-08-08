@@ -23,19 +23,20 @@
       "text"
     ],
     "require": [
-      "ts-node/register"
+      "ts-node/register",
+      "tsconfig-paths/register",
+      "source-map-support/register"
     ],
-    "all": true,
     "sourcemap": true,
     "instrument": true
   },
   "scripts": {
-    "test": "nyc mocha --recursive --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts",
+    "test": "nyc mocha --timeout=10000 --exit --full-trace --bail --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublish": "npm run clean && npm run build"
+    "prepublishOnly": "npm run clean && npm run build && git tag -a "
   },
   "author": "Matthew P DuCharme",
   "license": "SEE LICENSE IN LICENSE.md",
