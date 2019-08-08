@@ -58,7 +58,7 @@ describe("#decorators", (): void => {
         .that.is.eql(Bar);
     });
 
-    it('should allow an options parameter to be passed into the relationship', (): void => {
+    it("should allow an options parameter to be passed into the relationship", (): void => {
       class Bar {
         @primaryKey
         id: number = 0;
@@ -77,8 +77,7 @@ describe("#decorators", (): void => {
 
       expect(((f as unknown) as Meta).__meta__.relationships)
         .to.have.property("friends")
-        .that.has.property("options")
-        .that.is.empty;
+        .that.has.property("options").that.is.empty;
     });
   });
 });

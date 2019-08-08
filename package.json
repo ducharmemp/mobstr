@@ -1,6 +1,6 @@
 {
   "name": "@ducharmemp/mobstr",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "Object relational mapper for MobX stores",
   "main": "dist/index.js",
   "repository": {
@@ -38,7 +38,8 @@
     "start": "npm run build -- --watch",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build && git tag -a "
+    "prepublishOnly": "npm run clean && npm run build && npm version patch",
+    "postpublish": "git push --tags && git push origin master"
   },
   "author": "Matthew P DuCharme",
   "license": "SEE LICENSE IN LICENSE.md",
