@@ -101,6 +101,26 @@ __meta__: {
 <details>
   <summary><b>Why decorators?</b></summary>
 I previously developed back-end applications in python, so you could say that Flask/SQLAlchemy inspired the initial implementation. Relationship definitions were also inspired by the fantastic TypeORM library. I find that decorators provide a nice semantic over the meaning of the invocation, while staying relatively out of the way for type definitions. This means that in TypeScript, we can "properly" type our model attrbutes to match the mental model of the developer. This does come with some footguns that are unfortunate, which I will call out specifically at a later date.
+  
+  Example of "proper" typing of class attributes:
+  
+```ts
+class Bar {
+    @primaryKey
+    id: string = uuid();
+}
+
+class Foo {
+    @primaryKey
+    id: string = uuid();
+    
+    @relationship(type => Bar)
+    friends: Bar[] = [];
+}
+
+const f = new Foo();
+f.friends[0].id // This properly gives us type hints because we've typed it as a Bar[]. We could have also typed it as an IObservableArray
+```
 </details>
 
 <details>
