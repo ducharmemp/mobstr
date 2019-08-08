@@ -315,4 +315,32 @@ describe("#integration", () => {
     f.friends.push(b);
     expect(f.friendIds).to.have.lengthOf(1);
   });
+
+  it("should allow objects to be assigned to the model instances", () => {
+    const store = createStore();
+
+    class Bar {
+      @primaryKey
+      id: string = uuid();
+    }
+
+    class Foo {
+      @primaryKey
+      id: string = uuid();
+
+      @relationship(store, (type: any) => Bar)
+      friends: Bar[] = [];
+
+      @computed
+      get friendIds() {
+        return this.friends.map(friend => friend.id);
+      }
+    }
+
+    const b = new Bar();
+    const f = Object.assign(new Foo(), { id: '123', friends: [ b ] });
+    expect(f).to.have.property('id', '123');
+    expect(f).to.have.property('friends').that.has.lengthOf(1).and.includes(b);
+    expect(store).to.have.property('collections').that.has.property('Bar').that.has.lengthOf(1);
+  });
 });
