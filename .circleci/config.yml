@@ -31,11 +31,11 @@ jobs:
 
       - store_artifacts: # special step to save test results as as artifact
           # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: ./coverage/mocha/test-results.xml
+          path: ./test-results/mocha/test-results.xml
           prefix: tests
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
           path: coverage
           prefix: coverage
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: test-results.xml
+          path: test-results
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples

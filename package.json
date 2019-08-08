@@ -30,7 +30,7 @@
     "instrument": true
   },
   "scripts": {
-    "test": "nyc mocha --recursive --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=coverage/mocha/test-results.xml -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts",
+    "test": "nyc mocha --recursive --timeout=10000 --exit --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/**/*.test.ts",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
     "build": "tsc",
