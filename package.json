@@ -32,6 +32,7 @@
   },
   "scripts": {
     "test": "nyc mocha --timeout=10000 --exit --full-trace --bail --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",
+    "coverage": "nyc report --reporter=text-lcov > .coverage",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
     "build": "tsc",
