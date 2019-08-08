@@ -1,4 +1,5 @@
 # MobStr
+[![CircleCI](https://circleci.com/gh/ducharmemp/mobstr.svg?style=svg)](https://circleci.com/gh/ducharmemp/mobstr)
 
 MobStr is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual book-keeping of object relationships.
 
