@@ -300,6 +300,13 @@ function ShowAllCompanies(props) {
 
 ```
 
+## Getting Started
+This does require decorator support for now, so follow the instructions for enabling babel decorator support here: https://babeljs.io/docs/en/babel-plugin-proposal-decorators
+
+If using TypeScript, enable the "experimentalDecorators" flag in tsconfig.json, instructions located here: https://www.typescriptlang.org/docs/handbook/decorators.html
+
+If using Create-React-App in conjunction with this project and don't wish to eject, please use react-app-rewired to override the babel settings, located here: https://github.com/timarney/react-app-rewired
+
 ## Running the tests
 
 This project uses mocha/chai for testing purposes. To invoke, use `npm test` to run the test suite.
