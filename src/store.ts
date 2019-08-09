@@ -229,7 +229,12 @@ export const join = action(
   }
 );
 
-export const dropCollection = action(
+/**
+ * Truncates a given collection in the store and triggers any observables watching this particular collection.
+ * This is essentially a very fast form of mass deletion.
+ *
+ */
+export const truncateCollection = action(
   <T>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
@@ -238,6 +243,5 @@ export const dropCollection = action(
     const currentCollectionName = getMeta(entityClass).collectionName;
     // Trigger any observables watching the store for this collection
     store.collections[currentCollectionName as string] = observable.map();
-    delete store.collections[currentCollectionName as string];
   }
 );

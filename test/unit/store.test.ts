@@ -12,7 +12,8 @@ import {
   findAll,
   createStore,
   removeOne,
-  findOne
+  findOne,
+  truncateCollection
 } from "../../src/store";
 import { primaryKey, relationship } from "../../src/decorators";
 
@@ -124,5 +125,20 @@ describe("#store", (): void => {
       const store = createStore();
       expect(findOne(store, Foo, "")).to.be.undefined;
     });
+  });
+
+  describe("#truncateCollection", (): void => {
+    it('should delete all entries in a collection', (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey
+        id = uuid();
+      }
+
+      addAll(store, range(20).map(() => new Foo()));
+      expect(findAll(store, Foo)).to.have.lengthOf(20);
+      truncateCollection(store, Foo);
+      expect(findAll(store, Foo)).to.have.lengthOf(0);
+    })
   });
 });

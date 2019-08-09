@@ -38,7 +38,7 @@
     "start": "npm run build -- --watch",
     "build": "tsc",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build && npm test && npm version patch",
+    "prepublishOnly": "npm run clean && npm run build && npm test",
     "postpublish": "git push --tags && git push origin master"
   },
   "author": "Matthew P DuCharme",

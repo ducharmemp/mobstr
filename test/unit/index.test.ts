@@ -15,7 +15,8 @@ describe("#index", (): void => {
         "addOne",
         "addAll",
         "removeOne",
-        "removeAll"
+        "removeAll",
+        "truncateCollection"
       ]);
     });
   });

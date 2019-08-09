@@ -5,7 +5,8 @@ import {
   findAll,
   addAll,
   removeAll,
-  findOne
+  findOne,
+  truncateCollection,
 } from "./store";
 import { primaryKey, relationship } from "./decorators";
 
@@ -25,6 +26,7 @@ export default function initialize() {
     addOne: addOne.bind(null, store),
     addAll: addAll.bind(null, store),
     removeOne: removeOne.bind(null, store),
-    removeAll: removeAll.bind(null, store)
+    removeAll: removeAll.bind(null, store),
+    truncateCollection: truncateCollection.bind(null, store),
   };
 }
