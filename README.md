@@ -179,7 +179,7 @@ function apiCallResult(returnValue) {
   findAll(Foo).length === 0;
   ```
   
-  However, this does still have the same limitations as POJOs currently do, so you can't *directly* shove a JSON structure into the store, there has to be a preprocessing step.
+  However, this does still have the same limitations as POJOs currently do, so you can't *directly* shove a JSON structure into the store, there has to be a preprocessing step. However, a nice side effect of this is the ability to gather all Foo objects in a single query without walking the entirety of the tree.
 </details>
 <details>
   <summary><b>Can I have complex recursive relationships?</b></summary>
