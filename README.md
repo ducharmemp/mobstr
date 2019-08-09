@@ -156,6 +156,55 @@ function apiCallResult(returnValue) {
 ```
 
 </details>
+<details>
+  <summary><b>Can I have trees?</b></summary>
+  Absolutely. The following code ripped out of the test cases works perfectly:
+  
+  ```js
+  class Foo {
+    @primaryKey
+    id: string = uuid();
+
+    @relationship(store, () => Foo, { cascade: true })
+    leaves: Foo[] = [];
+  }
+  const foo = new Foo();
+  const leaves = [new Foo(), new Foo()];
+  const otherLeaves = [new Foo(), new Foo()];
+  addOne(store, foo);
+  foo.leaves.push(...leaves);
+  leaves[0].leaves.push(...otherLeaves);
+  findAll(Foo).length === 5;
+  removeOne(foo);
+  findAll(Foo).length === 0;
+  ```
+  
+  However, this does still have the same limitations as POJOs currently do, so you can't *directly* shove a JSON structure into the store, there has to be a preprocessing step.
+</details>
+<details>
+  <summary><b>Can I have complex recursive relationships?</b></summary>
+  At this time, no. It has a lot to do with when javascript class definitions are evaluated. For an example of what I'm talking about, please reference the below code:
+  
+  ```js
+  class Bar {
+    @primaryKey;
+    id = uuid()
+    
+    @relationship(() => Foo)
+    foos = [];
+  }
+  
+  class Foo {
+    @primaryKey
+    id = uuid();
+    
+    @relationship(() => Bar)
+    bars = []
+  }
+  ```
+  
+  At class definition time, "Foo" as a type is undefined, so the overall code will fail. I hope to eventually allow for these kinds of structures by using some form of lazy evalutaion on relationship definitions, similar to the method employed by SQLAlchemy.
+</details>
 
 ## Examples
 You can find some comprehensive toy examples in tests/integration.test.ts. Below is an example of real-world(ish) example using a fetch to get a company name and the a list of employees from that company.
