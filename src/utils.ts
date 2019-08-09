@@ -37,7 +37,7 @@ export function ensureMeta(target: any) {
     } as Meta["__meta__"];
 
     Object.defineProperty(target, "__meta__", {
-      enumerable: true,
+      enumerable: false,
       writable: false,
       configurable: true,
       value: metaAttribute
