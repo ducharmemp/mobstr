@@ -183,6 +183,7 @@ function apiCallResult(returnValue) {
 </details>
 <details>
   <summary><b>Can I have complex recursive relationships?</b></summary>
+ 
   At this time, no. It has a lot to do with when javascript class definitions are evaluated. For an example of what I'm talking about, please reference the below code:
   
   ```js
@@ -206,7 +207,8 @@ function apiCallResult(returnValue) {
   At class definition time, "Foo" as a type is undefined, so the overall code will fail. I hope to eventually allow for these kinds of structures by using some form of lazy evalutaion on relationship definitions, similar to the method employed by SQLAlchemy.
 </details>
 <details>
-  <summary><b>Does this work with anonymous classes?</summary>
+  <summary><b>Does this work with anonymous classes?</b></summary>
+ 
   No, since the decorator specification doens't allow for usage of decorators within anonymous classes, there's not much that MobStr can do at this time. I hope that in the future we could allow for something like this, since it could open up doors for dynamic model creation, although I'm not sure if that's a great idea or a terrible idea.
 </details>
 
