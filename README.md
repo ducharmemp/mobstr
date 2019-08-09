@@ -225,6 +225,7 @@ const {
     addAll,
     findOne,
     removeOne,
+    truncateCollection,
 } = createStore();
 
 class Employee {
@@ -272,6 +273,31 @@ findOne(Company, 1).employees.push(new Employee());
 ...
 // Maybe we want to show a table of the company in one column with an employee in the other
 join(Company, Employees).map((company, employee) => [company.id, employee.id])
+
+...
+function destroyCompany(companyId) {
+    findOne(Company, companyId).employees = [];
+    // If we had cascade: true in our relationship options, we could also delete the company from the store like so:
+    // removeOne(findOne(Company, companyId));
+}
+
+// Example of a react component to display all companies and with a button to delete all employees for a given company
+function ShowAllCompanies(props) {
+    const companies = findAll(Company);
+    return (
+        <div>
+            {
+                companies.map(company => (
+                    <div>
+                        <span>{company.name}</span>
+                        <button onClick={destroyCompany.bind(null, company.id)}>Destroy {company.name}?</button>
+                    </div>
+                ))
+            }
+        </div>
+    );
+}
+
 ```
 
 ## Running the tests
