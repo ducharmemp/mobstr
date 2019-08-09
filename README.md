@@ -205,6 +205,10 @@ function apiCallResult(returnValue) {
   
   At class definition time, "Foo" as a type is undefined, so the overall code will fail. I hope to eventually allow for these kinds of structures by using some form of lazy evalutaion on relationship definitions, similar to the method employed by SQLAlchemy.
 </details>
+<details>
+  <summary><b>Does this work with anonymous classes?</summary>
+  No, since the decorator specification doens't allow for usage of decorators within anonymous classes, there's not much that MobStr can do at this time. I hope that in the future we could allow for something like this, since it could open up doors for dynamic model creation, although I'm not sure if that's a great idea or a terrible idea.
+</details>
 
 ## Examples
 You can find some comprehensive toy examples in tests/integration.test.ts. Below is an example of real-world(ish) example using a fetch to get a company name and the a list of employees from that company.
