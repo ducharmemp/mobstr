@@ -17,7 +17,8 @@ module.exports = {
   parser:  '@typescript-eslint/parser',
   extends: [
     'airbnb',
-    'plugin:@typescript-eslint/recommended'
+    'plugin:@typescript-eslint/recommended',
+    'prettier'
   ],
   globals: {
     Atomics: 'readonly',

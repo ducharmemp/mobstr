@@ -1,6 +1,7 @@
 import { observable, remove, action } from "mobx";
 import { createStore, addOne } from "./store";
 import { ensureMeta, ensureRelationship, getMeta } from "./utils";
+import { Meta, CascadeOptions } from "./meta";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -44,11 +45,11 @@ export function indexed(target: any, propertyKey: string | symbol) {
 /**
  * Describes a relationship to another model. The related model will be referenced
  * by its primary key for accessing purposes.
- * 
+ *
  * When assigning to the relationship, all items are added to the store. When removing from the list,
- * via pop or splice, all items removed are *not necessarily* removed from the store unless otherwise 
+ * via pop or splice, all items removed are *not necessarily* removed from the store unless otherwise
  * specified in the relationship options.
- * 
+ *
  * Values can also be replaced in lists via indexing. While any new values will be added to the store,
  * replaced values will *not* be removed from the store unless otherwise specified in the relationship
  * options, similar to the approach for splice and pop.
@@ -79,7 +80,7 @@ export function indexed(target: any, propertyKey: string | symbol) {
 export function relationship(
   store: ReturnType<typeof createStore>,
   type: any,
-  options = {}
+  options: CascadeOptions = {}
 ) {
   return function(target: any, propertyKey: string | symbol): any {
     ensureMeta(target);
@@ -91,8 +92,9 @@ export function relationship(
         ensureMeta(this);
         ensureRelationship(this, propertyKey as string, type, options);
 
-        const currentRelationship = getMeta(this)
-          .relationships[propertyKey as string];
+        const currentRelationship = getMeta(this).relationships[
+          propertyKey as string
+        ];
         const propertyCollectionName = getMeta(currentRelationship.type)
           .collectionName;
         const propertyCollection =
@@ -127,7 +129,8 @@ export function relationship(
             });
           } else {
             addOne(store, changes.newValue);
-            currentRelationship.keys[changes.index] = changes.newValue[getMeta(changes.newValue).key.get() as string]
+            currentRelationship.keys[changes.index] =
+              changes.newValue[getMeta(changes.newValue).key.get() as string];
           }
         });
 
@@ -138,8 +141,9 @@ export function relationship(
         ensureMeta(this);
         ensureRelationship(this, propertyKey as string, type, options);
 
-        const currentRelationship = getMeta(this)
-          .relationships[propertyKey as string];
+        const currentRelationship = getMeta(this).relationships[
+          propertyKey as string
+        ];
         values.map(value => addOne(store, value));
         currentRelationship.keys = observable.array(
           values.map(value => value[getMeta(value).key.get() as string])

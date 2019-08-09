@@ -39,11 +39,11 @@ describe("#utils", (): void => {
     });
   });
 
-  describe('#getMeta', (): void => {
-    it('should return the metadata associated with a given object', (): void => {
+  describe("#getMeta", (): void => {
+    it("should return the metadata associated with a given object", (): void => {
       class Foo {
         @primaryKey
-        id = 'name'
+        id = "name";
       }
 
       const f = new Foo();

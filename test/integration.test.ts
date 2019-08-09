@@ -9,7 +9,8 @@ import {
   removeOne,
   join,
   findAll,
-  findOne
+  findOne,
+  addAll
 } from "../src/store";
 import { primaryKey, relationship } from "../src/decorators";
 
@@ -342,9 +343,38 @@ describe("#integration", () => {
     }
 
     const b = new Bar();
-    const f = Object.assign(new Foo(), { id: '123', friends: [ b ] });
-    expect(f).to.have.property('id', '123');
-    expect(f).to.have.property('friends').that.has.lengthOf(1).and.includes(b);
-    expect(store).to.have.property('collections').that.has.property('Bar').that.has.lengthOf(1);
+    const f = Object.assign(new Foo(), { id: "123", friends: [b] });
+    expect(f).to.have.property("id", "123");
+    expect(f)
+      .to.have.property("friends")
+      .that.has.lengthOf(1)
+      .and.includes(b);
+    expect(store)
+      .to.have.property("collections")
+      .that.has.property("Bar")
+      .that.has.lengthOf(1);
+  });
+
+  // FIXME: This should work properly or we should warn/error for any circular relationships
+  it("should allow for complex relationships, like a self-referencing tree", (): void => {
+    const store = createStore();
+
+    class Foo {
+      @primaryKey
+      id: string = uuid();
+
+      @relationship(store, () => Foo, { cascade: true })
+      leaves: Foo[] = [];
+    }
+
+    const foo = new Foo();
+    const leaves = [new Foo(), new Foo()];
+    const otherLeaves = [new Foo(), new Foo()];
+    addOne(store, foo);
+    foo.leaves.push(...leaves);
+    leaves[0].leaves.push(...otherLeaves);
+    expect(findAll(store, Foo)).to.have.lengthOf(5);
+    expect(() => removeOne(store, foo)).to.not.throw();
+    expect(findAll(store, Foo)).to.be.empty;
   });
 });

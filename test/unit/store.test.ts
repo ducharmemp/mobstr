@@ -6,8 +6,15 @@ import { describe, it } from "mocha";
 import { expect } from "chai";
 import { range } from "lodash";
 
-import { addAll, removeAll, findAll, createStore } from "../../src/store";
-import { primaryKey } from "@src/decorators";
+import {
+  addAll,
+  removeAll,
+  findAll,
+  createStore,
+  removeOne,
+  findOne
+} from "../../src/store";
+import { primaryKey, relationship } from "@src/decorators";
 
 describe("#store", (): void => {
   describe("#addAll", (): void => {
@@ -50,6 +57,12 @@ describe("#store", (): void => {
         findAll(store, Foo, entity => entity.name === "test2")
       ).to.have.lengthOf(1);
     });
+
+    it("should find an empty list if there are no entries in the store", (): void => {
+      class Foo {}
+      const store = createStore();
+      expect(findAll(store, Foo)).to.be.empty;
+    });
   });
 
   describe("#removeAll", (): void => {
@@ -72,6 +85,44 @@ describe("#store", (): void => {
         .to.have.property("collections")
         .that.has.property("Foo")
         .that.has.lengthOf(0);
+    });
+  });
+
+  describe("#removeOne", (): void => {
+    it("should cascade delete any relationships with cascade=true", (): void => {
+      const store = createStore();
+      class Bar {
+        @primaryKey
+        id = uuid();
+      }
+      class Baz {
+        @primaryKey
+        id = uuid();
+
+        @relationship(store, () => Bar)
+        enemies: Bar[] = [];
+      }
+      class Foo {
+        @relationship(store, () => Bar, { cascade: true })
+        friends: Bar[] = [];
+      }
+
+      const foo = new Foo();
+      const bar = new Bar();
+      const baz = new Baz();
+      foo.friends.push(bar);
+      baz.enemies.push(bar);
+      expect(baz.enemies).to.have.lengthOf(1);
+      removeOne(store, foo);
+      expect(baz.enemies).to.have.lengthOf(0);
+    });
+  });
+
+  describe("#findOne", (): void => {
+    it("should not find anything when querying an object not in the store", (): void => {
+      class Foo {}
+      const store = createStore();
+      expect(findOne(store, Foo, "")).to.be.undefined;
     });
   });
 });

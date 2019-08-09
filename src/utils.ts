@@ -8,7 +8,7 @@ import { Meta } from "./meta";
  * @param {unknown} target
  * @returns {Meta['__meta__']}
  */
-export function getMeta(target: unknown): Meta['__meta__'] {
+export function getMeta(target: unknown): Meta["__meta__"] {
   return (target as Meta).__meta__;
 }
 
@@ -36,16 +36,12 @@ export function ensureMeta(target: any) {
       >
     } as Meta["__meta__"];
 
-    Object.defineProperty(
-      target,
-      '__meta__',
-      {
-        enumerable: false,
-        writable: false,
-        configurable: true,
-        value: metaAttribute
-      },
-    );
+    Object.defineProperty(target, "__meta__", {
+      enumerable: true,
+      writable: false,
+      configurable: true,
+      value: metaAttribute
+    });
   }
 }
 
@@ -55,9 +51,9 @@ export function ensureRelationship(
   type: () => any,
   options: any
 ) {
-  getMeta(target).relationships[
+  getMeta(target).relationships[propertyKey] = getMeta(target).relationships[
     propertyKey
-  ] = getMeta(target).relationships[propertyKey] || {
+  ] || {
     type: type(),
     keys: observable.array([]),
     options

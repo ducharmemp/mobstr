@@ -82,7 +82,7 @@ describe("#decorators", (): void => {
         .that.has.property("options").that.is.empty;
     });
 
-    it('should allow a user to replace an entity in a relationship by index', (): void => {
+    it("should allow a user to replace an entity in a relationship by index", (): void => {
       const store = createStore();
       class Bar {
         @primaryKey

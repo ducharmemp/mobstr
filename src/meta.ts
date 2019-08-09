@@ -1,5 +1,9 @@
 import { IObservableValue, IObservableArray } from "mobx";
 
+export interface CascadeOptions {
+  cascade?: boolean;
+}
+
 export interface Meta {
   __meta__: {
     key: IObservableValue<string | symbol | number | null>;
@@ -10,7 +14,7 @@ export interface Meta {
       {
         type: any;
         keys: IObservableArray<string>;
-        options: Record<string, any>;
+        options: CascadeOptions;
       }
     >;
     indicies: IObservableArray<string | symbol | number>;
