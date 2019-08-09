@@ -355,7 +355,6 @@ describe("#integration", () => {
       .that.has.lengthOf(1);
   });
 
-  // FIXME: This should work properly or we should warn/error for any circular relationships
   it("should allow for complex relationships, like a self-referencing tree", (): void => {
     const store = createStore();
 

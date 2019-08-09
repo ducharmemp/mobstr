@@ -1,4 +1,4 @@
-import { observable, remove, action } from "mobx";
+import { observable, action } from "mobx";
 import { createStore, addOne } from "./store";
 import { ensureMeta, ensureRelationship, getMeta } from "./utils";
 import { Meta, CascadeOptions } from "./meta";
@@ -125,7 +125,7 @@ export function relationship(
                 )
               );
               // FIXME: This would be the proper place to track cascades on the relationship.
-              remove(store, change);
+              // removeOne(store, change);
             });
           } else {
             addOne(store, changes.newValue);
