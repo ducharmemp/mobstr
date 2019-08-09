@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import { expect } from "chai";
 
 import { ensureMeta, ensureRelationship, getMeta } from "../../src/utils";
-import { primaryKey } from "@src/decorators";
+import { primaryKey } from "../../src/decorators";
 
 describe("#utils", (): void => {
   describe("#ensureMeta", (): void => {

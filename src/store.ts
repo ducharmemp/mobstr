@@ -228,3 +228,16 @@ export const join = action(
     });
   }
 );
+
+export const dropCollection = action(
+  <T>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+  ) => {
+    ensureMeta(entityClass);
+    const currentCollectionName = getMeta(entityClass).collectionName;
+    // Trigger any observables watching the store for this collection
+    store.collections[currentCollectionName as string] = observable.map();
+    delete store.collections[currentCollectionName as string];
+  }
+);

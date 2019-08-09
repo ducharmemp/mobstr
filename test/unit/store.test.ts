@@ -14,7 +14,7 @@ import {
   removeOne,
   findOne
 } from "../../src/store";
-import { primaryKey, relationship } from "@src/decorators";
+import { primaryKey, relationship } from "../../src/decorators";
 
 describe("#store", (): void => {
   describe("#addAll", (): void => {

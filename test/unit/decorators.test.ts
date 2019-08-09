@@ -1,11 +1,11 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
+import { v4 as uuid } from 'uuid';
 
 import { indexed, primaryKey, relationship } from "../../src/decorators";
-import { Meta } from "@src/meta";
-import uuid = require("uuid");
-import { createStore } from "@src/store";
+import { Meta } from "../../src/meta";
+import { createStore } from "../../src/store";
 
 describe("#decorators", (): void => {
   describe("#indexed", (): void => {
