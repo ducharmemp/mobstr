@@ -4,6 +4,8 @@ import sinon from "sinon";
 
 import { indexed, primaryKey, relationship } from "../../src/decorators";
 import { Meta } from "@src/meta";
+import uuid = require("uuid");
+import { createStore } from "@src/store";
 
 describe("#decorators", (): void => {
   describe("#indexed", (): void => {
@@ -78,6 +80,28 @@ describe("#decorators", (): void => {
       expect(((f as unknown) as Meta).__meta__.relationships)
         .to.have.property("friends")
         .that.has.property("options").that.is.empty;
+    });
+
+    it('should allow a user to replace an entity in a relationship by index', (): void => {
+      const store = createStore();
+      class Bar {
+        @primaryKey
+        id = uuid();
+      }
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @relationship(store, () => Bar)
+        friends: Bar[] = [];
+      }
+
+      const f = new Foo();
+      const b = new Bar();
+      f.friends.push(new Bar(), new Bar());
+      f.friends[0] = b;
+      expect(f.friends[0]).to.be.eql(b);
     });
   });
 });

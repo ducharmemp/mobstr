@@ -1,7 +1,6 @@
-import { observable, remove, action, extendObservable } from "mobx";
+import { observable, remove, action } from "mobx";
 import { createStore, addOne } from "./store";
-import { Meta } from "./meta";
-import { ensureMeta, ensureRelationship } from "./utils";
+import { ensureMeta, ensureRelationship, getMeta } from "./utils";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -39,12 +38,20 @@ export function primaryKey(target: any, propertyKey: string | symbol) {
  */
 export function indexed(target: any, propertyKey: string | symbol) {
   ensureMeta(target);
-  (target as Meta).__meta__.indicies.push(propertyKey);
+  getMeta(target).indicies.push(propertyKey);
 }
 
 /**
  * Describes a relationship to another model. The related model will be referenced
  * by its primary key for accessing purposes.
+ * 
+ * When assigning to the relationship, all items are added to the store. When removing from the list,
+ * via pop or splice, all items removed are *not necessarily* removed from the store unless otherwise 
+ * specified in the relationship options.
+ * 
+ * Values can also be replaced in lists via indexing. While any new values will be added to the store,
+ * replaced values will *not* be removed from the store unless otherwise specified in the relationship
+ * options, similar to the approach for splice and pop.
  *
  * @example
  * class BarModel {
@@ -84,10 +91,10 @@ export function relationship(
         ensureMeta(this);
         ensureRelationship(this, propertyKey as string, type, options);
 
-        const currentRelationship = ((this as unknown) as Meta).__meta__
+        const currentRelationship = getMeta(this)
           .relationships[propertyKey as string];
-        const propertyCollectionName = (currentRelationship.type as Meta)
-          .__meta__.collectionName;
+        const propertyCollectionName = getMeta(currentRelationship.type)
+          .collectionName;
         const propertyCollection =
           store.collections[propertyCollectionName as string];
 
@@ -103,23 +110,24 @@ export function relationship(
           if (changes.type === "splice") {
             changes.added.map(
               action((change: any) => {
-                currentRelationship.keys.push(
-                  change[change.__meta__.key.get()]
-                );
                 addOne(store, change);
+                currentRelationship.keys.push(
+                  change[getMeta(change).key.get() as string]
+                );
               })
             );
             changes.removed.forEach(change => {
               currentRelationship.keys.replace(
                 currentRelationship.keys.filter(
-                  key => key !== change[change.__meta__.key.get()]
+                  key => key !== change[getMeta(change).key.get() as string]
                 )
               );
               // FIXME: This would be the proper place to track cascades on the relationship.
               remove(store, change);
             });
           } else {
-            // TODO: ???? What to do with IArrayChange?
+            addOne(store, changes.newValue);
+            currentRelationship.keys[changes.index] = changes.newValue[getMeta(changes.newValue).key.get() as string]
           }
         });
 
@@ -130,11 +138,11 @@ export function relationship(
         ensureMeta(this);
         ensureRelationship(this, propertyKey as string, type, options);
 
-        const currentRelationship = ((this as unknown) as Meta).__meta__
+        const currentRelationship = getMeta(this)
           .relationships[propertyKey as string];
         values.map(value => addOne(store, value));
         currentRelationship.keys = observable.array(
-          values.map(value => value[value.__meta__.key])
+          values.map(value => value[getMeta(value).key.get() as string])
         );
       }
     });

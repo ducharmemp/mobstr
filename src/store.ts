@@ -2,7 +2,7 @@ import { observable, action } from "mobx";
 import { flatMap } from "lodash";
 
 import { Meta } from "./meta";
-import { ensureMeta } from "./utils";
+import { ensureMeta, getMeta } from "./utils";
 
 /**
  * Creates a store for use with decorators and other helper functions. Meant to be used as a singleton,
@@ -32,9 +32,9 @@ export const createStore = action(() =>
 export const addOne = action(
   <T>(store: ReturnType<typeof createStore>, entity: T) => {
     ensureMeta(entity);
-    const currentCollection = ((entity as unknown) as Meta).__meta__
+    const currentCollection = getMeta(entity)
       .collectionName;
-    const currentKey = ((entity as unknown) as Meta).__meta__.key.get();
+    const currentKey = getMeta(entity).key.get();
     store.collections[currentCollection as string] =
       store.collections[currentCollection as string] || observable.map();
     store.collections[currentCollection as string].set(
@@ -66,9 +66,9 @@ export const addAll = action(
 export const removeOne = action(
   <T>(store: ReturnType<typeof createStore>, entity: T) => {
     ensureMeta(entity);
-    const primaryKey = ((entity as unknown) as Meta).__meta__.key.get() as keyof T;
+    const primaryKey = getMeta(entity).key.get() as keyof T;
 
-    const currentCollection = ((entity as unknown) as Meta).__meta__
+    const currentCollection = getMeta(entity)
       .collectionName;
     // TODO: Delete all object references if we're deleting something that has a cascade
     (store.collections[currentCollection as string] || observable.map()).delete(
@@ -117,7 +117,7 @@ export const findOne = action(
     primaryKey: ReturnType<Meta["__meta__"]["key"]["get"]>
   ): T => {
     ensureMeta(entityClass);
-    const currentCollection = ((entityClass as unknown) as Meta).__meta__
+    const currentCollection = getMeta(entityClass)
       .collectionName;
     return (
       store.collections[currentCollection as string] || observable.map()
@@ -150,7 +150,7 @@ export const findAll = action(
     findClause: (arg0: T) => any = (entry: T) => entry
   ) => {
     ensureMeta(entityClass);
-    const currentCollection = ((entityClass as unknown) as Meta).__meta__
+    const currentCollection = getMeta(entityClass)
       .collectionName;
     return Array.from(
       (
@@ -199,19 +199,19 @@ export const join = action(
   ): [T, K][] => {
     ensureMeta(entityClass);
     ensureMeta(joinClass);
-    const entityCollectionName = ((entityClass as unknown) as Meta).__meta__
+    const entityCollectionName = getMeta(entityClass)
       .collectionName;
     const entityCollection = Array.from(
       store.collections[entityCollectionName as string].values()
     );
 
-    const childCollectionName = ((joinClass as unknown) as Meta).__meta__
+    const childCollectionName = getMeta(joinClass)
       .collectionName;
     const childCollection = store.collections[childCollectionName as string];
 
     return flatMap(entityCollection, (entity: any) => {
       const joinRelationships = Object.values(
-        (entity as Meta).__meta__.relationships
+        getMeta(entity).relationships
       ).filter(({ type }) => type === joinClass);
 
       return flatMap(joinRelationships, ({ keys }) =>

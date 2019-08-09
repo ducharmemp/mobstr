@@ -5,6 +5,17 @@ import { Meta } from "./meta";
  *
  *
  * @export
+ * @param {unknown} target
+ * @returns {Meta['__meta__']}
+ */
+export function getMeta(target: unknown): Meta['__meta__'] {
+  return (target as Meta).__meta__;
+}
+
+/**
+ *
+ *
+ * @export
  * @param {*} target
  */
 export function ensureMeta(target: any) {
@@ -14,7 +25,7 @@ export function ensureMeta(target: any) {
       indicies: observable.array([]),
       key: observable.box(null),
       // Spread the values already present in the prototype, we want to maintain the constructor name
-      ...(target.__meta__ || {}),
+      ...(getMeta(target) || {}),
       relationships: {} as Record<
         string | symbol,
         {
@@ -44,12 +55,11 @@ export function ensureRelationship(
   type: () => any,
   options: any
 ) {
-  ((target as unknown) as Meta).__meta__.relationships[
+  getMeta(target).relationships[
     propertyKey
-  ] = ((target as unknown) as Meta).__meta__.relationships[propertyKey] || {
+  ] = getMeta(target).relationships[propertyKey] || {
     type: type(),
     keys: observable.array([]),
     options
   };
 }
-

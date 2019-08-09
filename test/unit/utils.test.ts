@@ -1,7 +1,8 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 
-import { ensureMeta, ensureRelationship } from "../../src/utils";
+import { ensureMeta, ensureRelationship, getMeta } from "../../src/utils";
+import { primaryKey } from "@src/decorators";
 
 describe("#utils", (): void => {
   describe("#ensureMeta", (): void => {
@@ -35,6 +36,19 @@ describe("#utils", (): void => {
         .that.has.property("relationships")
         .that.has.property("friends")
         .that.has.property("type", Bar);
+    });
+  });
+
+  describe('#getMeta', (): void => {
+    it('should return the metadata associated with a given object', (): void => {
+      class Foo {
+        @primaryKey
+        id = 'name'
+      }
+
+      const f = new Foo();
+
+      expect(getMeta(f)).to.exist;
     });
   });
 });
