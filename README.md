@@ -9,6 +9,7 @@ MobStr is a project designed to provide an ORM-like interface to a MobX store. T
 * Relationship cascades and auto-cleanup for removed objects
 * Separation of concerns for managing object models and RESTful/GraphQL API queries (no sagas/thunks)
 * Update objects directly without the need for complex copy operations
+* Opt-in semantics for constraints and checks on columns for debugging purposes. Can be disabled for production
 
 ## Technical Details
 <details>
