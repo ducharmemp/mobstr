@@ -8,6 +8,7 @@ import {
   findOne,
   truncateCollection,
 } from "./store";
+import { createCollectionTrigger, dropTrigger } from './triggers';
 import { primaryKey, relationship } from "./decorators";
 
 /**
@@ -19,8 +20,10 @@ export default function initialize() {
   const store = createStore();
   return {
     store,
+    // Decorators
     primaryKey,
     relationship: relationship.bind(null, store),
+    // Store methods
     findAll: findAll.bind(null, store),
     findOne: findOne.bind(null, store),
     addOne: addOne.bind(null, store),
@@ -28,5 +31,8 @@ export default function initialize() {
     removeOne: removeOne.bind(null, store),
     removeAll: removeAll.bind(null, store),
     truncateCollection: truncateCollection.bind(null, store),
+    // Trigger methods
+    dropTrigger: dropTrigger.bind(null, store),
+    createCollectionTrigger: createCollectionTrigger.bind(null, store),
   };
 }

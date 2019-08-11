@@ -1,4 +1,4 @@
-import { IObservableValue, IObservableArray } from "mobx";
+import { IObservableValue, IObservableArray, IObservableObject, Lambda } from "mobx";
 
 export interface CascadeOptions {
   cascade?: boolean;
@@ -19,4 +19,15 @@ export interface Meta {
     >;
     indicies: IObservableArray<string | symbol | number>;
   };
+}
+
+export interface Store extends IObservableObject {
+  collections: Record<
+    string | symbol | number,
+    Map<string | symbol | number, any>
+  >;
+  primaryKeys: Map<string, any>;
+  indicies: Map<string, any>;
+  triggers: Map<number, Lambda>;
+  nextId: number;
 }

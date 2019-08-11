@@ -1,10 +1,9 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
-import sinon from "sinon";
 import { v4 as uuid } from 'uuid';
 
 import { indexed, primaryKey, relationship } from "../../src/decorators";
-import { Meta } from "../../src/meta";
+import { Meta } from "../../src/types";
 import { createStore } from "../../src/store";
 
 describe("#decorators", (): void => {
@@ -39,6 +38,7 @@ describe("#decorators", (): void => {
 
   describe("#relationship", (): void => {
     it("should set a relationship to the __meta__.key", (): void => {
+      const store = createStore();
       class Bar {
         @primaryKey
         id: number = 0;
@@ -48,7 +48,7 @@ describe("#decorators", (): void => {
         @primaryKey
         attrib: number = 0;
 
-        @relationship(sinon.fake() as any, () => Bar)
+        @relationship(store, () => Bar)
         friends: Bar[] = [];
       }
 
@@ -61,6 +61,7 @@ describe("#decorators", (): void => {
     });
 
     it("should allow an options parameter to be passed into the relationship", (): void => {
+      const store = createStore();
       class Bar {
         @primaryKey
         id: number = 0;
@@ -71,7 +72,7 @@ describe("#decorators", (): void => {
         attrib: number = 0;
 
         // TODO: Fill out options with cascade options
-        @relationship(sinon.fake() as any, () => Bar, {})
+        @relationship(store, () => Bar, {})
         friends: Bar[] = [];
       }
 

@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 
-import { ensureMeta, ensureRelationship, getMeta } from "../../src/utils";
+import { ensureMeta, ensureRelationship, getMeta, ensureConstructorMeta } from "../../src/utils";
 import { primaryKey } from "../../src/decorators";
 
 describe("#utils", (): void => {
@@ -49,6 +49,20 @@ describe("#utils", (): void => {
       const f = new Foo();
 
       expect(getMeta(f)).to.exist;
+    });
+  });
+
+  describe("#ensureConstructorMeta", (): void => {
+    it('should attach a meta object onto the prototype', (): void => {
+      class Foo {}
+      ensureConstructorMeta(new Foo())
+      expect(Foo).to.haveOwnProperty('__meta__');
+    });
+
+    it('should not attach a meta object onto the prototype if the prototype is Object', (): void => {
+      class Foo {}
+      ensureConstructorMeta(Foo)
+      expect(Foo).to.not.haveOwnProperty('__meta__');
     });
   });
 });

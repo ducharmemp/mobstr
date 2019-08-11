@@ -1,5 +1,6 @@
-import { observable } from "mobx";
-import { Meta } from "./meta";
+import { observable, action } from "mobx";
+import { Meta } from "./types";
+import { createStore } from "./store";
 
 /**
  *
@@ -13,7 +14,8 @@ export function getMeta(target: unknown): Meta["__meta__"] {
 }
 
 /**
- *
+ * Ensures that the current target has a meta attribute attached, and ensures that
+ * the meta is attached to the target itself and not its prototype
  *
  * @export
  * @param {*} target
@@ -45,6 +47,25 @@ export function ensureMeta(target: any) {
   }
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {*} target
+ */
+export function ensureConstructorMeta(target: any) {
+  ensureMeta(target.constructor);
+}
+
+/**
+ *
+ *
+ * @export
+ * @param {*} target
+ * @param {string} propertyKey
+ * @param {() => any} type
+ * @param {*} options
+ */
 export function ensureRelationship(
   target: any,
   propertyKey: string,
@@ -59,3 +80,21 @@ export function ensureRelationship(
     options
   };
 }
+
+export const getNextId = action((store: ReturnType<typeof createStore>) => {
+  store.nextId += 1;
+  return store.nextId;
+});
+
+/**
+ *
+ *
+ * @export
+ */
+export const ensureCollection = action(
+  (store: ReturnType<typeof createStore>, entityClass: any) => {
+    const currentMeta = getMeta(entityClass);
+    store.collections[currentMeta.collectionName as string] =
+      store.collections[currentMeta.collectionName as string] || observable.map();
+  }
+);

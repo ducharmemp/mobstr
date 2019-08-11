@@ -16,7 +16,9 @@ describe("#index", (): void => {
         "addAll",
         "removeOne",
         "removeAll",
-        "truncateCollection"
+        "truncateCollection",
+        "dropTrigger",
+        "createCollectionTrigger",
       ]);
     });
   });

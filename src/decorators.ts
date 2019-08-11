@@ -1,7 +1,13 @@
 import { observable, action } from "mobx";
 import { createStore, addOne } from "./store";
-import { ensureMeta, ensureRelationship, getMeta } from "./utils";
-import { Meta, CascadeOptions } from "./meta";
+import {
+  ensureMeta,
+  ensureConstructorMeta,
+  ensureRelationship,
+  ensureCollection,
+  getMeta
+} from "./utils";
+import { CascadeOptions } from "./types";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -24,6 +30,7 @@ import { Meta, CascadeOptions } from "./meta";
  */
 export function primaryKey(target: any, propertyKey: string | symbol) {
   ensureMeta(target);
+  ensureConstructorMeta(target);
   target.__meta__.indicies.push(propertyKey);
   target.__meta__.key.set(propertyKey);
 }
@@ -39,6 +46,7 @@ export function primaryKey(target: any, propertyKey: string | symbol) {
  */
 export function indexed(target: any, propertyKey: string | symbol) {
   ensureMeta(target);
+  ensureConstructorMeta(target);
   getMeta(target).indicies.push(propertyKey);
 }
 
@@ -84,6 +92,8 @@ export function relationship(
 ) {
   return function(target: any, propertyKey: string | symbol): any {
     ensureMeta(target);
+    ensureConstructorMeta(target);
+    ensureCollection(store, target);
     ensureMeta(type());
     ensureRelationship(target, propertyKey as string, type, options);
 
@@ -139,6 +149,8 @@ export function relationship(
 
       set(values: any[]) {
         ensureMeta(this);
+        ensureConstructorMeta(this);
+        ensureCollection(store, this);
         ensureRelationship(this, propertyKey as string, type, options);
 
         const currentRelationship = getMeta(this).relationships[

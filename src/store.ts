@@ -1,8 +1,8 @@
 import { observable, action } from "mobx";
 import { flatMap } from "lodash";
 
-import { Meta } from "./meta";
-import { ensureMeta, getMeta } from "./utils";
+import { Meta, Store } from "./types";
+import { ensureMeta, getMeta, ensureCollection } from "./utils";
 
 /**
  * Creates a store for use with decorators and other helper functions. Meant to be used as a singleton,
@@ -11,14 +11,16 @@ import { ensureMeta, getMeta } from "./utils";
  * @export
  * @returns
  */
-export const createStore = action(() =>
+export const createStore = action((): Store =>
   observable({
     collections: {} as Record<
       string | symbol | number,
       Map<string | symbol | number, any>
     >,
     primaryKeys: new Map(),
-    indicies: new Map()
+    indicies: new Map(),
+    triggers: new Map(),
+    nextId: 0,
   })
 );
 
@@ -32,12 +34,12 @@ export const createStore = action(() =>
 export const addOne = action(
   <T>(store: ReturnType<typeof createStore>, entity: T) => {
     ensureMeta(entity);
+    ensureMeta(Object.getPrototypeOf(entity));
+    ensureCollection(store, entity);
     const currentMeta = getMeta(entity);
     const currentCollection = currentMeta.collectionName;
     const currentKey = currentMeta.key.get();
 
-    store.collections[currentCollection as string] =
-      store.collections[currentCollection as string] || observable.map();
     store.collections[currentCollection as string].set(
       (entity[currentKey as keyof T] as unknown) as string | number | symbol,
       entity
@@ -68,6 +70,8 @@ export const addAll = action(
 export const removeOne = action(
   <T>(store: ReturnType<typeof createStore>, entity: T) => {
     ensureMeta(entity);
+    ensureMeta(Object.getPrototypeOf(entity));
+    ensureCollection(store, entity);
     const currentMeta = getMeta(entity);
     const primaryKey = currentMeta.key.get() as keyof T;
     const cascadeRelationshipKeys = Object.values(
@@ -75,7 +79,7 @@ export const removeOne = action(
     ).filter(relationship => relationship.options.cascade);
 
     const currentCollection = currentMeta.collectionName;
-    (store.collections[currentCollection as string] || observable.map()).delete(
+    store.collections[currentCollection as string].delete(
       // TODO: Properly type this, we need to check this beforehand to make sure that we can handle composite keys
       (entity[primaryKey] as unknown) as string | number | symbol
     );
@@ -129,9 +133,10 @@ export const findOne = action(
     primaryKey: ReturnType<Meta["__meta__"]["key"]["get"]>
   ): T => {
     ensureMeta(entityClass);
+    ensureCollection(store, entityClass);
     const currentCollection = getMeta(entityClass).collectionName;
     return (
-      store.collections[currentCollection as string] || observable.map()
+      store.collections[currentCollection as string]
     ).get(primaryKey as string);
   }
 );
@@ -161,10 +166,11 @@ export const findAll = action(
     findClause: (arg0: T) => any = (entry: T) => entry
   ) => {
     ensureMeta(entityClass);
+    ensureCollection(store, entityClass);
     const currentCollection = getMeta(entityClass).collectionName;
     return Array.from(
       (
-        store.collections[currentCollection as string] || observable.map()
+        store.collections[currentCollection as string]
       ).values()
     ).filter(findClause) as T[];
   }
@@ -209,6 +215,8 @@ export const join = action(
   ): [T, K][] => {
     ensureMeta(entityClass);
     ensureMeta(joinClass);
+    ensureCollection(store, entityClass);
+    ensureCollection(store, joinClass);
     const entityCollectionName = getMeta(entityClass).collectionName;
     const entityCollection = Array.from(
       store.collections[entityCollectionName as string].values()

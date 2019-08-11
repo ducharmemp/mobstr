@@ -31,8 +31,8 @@
     "instrument": true
   },
   "scripts": {
-    "test": "nyc mocha --timeout=10000 --exit --full-trace --bail  -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",
-    "test:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml",
+    "test": "nyc mocha --timeout=10000 -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",
+    "test:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml --exit --full-trace --bail",
     "coverage": "nyc report --reporter=text-lcov > .coverage",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
@@ -45,7 +45,8 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "lodash": "^4.17.15",
-    "mobx": "^5.13.0"
+    "mobx": "^5.13.0",
+    "sinon": "^7.4.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -66,7 +67,6 @@
     "mocha-junit-reporter": "^1.23.1",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
-    "sinon": "^7.4.1",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
