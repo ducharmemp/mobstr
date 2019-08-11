@@ -1,5 +1,7 @@
 import { IObservableValue, IObservableArray, IObservableObject, Lambda } from "mobx";
 
+export type Constructor<T> = new(...args: any[]) => T;
+
 export interface CascadeOptions {
   cascade?: boolean;
 }

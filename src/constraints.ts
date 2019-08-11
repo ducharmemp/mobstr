@@ -1,11 +1,26 @@
 import { createStore } from "./store";
+import { createCollectionTrigger, TriggerExecutionStrategy } from "./triggers";
+import { Constructor } from "./types";
 
 /**
  *
  *
  * @export
  */
-export function check(store: ReturnType<typeof createStore>) {}
+export function check<T extends Constructor<{}>>(
+  store: ReturnType<typeof createStore>,
+  entityClass: T,
+  propertyName: keyof InstanceType<T>
+) {
+  createCollectionTrigger(
+    store,
+    entityClass,
+    change => {
+      return change;
+    },
+    { triggerExecutionStrategy: TriggerExecutionStrategy.Intercept }
+  );
+}
 
 /**
  *
