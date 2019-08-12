@@ -9,9 +9,8 @@ import {
   dropTrigger,
   executeTrigger
 } from "../../src/triggers";
-import { createStore, addOne, removeOne, findOne, findAll } from "../../src/store";
-import { primaryKey } from "../../src/decorators";
-import { IObjectWillChange } from "mobx";
+import { createStore, addOne, removeOne, findOne } from "../../src/store";
+import { primaryKey, indexed } from "../../src/decorators";
 
 describe("#triggers", (): void => {
   describe("#createCollectionTrigger", (): void => {
@@ -52,7 +51,7 @@ describe("#triggers", (): void => {
       const fake = sinon.fake();
       const foo = new Foo();
       createCollectionTrigger(store, Foo, fake, {
-        eventType: TriggerQueryEvent.Delete
+        eventTypes: new Set([TriggerQueryEvent.Delete])
       });
 
       addOne(store, foo);
@@ -73,7 +72,8 @@ describe("#triggers", (): void => {
       createCollectionTrigger(store, Foo, fake, { triggerExecutionStrategy: TriggerExecutionStrategy.Intercept });
 
       addOne(store, foo);
-      expect(fake.callCount).to.be.equal(1);
+      addOne(store, foo);
+      expect(fake.callCount).to.be.equal(2);
     });
 
     it("should allow intercepts to rewrite the value", (): void => {
@@ -82,12 +82,13 @@ describe("#triggers", (): void => {
         @primaryKey
         id = "1234";
 
+        @indexed
         name = 'foo'
       }
 
       const foo = new Foo();
       // TODO: This does *NOT* allow us to rewrite the primary key. I need to document that or log a warning when the user does it
-      createCollectionTrigger(store, Foo, (change: IObjectWillChange) => {
+      createCollectionTrigger(store, Foo, change => {
         ((change as any).newValue as Foo).name = 'other';
         return change;
       }, { triggerExecutionStrategy: TriggerExecutionStrategy.Intercept });

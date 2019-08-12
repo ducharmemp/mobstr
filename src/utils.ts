@@ -1,4 +1,6 @@
-import { observable, action } from "mobx";
+import { observable, action, IObservableValue } from "mobx";
+import { get } from 'lodash';
+
 import { Meta } from "./types";
 import { createStore } from "./store";
 
@@ -22,21 +24,14 @@ export function getMeta(target: unknown): Meta["__meta__"] {
  */
 export function ensureMeta(target: any) {
   if (!Object.prototype.hasOwnProperty.call(target, "__meta__")) {
-    const metaAttribute = {
+    const metaAttribute: Meta["__meta__"] = {
       collectionName: target.name || target.constructor.name,
       indicies: observable.array([]),
       key: observable.box(null),
       // Spread the values already present in the prototype, we want to maintain the constructor name
       ...(getMeta(target) || {}),
-      relationships: {} as Record<
-        string | symbol,
-        {
-          type: string;
-          keys: string[];
-          options: Record<string, any>;
-        }
-      >
-    } as Meta["__meta__"];
+      relationships: {}
+    };
 
     Object.defineProperty(target, "__meta__", {
       enumerable: false,
@@ -98,3 +93,21 @@ export const ensureCollection = action(
       store.collections[currentMeta.collectionName as string] || observable.map();
   }
 );
+
+/**
+ *
+ *
+ * @export
+ */
+export const ensureIndicies = action(
+  (store: ReturnType<typeof createStore>, entityClass: any) => {
+    const currentMeta = getMeta(entityClass);
+    store.indicies[currentMeta.collectionName as string] =
+      store.indicies[currentMeta.collectionName as string] || observable.map();
+  }
+);
+
+export function getBoxedValueOrValue<T>(value: IObservableValue<T> | T): T {
+  // Magic to either get the boxed value or return the original value. We need to make sure to bind the this property
+  return get(value, 'get', () => value).bind(value)();
+}

@@ -31,8 +31,8 @@ import { CascadeOptions } from "./types";
 export function primaryKey(target: any, propertyKey: string | symbol) {
   ensureMeta(target);
   ensureConstructorMeta(target);
-  target.__meta__.indicies.push(propertyKey);
-  target.__meta__.key.set(propertyKey);
+  getMeta(target).indicies.push(propertyKey);
+  getMeta(target).key.set(propertyKey);
 }
 
 /**

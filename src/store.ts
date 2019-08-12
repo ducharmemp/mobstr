@@ -1,8 +1,8 @@
 import { observable, action } from "mobx";
 import { flatMap } from "lodash";
 
-import { Meta, Store } from "./types";
-import { ensureMeta, getMeta, ensureCollection } from "./utils";
+import { Meta, Store, Constructor } from "./types";
+import { ensureMeta, getMeta, ensureCollection, ensureIndicies, ensureConstructorMeta } from "./utils";
 
 /**
  * Creates a store for use with decorators and other helper functions. Meant to be used as a singleton,
@@ -11,17 +11,15 @@ import { ensureMeta, getMeta, ensureCollection } from "./utils";
  * @export
  * @returns
  */
-export const createStore = action((): Store =>
-  observable({
-    collections: {} as Record<
-      string | symbol | number,
-      Map<string | symbol | number, any>
-    >,
-    primaryKeys: new Map(),
-    indicies: new Map(),
-    triggers: new Map(),
-    nextId: 0,
-  })
+export const createStore = action(
+  (): Store =>
+    observable({
+      collections: {},
+      primaryKeys: new Map(),
+      indicies: {},
+      triggers: new Map(),
+      nextId: 0
+    })
 );
 
 /**
@@ -34,16 +32,25 @@ export const createStore = action((): Store =>
 export const addOne = action(
   <T>(store: ReturnType<typeof createStore>, entity: T) => {
     ensureMeta(entity);
-    ensureMeta(Object.getPrototypeOf(entity));
+    ensureConstructorMeta(entity);
     ensureCollection(store, entity);
+    ensureIndicies(store, entity);
     const currentMeta = getMeta(entity);
     const currentCollection = currentMeta.collectionName;
     const currentKey = currentMeta.key.get();
+    const indicies = currentMeta.indicies;
 
     store.collections[currentCollection as string].set(
-      (entity[currentKey as keyof T] as unknown) as string | number | symbol,
+      entity[currentKey as keyof T] as unknown as string,
       entity
     );
+
+    indicies.forEach((index) => {
+      store.indicies[currentCollection as string].set(
+        entity[index as keyof T] as unknown as string,
+        entity
+      );
+    });
   }
 );
 
@@ -127,17 +134,17 @@ export const removeAll = action(
  * @param primaryKey
  */
 export const findOne = action(
-  <T>(
+  <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
     primaryKey: ReturnType<Meta["__meta__"]["key"]["get"]>
-  ): T => {
+  ): InstanceType<T> => {
     ensureMeta(entityClass);
     ensureCollection(store, entityClass);
     const currentCollection = getMeta(entityClass).collectionName;
-    return (
-      store.collections[currentCollection as string]
-    ).get(primaryKey as string);
+    return store.collections[currentCollection as string].get(
+      primaryKey as string
+    );
   }
 );
 
@@ -160,19 +167,17 @@ export const findOne = action(
  * @param findClause The testing predicate for including entities
  */
 export const findAll = action(
-  <T>(
+  <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
     findClause: (arg0: T) => any = (entry: T) => entry
-  ) => {
+  ): InstanceType<T>[] => {
     ensureMeta(entityClass);
     ensureCollection(store, entityClass);
     const currentCollection = getMeta(entityClass).collectionName;
     return Array.from(
-      (
-        store.collections[currentCollection as string]
-      ).values()
-    ).filter(findClause) as T[];
+      store.collections[currentCollection as string].values()
+    ).filter(findClause);
   }
 );
 
@@ -208,11 +213,11 @@ export const findAll = action(
  * @returns
  */
 export const join = action(
-  <T, K>(
+  <T extends Constructor<{}>, K extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
     joinClass: K
-  ): [T, K][] => {
+  ): [InstanceType<T>, InstanceType<K>][] => {
     ensureMeta(entityClass);
     ensureMeta(joinClass);
     ensureCollection(store, entityClass);
@@ -243,9 +248,9 @@ export const join = action(
  *
  */
 export const truncateCollection = action(
-  <T>(
+  <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
-    entityClass: T,
+    entityClass: T
   ) => {
     ensureMeta(entityClass);
     const currentCollectionName = getMeta(entityClass).collectionName;
