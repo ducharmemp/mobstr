@@ -13,7 +13,11 @@ import { getMeta, getNextId, ensureCollection } from "./utils";
 import { Constructor } from "./types";
 
 /**
- *
+ * Describes the order of execution for triggers.
+ * 
+ * Equivalent to the following SQL:
+ *   - Intercept "CREATE TRIGGER test BEFORE ...", "CREATE TRIGGER test INSTEAD OF ..."
+ *   - Observe "CREATE TRIGGER test AFTER ..."
  *
  * @export
  * @enum {number}
@@ -43,7 +47,12 @@ export interface TriggerOptions {
 }
 
 /**
- *
+ * Runs a given trigger, filtering out event types that aren't relevant to the current trigger
+ * 
+ * @export
+ * @param trigger
+ * @param eventTypes
+ * @param change
  */
 export const executeTrigger = action(
   (
@@ -59,12 +68,18 @@ export const executeTrigger = action(
 );
 
 /**
- *
+ * Wraps a trigger for execution
+ * 
+ * @export
+ * @param target
+ * @param trigger
+ * @param eventTypes
+ * @param triggerStrategy
  */
 export const wrapTrigger = action(
-  (
-    target: any,
-    trigger: any,
+  <T extends Constructor<{}>>(
+    target: Map<PropertyKey, any>,
+    trigger: Lambda | IInterceptor<IValueWillChange<InstanceType<T>>>,
     eventTypes: Set<TriggerQueryEvent>,
     triggerStrategy: TriggerExecutionStrategy
   ) => {
@@ -77,7 +92,25 @@ export const wrapTrigger = action(
 );
 
 /**
- *
+ * Creates a trigger scoped to a particular collection. This is a low-level primitive to basically
+ * map over mobx's intercept and observe for a particular collection
+ * 
+ * @example
+ * class Foo {
+ *  @primaryKey
+ *  id = ''
+ * 
+ *  name = 'fooName'
+ * }
+ * 
+ * createCollectionTrigger(Foo, (change) => { console.log('Foo changed', change) });
+ * addOne(new Foo());
+ * 
+ * @export
+ * @param store
+ * @param entityClass
+ * @param trigger
+ * @param options
  */
 export const createCollectionTrigger = action(
   <T extends Constructor<{}>>(
@@ -107,7 +140,11 @@ export const createCollectionTrigger = action(
 );
 
 /**
- *
+ * Drops a single trigger from the store
+ * 
+ * @export
+ * @param store
+ * @param triggerId
  */
 export const dropTrigger = action(
   (store: ReturnType<typeof createStore>, triggerId: number) => {
@@ -117,6 +154,13 @@ export const dropTrigger = action(
   }
 );
 
+/**
+ * Drops all triggers from the store. Note: constraints are implemented
+ * as triggers, so this function will drop all constraints as well
+ * 
+ * @export
+ * @param store
+ */
 export const dropAllTriggers = action(
   (store: ReturnType<typeof createStore>) => {
     Array.from(store.triggers.keys()).forEach(key => dropTrigger(store, key));

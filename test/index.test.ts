@@ -6,4 +6,3 @@ import "./unit/store.test";
 import "./unit/triggers.test";
 import "./unit/constraints.test";
 import "./unit/errors.test";
-// import "./perf.test";
