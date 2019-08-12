@@ -1,11 +1,11 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
-import sinon from "sinon";
 import { v4 as uuid } from 'uuid';
 
-import { indexed, primaryKey, relationship } from "../../src/decorators";
-import { Meta } from "../../src/meta";
-import { createStore } from "../../src/store";
+import { indexed, primaryKey, relationship, notNull, notUndefined, unique } from "../../src/decorators";
+import { Meta } from "../../src/types";
+import { createStore, addOne } from "../../src/store";
+import { IntegrityError } from "@src/errors";
 
 describe("#decorators", (): void => {
   describe("#indexed", (): void => {
@@ -39,6 +39,7 @@ describe("#decorators", (): void => {
 
   describe("#relationship", (): void => {
     it("should set a relationship to the __meta__.key", (): void => {
+      const store = createStore();
       class Bar {
         @primaryKey
         id: number = 0;
@@ -48,7 +49,7 @@ describe("#decorators", (): void => {
         @primaryKey
         attrib: number = 0;
 
-        @relationship(sinon.fake() as any, () => Bar)
+        @relationship(store, () => Bar)
         friends: Bar[] = [];
       }
 
@@ -61,6 +62,7 @@ describe("#decorators", (): void => {
     });
 
     it("should allow an options parameter to be passed into the relationship", (): void => {
+      const store = createStore();
       class Bar {
         @primaryKey
         id: number = 0;
@@ -71,7 +73,7 @@ describe("#decorators", (): void => {
         attrib: number = 0;
 
         // TODO: Fill out options with cascade options
-        @relationship(sinon.fake() as any, () => Bar, {})
+        @relationship(store, () => Bar, {})
         friends: Bar[] = [];
       }
 
@@ -102,6 +104,55 @@ describe("#decorators", (): void => {
       f.friends.push(new Bar(), new Bar());
       f.friends[0] = b;
       expect(f.friends[0]).to.be.eql(b);
+    });
+  });
+
+  describe('#notNull', (): void => {
+    it('should check that a given column is not nullable', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @notNull(store)
+        name = null;
+      }
+
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
+    });
+  });
+
+  describe('#notUndefined', (): void => {
+    it('should check that a given column is not undefine-able', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @notUndefined(store)
+        name = undefined;
+      }
+
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
+    });
+  });
+
+  describe('#unique', (): void => {
+    it('should check that a given column must have unique values', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @unique(store)
+        name = '1';
+      }
+
+      addOne(store, new Foo());
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
     });
   });
 });

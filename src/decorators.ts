@@ -1,7 +1,15 @@
 import { observable, action } from "mobx";
 import { createStore, addOne } from "./store";
-import { ensureMeta, ensureRelationship, getMeta } from "./utils";
-import { Meta, CascadeOptions } from "./meta";
+import {
+  ensureMeta,
+  ensureConstructorMeta,
+  ensureRelationship,
+  ensureCollection,
+  getMeta,
+  ensureIndicies
+} from "./utils";
+import { CascadeOptions } from "./types";
+import { checkNotNull, checkNotUndefined, checkUnique, check } from "./constraints";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -19,13 +27,14 @@ import { Meta, CascadeOptions } from "./meta";
  *
  * @export
  * @param {*} target
- * @param {(string | symbol)} propertyKey
+ * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
  */
-export function primaryKey(target: any, propertyKey: string | symbol) {
+export function primaryKey(target: any, propertyKey: PropertyKey) {
   ensureMeta(target);
-  target.__meta__.indicies.push(propertyKey);
-  target.__meta__.key.set(propertyKey);
+  ensureConstructorMeta(target);
+  getMeta(target).indicies.push(propertyKey);
+  getMeta(target).key.set(propertyKey);
 }
 
 /**
@@ -34,11 +43,12 @@ export function primaryKey(target: any, propertyKey: string | symbol) {
  *
  * @export
  * @param {*} target
- * @param {(string | symbol)} propertyKey
+ * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
  */
-export function indexed(target: any, propertyKey: string | symbol) {
+export function indexed(target: any, propertyKey: PropertyKey) {
   ensureMeta(target);
+  ensureConstructorMeta(target);
   getMeta(target).indicies.push(propertyKey);
 }
 
@@ -82,8 +92,10 @@ export function relationship(
   type: any,
   options: CascadeOptions = {}
 ) {
-  return function(target: any, propertyKey: string | symbol): any {
+  return function(target: any, propertyKey: PropertyKey): any {
     ensureMeta(target);
+    ensureConstructorMeta(target);
+    ensureCollection(store, target);
     ensureMeta(type());
     ensureRelationship(target, propertyKey as string, type, options);
 
@@ -139,6 +151,8 @@ export function relationship(
 
       set(values: any[]) {
         ensureMeta(this);
+        ensureConstructorMeta(this);
+        ensureCollection(store, this);
         ensureRelationship(this, propertyKey as string, type, options);
 
         const currentRelationship = getMeta(this).relationships[
@@ -151,4 +165,61 @@ export function relationship(
       }
     });
   };
+}
+
+/**
+ * Checks that a field will never receive `null` as a value
+ * 
+ * @param store 
+ */
+export function notNull<T>(store: ReturnType<typeof createStore>) {
+  return function(target: any, propertyKey: PropertyKey) {
+    ensureMeta(target);
+    ensureConstructorMeta(target);
+    ensureCollection(store, target.constructor);
+    ensureIndicies(store, target.constructor);
+    checkNotNull(store, target.constructor, propertyKey);
+  }
+}
+
+/**
+ * Checks that a field will never receive `undefined` as a value
+ * 
+ * @param store 
+ */
+export function notUndefined<T>(store: ReturnType<typeof createStore>) {
+  return function(target: any, propertyKey: PropertyKey) {
+    ensureMeta(target);
+    ensureConstructorMeta(target);
+    ensureCollection(store, target.constructor);
+    ensureIndicies(store, target.constructor);
+    checkNotUndefined(store, target.constructor, propertyKey);
+  }
+}
+
+/**
+ * Checks that the field has a unique value. Implies that an index will be created
+ * 
+ * @param store 
+ */
+export function unique<T>(store: ReturnType<typeof createStore>) {
+  return function(target: any, propertyKey: PropertyKey) {
+    indexed(target, propertyKey); // FIXME: Shouldn't this have already been done in checkUnique?
+    checkUnique(store, target.constructor, propertyKey);
+  }
+}
+
+/**
+ * Defines a custom check function to be used while adding this object to the store.
+ * 
+ * @param store 
+ */
+export function setCheck<T>(store: ReturnType<typeof createStore>, checkConstraint: (...args: (keyof T)[]) => boolean) {
+  return function(target: any, propertyKey: PropertyKey) {
+    ensureMeta(target);
+    ensureConstructorMeta(target);
+    ensureCollection(store, target.constructor);
+    ensureIndicies(store, target.constructor);
+    check(store, target.constructor, propertyKey, checkConstraint);
+  }
 }

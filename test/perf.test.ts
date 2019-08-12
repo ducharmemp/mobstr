@@ -1,41 +1,86 @@
-import { range } from 'lodash';
-import { v4 as uuid } from 'uuid';
+import { range } from "lodash";
+import { v4 as uuid } from "uuid";
 
-import { primaryKey } from '../src/decorators';
-import { addAll, createStore, dropCollection, removeAll } from '../src/store';
+import createStore from "../dist/index";
 
-describe('#performance', (): void => {
-  it('should be performant in adding 10k amounts of items to a collection', (): void => {
-    const store = createStore()
+describe("#performance", (): void => {
+  const {
+    addAll,
+    primaryKey,
+    truncateCollection,
+    dropAllTriggers,
+    check,
+    notNull,
+    notUndefined,
+    unique,
+  } = createStore();
+  const times = range(100000);
 
-    class Foo {
-      @primaryKey
-      id = uuid();
-    }
-    addAll(store, range(10000).map(() => new Foo()))
+  class Foo {
+    @primaryKey
+    id = uuid();
+
+    number = Math.random();
+  }
+
+  class CheckedFoo {
+    @unique
+    @primaryKey
+    id = uuid();
+
+    @notNull
+    @notUndefined
+    age = 5;
+  }
+
+  let foos: Foo[];
+  let checkedFoos: CheckedFoo[];
+  let subset: Foo[];
+
+  before((): void => {
+    foos = times.map(() => new Foo());
+    checkedFoos = times.map(() => new CheckedFoo());
+    subset = foos.slice(0, 500);
+    check(Foo, "number", value => value > 0);
+    addAll(foos);
+    addAll(checkedFoos);
+    truncateCollection(Foo);
+    truncateCollection(CheckedFoo);
+    dropAllTriggers();
   });
 
-  it('should be performant in adding and then removing 10k items to a collection', (): void => {
-    const store = createStore();
-
-    class Foo {
-      @primaryKey
-      id = uuid();
-    }
-    const foos = range(10000).map(() => new Foo());
-    addAll(store, foos);
-    removeAll(store, foos);
+  afterEach((): void => {
+    truncateCollection(Foo);
+    dropAllTriggers();
   });
 
-  it('should be performant in adding 10k items and then dropping a collection', (): void => {
-    const store = createStore();
+  it("should be performant in adding a 500 item subset of the items to a collection", (): void => {
+    addAll(subset);
+  });
 
-    class Foo {
-      @primaryKey
-      id = uuid();
-    }
-    const foos = range(10000).map(() => new Foo());
-    addAll(store, foos);
-    dropCollection(store, Foo);
+  it("should be performant in adding 100k amounts of items to a collection", (): void => {
+    addAll(foos);
+  });
+
+  it("should be performant in adding 100k items and then dropping a collection", (): void => {
+    addAll(foos);
+    truncateCollection(Foo);
+  });
+
+  it("should be performant in adding 100k items with a constraint", (): void => {
+    check(Foo, "number", value => value > 0);
+    addAll(foos);
+    truncateCollection(Foo);
+  });
+
+  it("should be performant in adding 100k items with a constraint", (): void => {
+    check(Foo, "number", value => value > 0);
+    addAll(foos);
+    truncateCollection(Foo);
+  });
+
+  it("should be performant in adding 100k items with multiple decorator constraints", (): void => {
+    addAll(checkedFoos);
+    truncateCollection(CheckedFoo);
   });
 });

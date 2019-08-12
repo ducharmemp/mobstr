@@ -1,7 +1,7 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 
-import createStore from "../../src";
+import createStore from "../../src/index";
 
 describe("#index", (): void => {
   describe("#createStore", (): void => {
@@ -16,7 +16,18 @@ describe("#index", (): void => {
         "addAll",
         "removeOne",
         "removeAll",
-        "truncateCollection"
+        "truncateCollection",
+        "dropTrigger",
+        "createCollectionTrigger",
+        "dropAllTriggers",
+        "checkNotNull",
+        "checkNotUndefined",
+        "checkUnique",
+        "check",
+        "notNull",
+        "notUndefined",
+        "setCheck",
+        "unique"
       ]);
     });
   });

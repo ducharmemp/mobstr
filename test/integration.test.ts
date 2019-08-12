@@ -10,9 +10,8 @@ import {
   join,
   findAll,
   findOne,
-  addAll
 } from "../src/store";
-import { primaryKey, relationship } from "../src/decorators";
+import { primaryKey, relationship, setCheck, notNull, notUndefined } from "../src/decorators";
 
 describe("#integration", () => {
   it("should allow construction of a collection class", () => {
@@ -128,9 +127,9 @@ describe("#integration", () => {
     const b = new Bar();
     addOne(store, f);
     // This works because we have meta attributes on all classes. Having one instance means you can get *all* instances
-    expect(findAll(store, f)).to.have.length(1);
+    expect(findAll(store, Foo)).to.have.length(1);
     removeOne(store, f);
-    expect(findAll(store, f)).to.have.length(0);
+    expect(findAll(store, Foo)).to.have.length(0);
   });
 
   it("should allow the user to find a single item by key from a collection", () => {
@@ -375,5 +374,20 @@ describe("#integration", () => {
     expect(findAll(store, Foo)).to.have.lengthOf(5);
     expect(() => removeOne(store, foo)).to.not.throw();
     expect(findAll(store, Foo)).to.be.empty;
+  });
+
+  it('should allow multiple constraint decorators to be assigned to a single field', (): void => {
+    const store = createStore();
+    class Foo {
+      @primaryKey
+      id = uuid();
+
+      @notNull(store)
+      @notUndefined(store)
+      @setCheck(store, value => value > 5)
+      age = 5
+    }
+
+    expect(() => addOne(store, new Foo())).to.throw;
   });
 });
