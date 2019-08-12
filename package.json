@@ -28,7 +28,8 @@
       "source-map-support/register"
     ],
     "sourcemap": true,
-    "instrument": true
+    "instrument": true,
+    "all": true
   },
   "scripts": {
     "test": "nyc mocha --timeout=10000 -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",

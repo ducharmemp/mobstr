@@ -19,7 +19,6 @@ export function check<T extends Constructor<{}>>(
   entityClass: T,
   propertyName: keyof InstanceType<T>,
   constraint: (arg0: InstanceType<T>[keyof InstanceType<T>]) => boolean,
-  constraintOptions?: {}
 ) {
   createCollectionTrigger(
     store,
@@ -37,7 +36,7 @@ export function check<T extends Constructor<{}>>(
     {
       triggerExecutionStrategy: TriggerExecutionStrategy.Intercept,
       // Have to do update here due to "update" events being fired on the same observable
-      // 
+      // i.e. a Map.set on the same key actually fires an "update" event instead of an "add"
       eventTypes: new Set([TriggerQueryEvent.Insert, TriggerQueryEvent.Update])
     }
   );
@@ -52,14 +51,12 @@ export function notNull<T extends Constructor<{}>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>,
-  constraintOptions?: {}
 ) {
   check(
     store,
     entityClass,
     propertyName,
     propertyValue => propertyValue !== null,
-    constraintOptions
   );
 }
 
@@ -72,20 +69,18 @@ export function notUndefined<T extends Constructor<{}>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>,
-  constraintOptions?: {}
 ) {
   check(
     store,
     entityClass,
     propertyName,
     propertyValue => propertyValue !== undefined,
-    constraintOptions
   );
 }
 
 /**
  * Creates a unique constraint on a field in a given object. This implies that
- * the field is also indexed
+ * the field will be indexed.
  *
  * @export
  */
@@ -93,7 +88,6 @@ export function unique<T extends Constructor<{}>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>,
-  constraintOptions?: {}
 ) {
   const currentCollection = getMeta(entityClass).collectionName;
   indexed(entityClass, propertyName as string);
@@ -110,18 +104,5 @@ export function unique<T extends Constructor<{}>>(
         (propertyValue as unknown) as string
       );
     },
-    constraintOptions
   );
 }
-
-/**
- *
- *
- * @export
- */
-export function exclude<T extends Constructor<{}>>(
-  store: ReturnType<typeof createStore>,
-  entityClass: T,
-  propertyName: keyof InstanceType<T>,
-  constraintOptions?: {}
-) {}

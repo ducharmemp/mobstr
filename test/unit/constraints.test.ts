@@ -7,7 +7,6 @@ import {
   unique,
   notNull,
   notUndefined,
-  exclude
 } from "../../src/constraints";
 import { createStore, addOne } from "../../src/store";
 import { primaryKey, indexed } from "@src/decorators";
