@@ -1,8 +1,8 @@
-import { observable, action } from "mobx";
+import { observable, action, toJS } from "mobx";
 import { flatMap } from "lodash";
 
 import { Meta, Store, Constructor } from "./types";
-import { ensureMeta, getMeta, ensureCollection } from "./utils";
+import { ensureMeta, getMeta, ensureCollection, ensureIndicies, ensureConstructorMeta } from "./utils";
 
 /**
  * Creates a store for use with decorators and other helper functions. Meant to be used as a singleton,
@@ -14,12 +14,9 @@ import { ensureMeta, getMeta, ensureCollection } from "./utils";
 export const createStore = action(
   (): Store =>
     observable({
-      collections: {} as Record<
-        string | symbol | number,
-        Map<string | symbol | number, any>
-      >,
+      collections: {},
       primaryKeys: new Map(),
-      indicies: new Map(),
+      indicies: {},
       triggers: new Map(),
       nextId: 0
     })
@@ -35,16 +32,25 @@ export const createStore = action(
 export const addOne = action(
   <T>(store: ReturnType<typeof createStore>, entity: T) => {
     ensureMeta(entity);
-    ensureMeta(Object.getPrototypeOf(entity));
+    ensureConstructorMeta(entity);
     ensureCollection(store, entity);
+    ensureIndicies(store, entity);
     const currentMeta = getMeta(entity);
     const currentCollection = currentMeta.collectionName;
     const currentKey = currentMeta.key.get();
+    const indicies = currentMeta.indicies;
 
     store.collections[currentCollection as string].set(
-      (entity[currentKey as keyof T] as unknown) as string | number | symbol,
+      entity[currentKey as keyof T] as unknown as string,
       entity
     );
+
+    indicies.forEach((index) => {
+      store.indicies[currentCollection as string].set(
+        entity[index as keyof T] as unknown as string,
+        entity
+      );
+    });
   }
 );
 
