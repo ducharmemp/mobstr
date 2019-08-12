@@ -20,10 +20,14 @@ describe("#index", (): void => {
         "dropTrigger",
         "createCollectionTrigger",
         "dropAllTriggers",
+        "checkNotNull",
+        "checkNotUndefined",
+        "checkUnique",
+        "check",
         "notNull",
         "notUndefined",
-        "unique",
-        "check"
+        "setCheck",
+        "unique"
       ]);
     });
   });

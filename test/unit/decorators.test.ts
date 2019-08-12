@@ -2,9 +2,10 @@ import { describe, it } from "mocha";
 import { expect } from "chai";
 import { v4 as uuid } from 'uuid';
 
-import { indexed, primaryKey, relationship } from "../../src/decorators";
+import { indexed, primaryKey, relationship, notNull, notUndefined, unique } from "../../src/decorators";
 import { Meta } from "../../src/types";
-import { createStore } from "../../src/store";
+import { createStore, addOne } from "../../src/store";
+import { IntegrityError } from "@src/errors";
 
 describe("#decorators", (): void => {
   describe("#indexed", (): void => {
@@ -103,6 +104,56 @@ describe("#decorators", (): void => {
       f.friends.push(new Bar(), new Bar());
       f.friends[0] = b;
       expect(f.friends[0]).to.be.eql(b);
+    });
+  });
+
+  describe('#notNull', (): void => {
+    it('should check that a given column is not nullable', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @notNull(store)
+        name = null;
+      }
+
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
+    });
+  });
+
+  describe('#notUndefined', (): void => {
+    it('should check that a given column is not undefine-able', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @notUndefined(store)
+        name = undefined;
+      }
+
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
+    });
+  });
+
+  describe('#unique', (): void => {
+    it('should check that a given column must have unique values', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @unique(store)
+        name = '1';
+      }
+
+      addOne(store, new Foo());
+      console.log(store.indicies['Foo'].get('1'))
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
     });
   });
 });

@@ -2,7 +2,7 @@ import { describe, it } from "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 
-import { check, unique, notNull, notUndefined } from "../../src/constraints";
+import { check, checkUnique, checkNotNull, checkNotUndefined } from "../../src/constraints";
 import { createStore, addOne } from "../../src/store";
 import { primaryKey, indexed } from "@src/decorators";
 import { IntegrityError } from "@src/errors";
@@ -97,7 +97,7 @@ describe("#constraints", (): void => {
         name = null;
       }
 
-      notNull(store, Foo, "name");
+      checkNotNull(store, Foo, "name");
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
       dropAllTriggers(store);
@@ -114,7 +114,7 @@ describe("#constraints", (): void => {
         name = undefined;
       }
 
-      notUndefined(store, Foo, "name");
+      checkNotUndefined(store, Foo, "name");
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
       dropAllTriggers(store);
     });
@@ -131,7 +131,7 @@ describe("#constraints", (): void => {
         name = "something";
       }
 
-      unique(store, Foo, "name");
+      checkUnique(store, Foo, "name");
       addOne(store, new Foo());
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
       dropAllTriggers(store);

@@ -9,8 +9,8 @@ import {
   truncateCollection,
 } from "./store";
 import { createCollectionTrigger, dropTrigger, dropAllTriggers } from './triggers';
-import { primaryKey, relationship } from "./decorators";
-import { notNull, notUndefined, unique, check } from './constraints';
+import { primaryKey, relationship, notNull, notUndefined, setCheck, unique } from "./decorators";
+import { checkNotNull, checkNotUndefined, checkUnique, check } from './constraints';
 
 /**
  * Intializes a store and provides helper methods bound to that store for convenience.
@@ -24,6 +24,10 @@ export default function initialize() {
     // Decorators
     primaryKey,
     relationship: relationship.bind(null, store),
+    notNull: notNull(store),
+    notUndefined: notUndefined(store),
+    unique: unique(store),
+    setCheck: setCheck.bind(null, store),
     // Store methods
     findAll: findAll.bind(null, store),
     findOne: findOne.bind(null, store),
@@ -37,9 +41,9 @@ export default function initialize() {
     dropAllTriggers: dropAllTriggers.bind(null, store),
     createCollectionTrigger: createCollectionTrigger.bind(null, store),
     // Constraints
-    unique: unique.bind(null, store),
-    notNull: notNull.bind(null, store),
-    notUndefined: notUndefined.bind(null, store),
+    checkUnique: checkUnique.bind(null, store),
+    checkNotNull: checkNotNull.bind(null, store),
+    checkNotUndefined: checkNotUndefined.bind(null, store),
     check: check.bind(null, store),
   };
 }

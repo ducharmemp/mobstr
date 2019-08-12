@@ -76,7 +76,7 @@ export function check<K, T extends Constructor<K>>(
  * @param propertyName
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function notNull<T extends Constructor<{}>>(
+export function checkNotNull<T extends Constructor<{}>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>
@@ -105,7 +105,7 @@ export function notNull<T extends Constructor<{}>>(
  * @param propertyName
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function notUndefined<T extends Constructor<{}>>(
+export function checkNotUndefined<T extends Constructor<{}>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>
@@ -128,7 +128,7 @@ export function notUndefined<T extends Constructor<{}>>(
  * @param propertyName
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function unique<T extends Constructor<{}>>(
+export function checkUnique<T extends Constructor<{}>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>
