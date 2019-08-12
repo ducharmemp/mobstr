@@ -3,6 +3,7 @@
   "version": "0.2.1",
   "description": "Object relational mapper for MobX stores",
   "main": "dist/index.js",
+  "source": "src/index.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/ducharmemp/mobstr.git"
@@ -34,10 +35,11 @@
   "scripts": {
     "test": "nyc mocha --timeout=10000 -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",
     "test:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml --exit --full-trace --bail",
+    "test:prof": "npm run build && NODE_ENV=production node --prof $(which npm) run test -- --grep \"performance\" && node --prof-process isolate* > processed.txt && rm isolate*",
     "coverage": "nyc report --reporter=text-lcov > .coverage",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
-    "build": "tsc",
+    "build": "NODE_ENV=production microbundle build",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build && npm test",
     "postpublish": "git push --tags && git push origin master"
@@ -46,8 +48,7 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "lodash": "^4.17.15",
-    "mobx": "^5.13.0",
-    "sinon": "^7.4.1"
+    "mobx": "^5.13.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -64,13 +65,17 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-react": "^7.14.3",
+    "microbundle": "^0.11.0",
     "mocha": "^6.2.0",
     "mocha-junit-reporter": "^1.23.1",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
+    "rollup-plugin-typescript": "^1.0.1",
+    "sinon": "^7.4.1",
     "source-map-support": "^0.5.13",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",
+    "tslib": "^1.10.0",
     "typescript": "^3.5.3",
     "uuid": "^3.3.2"
   }

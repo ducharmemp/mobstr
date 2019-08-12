@@ -1,41 +1,54 @@
 import { range } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
-import { primaryKey } from '../src/decorators';
-import { addAll, createStore, dropCollection, removeAll } from '../src/store';
+import createStore from '../dist/index';
+import { observable } from 'mobx';
 
 describe('#performance', (): void => {
-  it('should be performant in adding 10k amounts of items to a collection', (): void => {
-    const store = createStore()
+  const { addAll, primaryKey, truncateCollection, dropAllTriggers, check } = createStore()
+  const times = range(100000);
 
-    class Foo {
-      @primaryKey
-      id = uuid();
-    }
-    addAll(store, range(10000).map(() => new Foo()))
+  class Foo {
+    @primaryKey
+    id = uuid();
+
+    number = Math.random();
+  }
+  
+  let foos: Foo[];
+  let subset: Foo[];
+  const m = observable.map()
+
+  before((): void => {
+    foos = times.map(() => new Foo());
+    subset = foos.slice(0, 500);
+    check(Foo, 'number', value => value > 0);
+    addAll(foos);
+    truncateCollection(Foo);
+    dropAllTriggers();
+  })
+  
+  afterEach((): void => {
+    truncateCollection(Foo);
+    dropAllTriggers();
+  })
+
+  it('should be performant in adding a 500 item subset of the items to a collection', (): void => {
+    addAll(subset);
   });
 
-  it('should be performant in adding and then removing 10k items to a collection', (): void => {
-    const store = createStore();
-
-    class Foo {
-      @primaryKey
-      id = uuid();
-    }
-    const foos = range(10000).map(() => new Foo());
-    addAll(store, foos);
-    removeAll(store, foos);
+  it('should be performant in adding 100k amounts of items to a collection', (): void => {
+    addAll(foos)
   });
 
-  it('should be performant in adding 10k items and then dropping a collection', (): void => {
-    const store = createStore();
+  it('should be performant in adding 100k items and then dropping a collection', (): void => {
+    addAll(foos);
+    truncateCollection(Foo);
+  });
 
-    class Foo {
-      @primaryKey
-      id = uuid();
-    }
-    const foos = range(10000).map(() => new Foo());
-    addAll(store, foos);
-    dropCollection(store, Foo);
+  it('should be performant in adding 100k items with a constraint', (): void => {
+    check(Foo, 'number', value => value > 0);
+    addAll(foos);
+    truncateCollection(Foo);
   });
 });

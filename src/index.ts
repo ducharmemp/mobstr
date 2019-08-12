@@ -8,8 +8,9 @@ import {
   findOne,
   truncateCollection,
 } from "./store";
-import { createCollectionTrigger, dropTrigger } from './triggers';
+import { createCollectionTrigger, dropTrigger, dropAllTriggers } from './triggers';
 import { primaryKey, relationship } from "./decorators";
+import { notNull, notUndefined, unique, check } from './constraints';
 
 /**
  * Intializes a store and provides helper methods bound to that store for convenience.
@@ -33,6 +34,12 @@ export default function initialize() {
     truncateCollection: truncateCollection.bind(null, store),
     // Trigger methods
     dropTrigger: dropTrigger.bind(null, store),
+    dropAllTriggers: dropAllTriggers.bind(null, store),
     createCollectionTrigger: createCollectionTrigger.bind(null, store),
+    // Constraints
+    unique: unique.bind(null, store),
+    notNull: notNull.bind(null, store),
+    notUndefined: notUndefined.bind(null, store),
+    check: check.bind(null, store),
   };
 }

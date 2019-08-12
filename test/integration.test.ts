@@ -10,7 +10,6 @@ import {
   join,
   findAll,
   findOne,
-  addAll
 } from "../src/store";
 import { primaryKey, relationship } from "../src/decorators";
 

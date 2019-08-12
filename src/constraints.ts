@@ -14,7 +14,7 @@ import { indexed } from './decorators';
  *
  * @export
  */
-export function check<T extends Constructor<{}>>(
+export function check<K, T extends Constructor<K>>(
   store: ReturnType<typeof createStore>,
   entityClass: T,
   propertyName: keyof InstanceType<T>,
@@ -24,8 +24,9 @@ export function check<T extends Constructor<{}>>(
     store,
     entityClass,
     change => {
-      const { newValue } = change;
+      const { newValue, object } = change;
       const propertyValue = getBoxedValueOrValue(newValue[propertyName]);
+      const oldValue = getBoxedValueOrValue(object[propertyName]);
       if (!constraint(propertyValue)) {
         throw new IntegrityError(
           `Check constraint failed on field ${entityClass.name}.${propertyName}`
