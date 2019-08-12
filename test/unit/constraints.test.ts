@@ -2,12 +2,7 @@ import { describe, it } from "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 
-import {
-  check,
-  unique,
-  notNull,
-  notUndefined,
-} from "../../src/constraints";
+import { check, unique, notNull, notUndefined } from "../../src/constraints";
 import { createStore, addOne } from "../../src/store";
 import { primaryKey, indexed } from "@src/decorators";
 import { IntegrityError } from "@src/errors";
@@ -29,6 +24,52 @@ describe("#constraints", (): void => {
       dropAllTriggers(store);
     });
 
+    it("should allow single property names or multiple property names for a check constraint", (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey
+        id = "";
+
+        name = "";
+
+        age = 0;
+      }
+
+      expect(
+        check(
+          store,
+          Foo,
+          ["name", "age"],
+          (name, age) => (name as string).length !== 0 && age !== 0
+        )
+      ).to.be.a(typeof 1);
+      expect(
+        check(store, Foo, "name", name => (name as string).length !== 0)
+      ).to.be.a(typeof 1);
+    });
+
+    it("should allow the definition of a check constraint with multiple values", (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey
+        id = "";
+
+        name = "";
+
+        age = 0;
+      }
+
+      expect(() =>
+        check(
+          store,
+          Foo,
+          ["name", "age"],
+          (name, age) => (name as string).length !== 0 && age !== 0
+        )
+      ).to.not.throw;
+      dropAllTriggers(store);
+    });
+
     it("should call the constraint when a value is added to the store", (): void => {
       const store = createStore();
       class Foo {
@@ -46,8 +87,8 @@ describe("#constraints", (): void => {
     });
   });
 
-  describe('#notNull', (): void => {
-    it('should check that the value is not null', (): void => {
+  describe("#notNull", (): void => {
+    it("should check that the value is not null", (): void => {
       const store = createStore();
       class Foo {
         @primaryKey
@@ -63,8 +104,8 @@ describe("#constraints", (): void => {
     });
   });
 
-  describe('#notUndefined', (): void => {
-    it('should check that the value is not undefined', (): void => {
+  describe("#notUndefined", (): void => {
+    it("should check that the value is not undefined", (): void => {
       const store = createStore();
       class Foo {
         @primaryKey
@@ -79,8 +120,8 @@ describe("#constraints", (): void => {
     });
   });
 
-  describe('#unique', (): void => {
-    it('should check that the value is unique', (): void => {
+  describe("#unique", (): void => {
+    it("should check that the value is unique", (): void => {
       const store = createStore();
       class Foo {
         @primaryKey

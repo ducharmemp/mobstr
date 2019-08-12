@@ -6,3 +6,5 @@ test-results
 coverage
 
 .rts2_cache*
+processed.txt
+isolate*

@@ -33,9 +33,10 @@
     "all": true
   },
   "scripts": {
-    "test": "nyc mocha --timeout=10000 -r ts-node/register -r tsconfig-paths/register -r source-map-support/register test/index.test.ts",
+    "test:setup": "mocha --timeout=10000 -r ts-node/register -r tsconfig-paths/register -r source-map-support/register",
+    "test": "nyc npm run test:setup -- test/index.test.ts",
     "test:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml --exit --full-trace --bail",
-    "test:prof": "npm run build && NODE_ENV=production node --prof $(which npm) run test -- --grep \"performance\" && node --prof-process isolate* > processed.txt && rm isolate*",
+    "test:prof": "npm run build && NODE_ENV=production node --prof $(which npm) run test:setup -- test/perf.test.ts && node --prof-process isolate* > processed.txt && rm isolate*",
     "coverage": "nyc report --reporter=text-lcov > .coverage",
     "test:watch": "npm run test -- --watch",
     "start": "npm run build -- --watch",
