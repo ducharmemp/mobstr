@@ -152,7 +152,6 @@ describe("#decorators", (): void => {
       }
 
       addOne(store, new Foo());
-      console.log(store.indicies['Foo'].get('1'))
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
     });
   });

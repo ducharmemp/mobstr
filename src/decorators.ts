@@ -209,7 +209,6 @@ export function unique<T>(store: ReturnType<typeof createStore>) {
   }
 }
 
-// TODO: Rename
 /**
  * Defines a custom check function to be used while adding this object to the store.
  * 
