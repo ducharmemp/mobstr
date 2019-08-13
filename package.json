@@ -53,7 +53,6 @@
     "build:docs": "typedoc --options ./typedocconfig.js",
     "clean": "rm -rf dist && rm -rf .rts2*",
     "preversion": "npm run clean && npm run build && npm run build:docs && npm test && git add .",
-    "prepublishOnly": "npm version",
     "postpublish": "git push --tags && git push origin master"
   },
   "author": "Matthew P DuCharme",
