@@ -9,6 +9,7 @@ MobStr is a project designed to provide an ORM-like interface to a MobX store. T
 * Relationship cascades and auto-cleanup for removed objects
 * Separation of concerns for managing object models and RESTful/GraphQL API queries (no sagas/thunks)
 * Update objects directly without the need for complex copy operations
+* Opt-in semantics for constraints and checks on columns for debugging purposes and sanity checks.
 
 ## Technical Details
 <details>
@@ -210,6 +211,14 @@ function apiCallResult(returnValue) {
   <summary><b>Does this work with anonymous classes?</b></summary>
  
   No, since the decorator specification doens't allow for usage of decorators within anonymous classes, there's not much that MobStr can do at this time. I hope that in the future we could allow for something like this, since it could open up doors for dynamic model creation, although I'm not sure if that's a great idea or a terrible idea.
+</details>
+<details>
+  <summary><b>Are there column constraints?</b></summary>
+  Yes, and they're opt-in by default. MobStr performs no type-checking at runtime since there are plenty of libraries that can validate complex nested schemas, or that can perform complex type checking. However, there are certain store-level constraints that can be checked, such as unique. notUndefined/notNull are included for feature parity with SQL databases. Check constraints can also be user defined, to validate objects in a custom manner as they are populated.
+</details>
+<details>
+  <summary><b>Are there listeners on the store?</b></summary>
+  Yes. While MobX provides observer/interceptor support out of the box, MobStr providees syntactic sugar around these interfaces, allowing the store to behave similar to a database. For example, observers/interceptors defined using MobStr's trigger API can discriminate against the type of action being performed (delete, update, add, etc.), leading to a natural and consistent API to map developer intentions against the underlying primitives.
 </details>
 
 ## Examples
