@@ -1,3 +1,6 @@
+/**
+ * @module triggers
+ */
 import {
   observe,
   Lambda,
@@ -10,46 +13,18 @@ import {
 } from "mobx";
 import { createStore } from "./store";
 import { getMeta, getNextId, ensureCollection } from "./utils";
-import { Constructor } from "./types";
-
-/**
- * Describes the order of execution for triggers.
- * 
- * Equivalent to the following SQL:
- *   - Intercept "CREATE TRIGGER test BEFORE ...", "CREATE TRIGGER test INSTEAD OF ..."
- *   - Observe "CREATE TRIGGER test AFTER ..."
- *
- * @export
- * @enum {number}
- */
-export enum TriggerExecutionStrategy {
-  Intercept, // Before event, allows rewrite
-  Observe // After event, disallows rewrite
-}
-
-/**
- *
- *
- * @export
- * @enum {string}
- */
-export enum TriggerQueryEvent {
-  Insert = "add",
-  Delete = "delete",
-  Update = "update",
-  // Truncate = "truncate",
-  All = "all"
-}
-
-export interface TriggerOptions {
-  eventTypes?: Set<TriggerQueryEvent>;
-  triggerExecutionStrategy?: TriggerExecutionStrategy;
-}
+import {
+  Constructor,
+  TriggerQueryEvent,
+  TriggerExecutionStrategy,
+  TriggerOptions
+} from "./types";
 
 /**
  * Runs a given trigger, filtering out event types that aren't relevant to the current trigger
- * 
+ *
  * @export
+ * @function
  * @param trigger
  * @param eventTypes
  * @param change
@@ -60,7 +35,10 @@ export const executeTrigger = action(
     eventTypes: Set<TriggerQueryEvent>,
     change: IObjectWillChange | IObjectDidChange
   ): any | null => {
-    if (!eventTypes.has(TriggerQueryEvent.All) && !eventTypes.has(change.type as TriggerQueryEvent)) {
+    if (
+      !eventTypes.has(TriggerQueryEvent.All) &&
+      !eventTypes.has(change.type as TriggerQueryEvent)
+    ) {
       return;
     }
     return trigger(change);
@@ -69,8 +47,9 @@ export const executeTrigger = action(
 
 /**
  * Wraps a trigger for execution
- * 
+ *
  * @export
+ * @function
  * @param target
  * @param trigger
  * @param eventTypes
@@ -94,19 +73,23 @@ export const wrapTrigger = action(
 /**
  * Creates a trigger scoped to a particular collection. This is a low-level primitive to basically
  * map over mobx's intercept and observe for a particular collection
- * 
+ *
  * @example
+ * ```typescript
+ *
  * class Foo {
  *  @primaryKey
  *  id = ''
- * 
+ *
  *  name = 'fooName'
  * }
- * 
+ *
  * createCollectionTrigger(Foo, (change) => { console.log('Foo changed', change) });
  * addOne(new Foo());
- * 
+ * ```
+ *
  * @export
+ * @function
  * @param store
  * @param entityClass
  * @param trigger
@@ -141,8 +124,9 @@ export const createCollectionTrigger = action(
 
 /**
  * Drops a single trigger from the store
- * 
+ *
  * @export
+ * @function
  * @param store
  * @param triggerId
  */
@@ -157,8 +141,9 @@ export const dropTrigger = action(
 /**
  * Drops all triggers from the store. Note: constraints are implemented
  * as triggers, so this function will drop all constraints as well
- * 
+ *
  * @export
+ * @function
  * @param store
  */
 export const dropAllTriggers = action(

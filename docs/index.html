@@ -1,0 +1,576 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@ducharmemp/mobstr</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@ducharmemp/mobstr</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> @ducharmemp/mobstr</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#mobstr" id="mobstr" style="color: inherit; text-decoration: none;">
+					<h1>MobStr</h1>
+				</a>
+				<p><a href="https://circleci.com/gh/ducharmemp/mobstr"><img src="https://circleci.com/gh/ducharmemp/mobstr.svg?style=svg" alt="CircleCI"></a> <a href="https://codecov.io/gh/ducharmemp/mobstr"><img src="https://codecov.io/gh/ducharmemp/mobstr/branch/master/graph/badge.svg" alt="CodeCov"></a> <a href="https://www.npmjs.com/package/@ducharmemp/mobstr" title="View this project on npm"><img src="https://img.shields.io/npm/v/@ducharmemp/mobstr" alt="npm version"></a></p>
+				<p>MobStr is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual book-keeping of object relationships. It also provides an opt-in approach to constraint checking, which can lead to better performance since we simply don&#39;t check every field.</p>
+				<a href="#benefits" id="benefits" style="color: inherit; text-decoration: none;">
+					<h2>Benefits</h2>
+				</a>
+				<ul>
+					<li>Simple and direct query API to find/delete entries from the data store</li>
+					<li>Declarative API for describing object models in a manner similar to other data stores</li>
+					<li>Relationship cascades and auto-cleanup for removed objects</li>
+					<li>Separation of concerns for managing object models and RESTful/GraphQL API queries (no sagas/thunks)</li>
+					<li>Update objects directly without the need for complex copy operations</li>
+				</ul>
+				<a href="#technical-details" id="technical-details" style="color: inherit; text-decoration: none;">
+					<h2>Technical Details</h2>
+				</a>
+				<details>
+					<summary><b>Rationale</b></summary>
+					While developing projects, I found myself maintaining more maps and objects for relationship maintenance than I enjoyed, and had to remember to invalidate those relationships with objects to avoid having dangling references to deleted objects. I also disliked the overall method that I had to use to find the related objects. Too often I find myself accidentally slipping in attributes that are meant to achieve faster performance for lookup to my store objects, such as maps or objects. This works for a time, but then my model becomes polluted with extra attributes that I need to keep in sync and the model deviates further from my actual intention.<br><br>
+					<p>  Additionally, it&#39;s actually fairly easy to make certain guarantees that MobX provides invalid by complete accident, especially when copying string keys from observable objects into another observable. The answer is to leverage <code>computed</code> or <code>autorun</code> or other reaction-based functions, but this library <em>should</em> abstract over those to the point where the user doesn&#39;t need to necessarily worry about committing error-prone code in these specialized cases.<br><br></p>
+					<p>  There do exist other solutions in the MobX examples and they are perfectly valid, but they require passing around parent contexts and there isn&#39;t an out of the box solution for saying &quot;I have all of these models that I know are related to parents, but I just want these without looping through all of the parents&quot;. Consider this example store code loosely lifted from the MobX documentation:</p>
+					<pre><code class="language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ToDo</span> </span>{
+    <span class="hljs-keyword">constructor</span>(store) {
+        <span class="hljs-keyword">this</span>.store = store;
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Parent</span> </span>{
+    @observable todos = []
+
+    makeTodo() {
+      <span class="hljs-keyword">this</span>.todos.push(<span class="hljs-keyword">new</span> ToDo(<span class="hljs-keyword">this</span>));
+    }
+}</code></pre>
+					<p>Full and complete sample here: <a href="https://mobx.js.org/best/store.html">https://mobx.js.org/best/store.html</a></p>
+					<p>This requires only a simple flatmap to achieve the desired output of a list of all ToDos, but more complicated relationships would easily become more cumbersome. For example, take the following code snippet:</p>
+					<pre><code class="language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Step</span> </span>{}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ToDo</span> </span>{
+    @observable steps = [];
+
+    makeStep() {
+        <span class="hljs-keyword">this</span>.steps.push(<span class="hljs-keyword">new</span> Step(<span class="hljs-keyword">this</span>))
+    }
+
+    <span class="hljs-keyword">constructor</span>(store) {
+        <span class="hljs-keyword">this</span>.store = store;
+    }
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Parent</span> </span>{
+    @observable todos = []
+
+    makeTodo() {
+      <span class="hljs-keyword">this</span>.todos.push(<span class="hljs-keyword">new</span> ToDo(<span class="hljs-keyword">this</span>));
+    }
+}</code></pre>
+					<p>The overall approach is still the same (flatMap with a greater depth to get all Steps from all ToDos), but it would be nice to simply query for all of the steps that currently exist in isolation, or all ofthe ToDos that currently exist without having to traverse the parent contexts.</p>
+					<p>With this project, I hope to separate the concerns of managing a centralized store with an accessible syntax for describing model relationships and model structure. Eventually I also hope to integrate nice-to-have features, such as index only lookups, complex primary key structures, and relationship cascade options.</p>
+				</details>
+				<details>
+					<summary><b>Why not mobx-state-tree or other existing libraries instead of developing this solution?</b></summary>
+					I wanted to tinker a bit with how far I could take this project while punting on features such as state snapshots and state rewinding. I haven't been in a debugging situation where it was helpful for me personally, so MobX-state-tree and others have a bit too much complexity for my taste.
+					<p>All told, this project is about 200 lines of actual code (so far!), with most of the actual code lying in the decorators to set up meta attributes and maintain book-keeping, so it should achieve a very similar result to mobx-state-tree while cutting down on the complexity. LOC isn&#39;t a great metric for complexity or scope but it&#39;s what I have on hand.  </p>
+				</details>
+				<details>
+					<summary><b>What is this `__meta__` attribute attatched to my objects?</b></summary>
+					MobStr needs to maintain records of primary keys names, collection names, and related objects *somewhere*, so shoving them into the added objects was a short-term solution to get up and running. Eventually I hope to separate these meta attributes from the actual models and store that information in the central store in order to avoid any confusion in console.log outputs or object inspection.
+					<p>As of now, the form that the <code>__meta__</code> attribute takes is this:</p>
+					<pre><code class="language-js">__meta__: {
+    <span class="hljs-attr">key</span>: IObservableValue&lt;string | symbol | number | <span class="hljs-literal">null</span>&gt;;
+
+    collectionName: string | symbol | number;
+    relationships: Record&lt;
+      string | symbol,
+      {
+        <span class="hljs-attr">type</span>: any;
+        keys: IObservableArray&lt;string&gt;;
+        options: Record&lt;string, any&gt;;
+      }
+    &gt;;
+    indicies: IObservableArray&lt;string | symbol | number&gt;;
+  };</code></pre>
+				</details>
+				<details>
+					<summary><b>Why decorators?</b></summary>
+					I previously developed back-end applications in python, so you could say that Flask/SQLAlchemy inspired the initial implementation. Relationship definitions were also inspired by the fantastic TypeORM library. I find that decorators provide a nice semantic over the meaning of the invocation, while staying relatively out of the way for type definitions. This means that in TypeScript, we can "properly" type our model attrbutes to match the mental model of the developer. This does come with some footguns that are unfortunate, which I will call out specifically at a later date.
+					<p>  Example of &quot;proper&quot; typing of class attributes:</p>
+					<pre><code class="language-ts"><span class="hljs-keyword">class</span> Bar {
+    <span class="hljs-meta">@primaryKey</span>
+    id: <span class="hljs-built_in">string</span> = uuid();
+}
+
+<span class="hljs-keyword">class</span> Foo {
+    <span class="hljs-meta">@primaryKey</span>
+    id: <span class="hljs-built_in">string</span> = uuid();
+
+    <span class="hljs-meta">@relationship</span>(<span class="hljs-function"><span class="hljs-params">type</span> =&gt;</span> Bar)
+    friends: Bar[] = [];
+}
+
+<span class="hljs-keyword">const</span> f = <span class="hljs-keyword">new</span> Foo();
+f.friends[<span class="hljs-number">0</span>].id <span class="hljs-comment">// This properly gives us type hints because we've typed it as a Bar[]. We could have also typed it as an IObservableArray</span></code></pre>
+				</details>
+				<details>
+					<summary><b>Does this have anything to do with network calls?</b></summary>
+					At this time, no. There are plenty of ORMs for REST interfaces and GrahQL interfaces that are more feature complete than a hobby project, and I wanted to focus on an area that I felt was lacking in the front-end.
+				</details>
+				<details>
+					<summary><b>Can I store arbitrary objects without a prototype in the store without defining a model?</b></summary>
+					Not exactly, at least not yet. I hope to make that a 1.0 feature. However, the likelihood of allowing similar definitions of `relationship` and `primaryKey` is uncertain at this time, due to the need for type names for storage purposes. It's entirely possible that this library could also offer a `collection` wrapper that would allow similar semantics for plain old objects.
+					<p>At this time, the recommended way to use POJOs in this library is similar to this example code:</p>
+					<pre><code class="language-js"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
+    @primaryKey
+    id = uuid();
+
+    @observable
+    someProperty = []
+}
+
+<span class="hljs-comment">// returnValue = { status: 200, data: {id: '1234', someProperty: [1, 2, 3, 4] }}</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">apiCallResult</span>(<span class="hljs-params">returnValue</span>) </span>{
+    <span class="hljs-comment">// Validate</span>
+    ...
+    <span class="hljs-comment">// Dump the result into a new instance of the model</span>
+    <span class="hljs-keyword">const</span> f = <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">new</span> Foo(), returnValue.data);
+    add(f);
+    <span class="hljs-keyword">return</span> f;
+}
+</code></pre>
+				</details>
+				<details>
+					<summary><b>Can I have trees?</b></summary>
+					Absolutely. The following code ripped out of the test cases works perfectly:
+					<pre><code class="language-js">  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
+    @primaryKey
+    id: string = uuid();
+
+    @relationship(store, () =&gt; Foo, { <span class="hljs-attr">cascade</span>: <span class="hljs-literal">true</span> })
+    leaves: Foo[] = [];
+  }
+  <span class="hljs-keyword">const</span> foo = <span class="hljs-keyword">new</span> Foo();
+  <span class="hljs-keyword">const</span> leaves = [<span class="hljs-keyword">new</span> Foo(), <span class="hljs-keyword">new</span> Foo()];
+  <span class="hljs-keyword">const</span> otherLeaves = [<span class="hljs-keyword">new</span> Foo(), <span class="hljs-keyword">new</span> Foo()];
+  addOne(store, foo);
+  foo.leaves.push(...leaves);
+  leaves[<span class="hljs-number">0</span>].leaves.push(...otherLeaves);
+  findAll(Foo).length === <span class="hljs-number">5</span>;
+  removeOne(foo);
+  findAll(Foo).length === <span class="hljs-number">0</span>;</code></pre>
+					<p>  However, this does still have the same limitations as POJOs currently do, so you can&#39;t <em>directly</em> shove a JSON structure into the store, there has to be a preprocessing step. However, a nice side effect of this is the ability to gather all Foo objects in a single query without walking the entirety of the tree.</p>
+				</details>
+				<details>
+					<summary><b>Can I have complex recursive relationships?</b></summary>
+					<p>  At this time, no. It has a lot to do with when javascript class definitions are evaluated. For an example of what I&#39;m talking about, please reference the below code:</p>
+					<pre><code class="language-js">  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Bar</span> </span>{
+    @primaryKey;
+    id = uuid()
+
+    @relationship(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> Foo)
+    foos = [];
+  }
+
+  <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Foo</span> </span>{
+    @primaryKey
+    id = uuid();
+
+    @relationship(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> Bar)
+    bars = []
+  }</code></pre>
+					<p>  At class definition time, &quot;Foo&quot; as a type is undefined, so the overall code will fail. I hope to eventually allow for these kinds of structures by using some form of lazy evalutaion on relationship definitions, similar to the method employed by SQLAlchemy.</p>
+				</details>
+				<details>
+					<summary><b>Does this work with anonymous classes?</b></summary>
+					<p>  No, since the decorator specification doens&#39;t allow for usage of decorators within anonymous classes, there&#39;s not much that MobStr can do at this time. I hope that in the future we could allow for something like this, since it could open up doors for dynamic model creation, although I&#39;m not sure if that&#39;s a great idea or a terrible idea.</p>
+				</details>
+				<a href="#examples" id="examples" style="color: inherit; text-decoration: none;">
+					<h2>Examples</h2>
+				</a>
+				<p>You can find some comprehensive toy examples in tests/integration.test.ts. Below is an example of real-world(ish) example using a fetch to get a company name and the a list of employees from that company.</p>
+				<pre><code class="language-js"><span class="hljs-keyword">import</span> { observable, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
+<span class="hljs-keyword">import</span> createStore <span class="hljs-keyword">from</span> <span class="hljs-string">'mobstr'</span>;
+
+<span class="hljs-keyword">const</span> {
+    relationship,
+    primaryKey,
+    addAll,
+    findOne,
+    removeOne,
+    truncateCollection,
+} = createStore();
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Employee</span> </span>{
+    @primaryKey
+    id = uuid()
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Company</span> </span>{
+    @primaryKey
+    id = uuid()
+
+    name;
+
+    @observable
+    affiliates = []
+
+    @relationship(<span class="hljs-function"><span class="hljs-params">type</span> =&gt;</span> Employee)
+    employees = [];
+
+    @computed
+    <span class="hljs-keyword">get</span> employeeIds() { <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.employees.map(<span class="hljs-function"><span class="hljs-params">employee</span> =&gt;</span> employee.id); }
+}
+
+<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getAllCompanies</span>(<span class="hljs-params">companyIds</span>) </span>{
+    <span class="hljs-keyword">const</span> companyData = <span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
+      companyIds.map(<span class="hljs-function"><span class="hljs-params">companyId</span> =&gt;</span> fetch(<span class="hljs-string">`/url/for/company/<span class="hljs-subst">${companyId}</span>`</span>)
+    );
+    companyData.forEach(<span class="hljs-function"><span class="hljs-params">company</span> =&gt;</span> {
+      <span class="hljs-comment">// Get all of the employee objects from the DB</span>
+      <span class="hljs-keyword">const</span> employees = <span class="hljs-keyword">await</span> <span class="hljs-built_in">Promise</span>.all(
+        company.employees.map(<span class="hljs-function"><span class="hljs-params">employee</span> =&gt;</span> fetch(<span class="hljs-string">`/url/for/company/employee/<span class="hljs-subst">${employee}</span>`</span>))
+      );
+
+      <span class="hljs-comment">// Note that this would overwrite any existing employees with the same ID in the data store, so make sure your IDs are unique!</span>
+      company.employees = employees.map(<span class="hljs-function"><span class="hljs-params">employee</span> =&gt;</span> <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">new</span> Employee(), employee))      
+    });
+
+    <span class="hljs-keyword">return</span> companyData.map(<span class="hljs-function"><span class="hljs-params">company</span> =&gt;</span> <span class="hljs-built_in">Object</span>.assign(<span class="hljs-keyword">new</span> Company(), company));
+}
+
+<span class="hljs-comment">// Top level await for illustrative purposes only</span>
+addAll(<span class="hljs-keyword">await</span> getAllCompanies([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>))
+findOne(Company, <span class="hljs-number">1</span>).employees.push(<span class="hljs-keyword">new</span> Employee());
+
+...
+<span class="hljs-comment">// Maybe we want to show a table of the company in one column with an employee in the other</span>
+join(Company, Employees).map(<span class="hljs-function">(<span class="hljs-params">company, employee</span>) =&gt;</span> [company.id, employee.id])
+
+...
+function destroyCompany(companyId) {
+    findOne(Company, companyId).employees = [];
+    <span class="hljs-comment">// If we had cascade: true in our relationship options, we could also delete the company from the store like so:</span>
+    <span class="hljs-comment">// removeOne(findOne(Company, companyId));</span>
+}
+
+<span class="hljs-comment">// Example of a react component to display all companies and with a button to delete all employees for a given company</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">ShowAllCompanies</span>(<span class="hljs-params">props</span>) </span>{
+    <span class="hljs-keyword">const</span> companies = findAll(Company);
+    <span class="hljs-keyword">return</span> (
+        <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+            {
+                companies.map(company =&gt; (
+                    <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>
+                        <span class="hljs-tag">&lt;<span class="hljs-name">span</span>&gt;</span>{company.name}<span class="hljs-tag">&lt;/<span class="hljs-name">span</span>&gt;</span>
+                        <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">onClick</span>=<span class="hljs-string">{destroyCompany.bind(null,</span> <span class="hljs-attr">company.id</span>)}&gt;</span>Destroy {company.name}?<span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+                    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+                ))
+            }
+        <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span></span>
+    );
+}
+</code></pre>
+				<a href="#getting-started" id="getting-started" style="color: inherit; text-decoration: none;">
+					<h2>Getting Started</h2>
+				</a>
+				<p>This does require decorator support for now, so follow the instructions for enabling babel decorator support here: <a href="https://babeljs.io/docs/en/babel-plugin-proposal-decorators">https://babeljs.io/docs/en/babel-plugin-proposal-decorators</a></p>
+				<p>If using TypeScript, enable the &quot;experimentalDecorators&quot; flag in tsconfig.json, instructions located here: <a href="https://www.typescriptlang.org/docs/handbook/decorators.html">https://www.typescriptlang.org/docs/handbook/decorators.html</a></p>
+				<p>If using Create-React-App in conjunction with this project and don&#39;t wish to eject, please use react-app-rewired to override the babel settings, located here: <a href="https://github.com/timarney/react-app-rewired">https://github.com/timarney/react-app-rewired</a></p>
+				<a href="#running-the-tests" id="running-the-tests" style="color: inherit; text-decoration: none;">
+					<h2>Running the tests</h2>
+				</a>
+				<p>This project uses mocha/chai for testing purposes. To invoke, use <code>npm test</code> to run the test suite.</p>
+				<a href="#built-with" id="built-with" style="color: inherit; text-decoration: none;">
+					<h2>Built With</h2>
+				</a>
+				<ul>
+					<li><a href="https://mobx.js.org/getting-started.html">MobX</a></li>
+					<li><a href="https://www.typescriptlang.org/">TypeScript</a></li>
+				</ul>
+				<a href="#versioning" id="versioning" style="color: inherit; text-decoration: none;">
+					<h2>Versioning</h2>
+				</a>
+				<p>We use <a href="http://semver.org/">SemVer</a> for versioning. For the versions available, see the <a href="https://github.com/ducharmemp/mobxt/tags">tags on this repository</a>. </p>
+				<a href="#authors" id="authors" style="color: inherit; text-decoration: none;">
+					<h2>Authors</h2>
+				</a>
+				<ul>
+					<li><strong>Matthew DuCharme</strong> - <em>Initial work</em> - <a href="https://github.com/ducharmemp">My Github</a></li>
+				</ul>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h2>License</h2>
+				</a>
+				<p>This project is licensed under the MIT License - see the <a href="LICENSE.md">LICENSE.md</a> file for details</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum tsd-is-external">
+						<a href="enums/triggerexecutionstrategy.html" class="tsd-kind-icon">Trigger<wbr>Execution<wbr>Strategy</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-is-external">
+						<a href="enums/triggerqueryevent.html" class="tsd-kind-icon">Trigger<wbr>Query<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/integrityerror.html" class="tsd-kind-icon">Integrity<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/cascadeoptions.html" class="tsd-kind-icon">Cascade<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/meta.html" class="tsd-kind-icon">Meta</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/store.html" class="tsd-kind-icon">Store</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/triggeroptions.html" class="tsd-kind-icon">Trigger<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-private tsd-is-external">
+						<a href="globals.html#constructor" class="tsd-kind-icon">Constructor</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#addall" class="tsd-kind-icon">add<wbr>All</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#addone" class="tsd-kind-icon">add<wbr>One</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#createcollectiontrigger" class="tsd-kind-icon">create<wbr>Collection<wbr>Trigger</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#createstore" class="tsd-kind-icon">create<wbr>Store</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#dropallconstraints" class="tsd-kind-icon">drop<wbr>All<wbr>Constraints</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#dropalltriggers" class="tsd-kind-icon">drop<wbr>All<wbr>Triggers</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#dropconstraint" class="tsd-kind-icon">drop<wbr>Constraint</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#droptrigger" class="tsd-kind-icon">drop<wbr>Trigger</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#ensurecollection" class="tsd-kind-icon">ensure<wbr>Collection</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#ensureindicies" class="tsd-kind-icon">ensure<wbr>Indicies</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#executetrigger" class="tsd-kind-icon">execute<wbr>Trigger</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#findall" class="tsd-kind-icon">find<wbr>All</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#findone" class="tsd-kind-icon">find<wbr>One</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#getnextid" class="tsd-kind-icon">get<wbr>Next<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#join" class="tsd-kind-icon">join</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#removeall" class="tsd-kind-icon">remove<wbr>All</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#removeone" class="tsd-kind-icon">remove<wbr>One</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#truncatecollection" class="tsd-kind-icon">truncate<wbr>Collection</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#wraptrigger" class="tsd-kind-icon">wrap<wbr>Trigger</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#check" class="tsd-kind-icon">check</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#checknotnull" class="tsd-kind-icon">check<wbr>Not<wbr>Null</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#checknotundefined" class="tsd-kind-icon">check<wbr>Not<wbr>Undefined</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#checkunique" class="tsd-kind-icon">check<wbr>Unique</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#ensureconstructormeta" class="tsd-kind-icon">ensure<wbr>Constructor<wbr>Meta</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#ensuremeta" class="tsd-kind-icon">ensure<wbr>Meta</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#ensurerelationship" class="tsd-kind-icon">ensure<wbr>Relationship</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#getboxedvalueorvalue" class="tsd-kind-icon">get<wbr>Boxed<wbr>Value<wbr>OrValue</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#getmeta" class="tsd-kind-icon">get<wbr>Meta</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#indexed" class="tsd-kind-icon">indexed</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#initialize" class="tsd-kind-icon">initialize</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#notnull" class="tsd-kind-icon">not<wbr>Null</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#notundefined" class="tsd-kind-icon">not<wbr>Undefined</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#primarykey" class="tsd-kind-icon">primary<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#relationship" class="tsd-kind-icon">relationship</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#setcheck" class="tsd-kind-icon">set<wbr>Check</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#unique" class="tsd-kind-icon">unique</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

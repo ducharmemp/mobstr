@@ -1,3 +1,6 @@
+/**
+ * @module mobstr
+ */
 import {
   createStore,
   addOne,
@@ -6,11 +9,27 @@ import {
   addAll,
   removeAll,
   findOne,
-  truncateCollection,
+  truncateCollection
 } from "./store";
-import { createCollectionTrigger, dropTrigger, dropAllTriggers } from './triggers';
-import { primaryKey, relationship, notNull, notUndefined, setCheck, unique } from "./decorators";
-import { checkNotNull, checkNotUndefined, checkUnique, check } from './constraints';
+import {
+  createCollectionTrigger,
+  dropTrigger,
+  dropAllTriggers
+} from "./triggers";
+import {
+  primaryKey,
+  relationship,
+  notNull,
+  notUndefined,
+  setCheck,
+  unique
+} from "./decorators";
+import {
+  checkNotNull,
+  checkNotUndefined,
+  checkUnique,
+  check
+} from "./constraints";
 
 /**
  * Intializes a store and provides helper methods bound to that store for convenience.
@@ -44,6 +63,6 @@ export default function initialize() {
     checkUnique: checkUnique.bind(null, store),
     checkNotNull: checkNotNull.bind(null, store),
     checkNotUndefined: checkNotUndefined.bind(null, store),
-    check: check.bind(null, store),
+    check: check.bind(null, store)
   };
 }

@@ -8,11 +8,11 @@ describe("#performance", (): void => {
     addAll,
     primaryKey,
     truncateCollection,
-    dropAllTriggers,
+    dropTrigger,
     check,
     notNull,
     notUndefined,
-    unique,
+    unique
   } = createStore();
   const times = range(100000);
 
@@ -24,7 +24,6 @@ describe("#performance", (): void => {
   }
 
   class CheckedFoo {
-    @unique
     @primaryKey
     id = uuid();
 
@@ -41,17 +40,17 @@ describe("#performance", (): void => {
     foos = times.map(() => new Foo());
     checkedFoos = times.map(() => new CheckedFoo());
     subset = foos.slice(0, 500);
-    check(Foo, "number", value => value > 0);
+    const triggerId = check(Foo, "number", value => value > 0);
     addAll(foos);
     addAll(checkedFoos);
     truncateCollection(Foo);
     truncateCollection(CheckedFoo);
-    dropAllTriggers();
+    dropTrigger(triggerId);
   });
 
   afterEach((): void => {
     truncateCollection(Foo);
-    dropAllTriggers();
+    truncateCollection(CheckedFoo);
   });
 
   it("should be performant in adding a 500 item subset of the items to a collection", (): void => {
@@ -70,17 +69,9 @@ describe("#performance", (): void => {
   it("should be performant in adding 100k items with a constraint", (): void => {
     check(Foo, "number", value => value > 0);
     addAll(foos);
-    truncateCollection(Foo);
-  });
-
-  it("should be performant in adding 100k items with a constraint", (): void => {
-    check(Foo, "number", value => value > 0);
-    addAll(foos);
-    truncateCollection(Foo);
   });
 
   it("should be performant in adding 100k items with multiple decorator constraints", (): void => {
     addAll(checkedFoos);
-    truncateCollection(CheckedFoo);
   });
 });

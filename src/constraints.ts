@@ -1,14 +1,19 @@
+/**
+ * @module constraints
+ */
 import { isArray } from "lodash";
 
 import { createStore } from "./store";
 import {
   createCollectionTrigger,
-  TriggerExecutionStrategy,
-  TriggerQueryEvent,
   dropTrigger,
   dropAllTriggers
 } from "./triggers";
-import { Constructor } from "./types";
+import {
+  Constructor,
+  TriggerExecutionStrategy,
+  TriggerQueryEvent
+} from "./types";
 import {
   getBoxedValueOrValue,
   getMeta,
@@ -47,6 +52,7 @@ export function check<K, T extends Constructor<K>>(
         getBoxedValueOrValue(newValue[propertyName])
       );
       if (!constraint(...propertyValues)) {
+        console.log("CONSTRAINT FAILED", propertyNames, propertyValues);
         throw new IntegrityError(
           `Check constraint failed on ${
             entityClass.name
