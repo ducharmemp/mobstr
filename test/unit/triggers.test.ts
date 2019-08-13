@@ -3,14 +3,13 @@ import { expect } from "chai";
 import sinon from "sinon";
 
 import {
-  TriggerExecutionStrategy,
-  TriggerQueryEvent,
   createCollectionTrigger,
   dropTrigger,
   executeTrigger
 } from "../../src/triggers";
 import { createStore, addOne, removeOne, findOne } from "../../src/store";
 import { primaryKey, indexed } from "../../src/decorators";
+import { TriggerQueryEvent, TriggerExecutionStrategy } from "../../src/types";
 
 describe("#triggers", (): void => {
   describe("#createCollectionTrigger", (): void => {

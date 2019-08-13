@@ -121,6 +121,22 @@ describe("#decorators", (): void => {
 
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
     });
+
+    it('should check that a given column is not nullable if the user tries to set it on instance construction', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @notNull(store)
+        name = 5;
+      }
+
+      const f = new Foo();
+      (f.name as any) = null;
+      expect(() => addOne(store, f)).to.throw(IntegrityError);
+    });
   });
 
   describe('#notUndefined', (): void => {

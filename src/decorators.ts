@@ -1,3 +1,6 @@
+/**
+ * @module decorators
+ */
 import { observable, action } from "mobx";
 import { createStore, addOne } from "./store";
 import {
@@ -9,7 +12,12 @@ import {
   ensureIndicies
 } from "./utils";
 import { CascadeOptions } from "./types";
-import { checkNotNull, checkNotUndefined, checkUnique, check } from "./constraints";
+import {
+  checkNotNull,
+  checkNotUndefined,
+  checkUnique,
+  check
+} from "./constraints";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -26,6 +34,7 @@ import { checkNotNull, checkNotUndefined, checkUnique, check } from "./constrain
  * }
  *
  * @export
+ * @function
  * @param {*} target
  * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
@@ -42,6 +51,7 @@ export function primaryKey(target: any, propertyKey: PropertyKey) {
  * case of specialized filters. Currently not implemented.
  *
  * @export
+ * @function
  * @param {*} target
  * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
@@ -65,6 +75,8 @@ export function indexed(target: any, propertyKey: PropertyKey) {
  * options, similar to the approach for splice and pop.
  *
  * @example
+ * ```typescript
+ *
  * class BarModel {
  *  @primaryKey
  *  id: string = uuid();
@@ -80,8 +92,9 @@ export function indexed(target: any, propertyKey: PropertyKey) {
  *
  * const f = new FooModel();
  * f.friends.push(new BarModel());
- *
+ * ```
  * @export
+ * @function
  * @param {ReturnType<typeof createStore>} store
  * @param {*} type
  * @param {*} [options={}]
@@ -169,8 +182,8 @@ export function relationship(
 
 /**
  * Checks that a field will never receive `null` as a value
- * 
- * @param store 
+ *
+ * @param store
  */
 export function notNull<T>(store: ReturnType<typeof createStore>) {
   return function(target: any, propertyKey: PropertyKey) {
@@ -179,13 +192,13 @@ export function notNull<T>(store: ReturnType<typeof createStore>) {
     ensureCollection(store, target.constructor);
     ensureIndicies(store, target.constructor);
     checkNotNull(store, target.constructor, propertyKey);
-  }
+  };
 }
 
 /**
  * Checks that a field will never receive `undefined` as a value
- * 
- * @param store 
+ *
+ * @param store
  */
 export function notUndefined<T>(store: ReturnType<typeof createStore>) {
   return function(target: any, propertyKey: PropertyKey) {
@@ -194,32 +207,35 @@ export function notUndefined<T>(store: ReturnType<typeof createStore>) {
     ensureCollection(store, target.constructor);
     ensureIndicies(store, target.constructor);
     checkNotUndefined(store, target.constructor, propertyKey);
-  }
+  };
 }
 
 /**
  * Checks that the field has a unique value. Implies that an index will be created
- * 
- * @param store 
+ *
+ * @param store
  */
 export function unique<T>(store: ReturnType<typeof createStore>) {
   return function(target: any, propertyKey: PropertyKey) {
     indexed(target, propertyKey); // FIXME: Shouldn't this have already been done in checkUnique?
     checkUnique(store, target.constructor, propertyKey);
-  }
+  };
 }
 
 /**
  * Defines a custom check function to be used while adding this object to the store.
- * 
- * @param store 
+ *
+ * @param store
  */
-export function setCheck<T>(store: ReturnType<typeof createStore>, checkConstraint: (...args: (keyof T)[]) => boolean) {
+export function setCheck<T>(
+  store: ReturnType<typeof createStore>,
+  checkConstraint: (...args: (keyof T)[]) => boolean
+) {
   return function(target: any, propertyKey: PropertyKey) {
     ensureMeta(target);
     ensureConstructorMeta(target);
     ensureCollection(store, target.constructor);
     ensureIndicies(store, target.constructor);
     check(store, target.constructor, propertyKey, checkConstraint);
-  }
+  };
 }

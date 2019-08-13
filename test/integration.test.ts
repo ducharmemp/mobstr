@@ -9,9 +9,15 @@ import {
   removeOne,
   join,
   findAll,
-  findOne,
+  findOne
 } from "../src/store";
-import { primaryKey, relationship, setCheck, notNull, notUndefined } from "../src/decorators";
+import {
+  primaryKey,
+  relationship,
+  setCheck,
+  notNull,
+  notUndefined
+} from "../src/decorators";
 
 describe("#integration", () => {
   it("should allow construction of a collection class", () => {
@@ -376,7 +382,7 @@ describe("#integration", () => {
     expect(findAll(store, Foo)).to.be.empty;
   });
 
-  it('should allow multiple constraint decorators to be assigned to a single field', (): void => {
+  it("should allow multiple constraint decorators to be assigned to a single field", (): void => {
     const store = createStore();
     class Foo {
       @primaryKey
@@ -385,7 +391,7 @@ describe("#integration", () => {
       @notNull(store)
       @notUndefined(store)
       @setCheck(store, value => value > 5)
-      age = 5
+      age = 5;
     }
 
     expect(() => addOne(store, new Foo())).to.throw;

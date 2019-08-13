@@ -1,5 +1,8 @@
+/**
+ * @module utils
+ */
 import { observable, action, IObservableValue } from "mobx";
-import { get } from 'lodash';
+import { get } from "lodash";
 
 import { Meta } from "./types";
 import { createStore } from "./store";
@@ -90,7 +93,8 @@ export const ensureCollection = action(
   (store: ReturnType<typeof createStore>, entityClass: any) => {
     const currentMeta = getMeta(entityClass);
     store.collections[currentMeta.collectionName as string] =
-      store.collections[currentMeta.collectionName as string] || observable.map();
+      store.collections[currentMeta.collectionName as string] ||
+      observable.map();
   }
 );
 
@@ -109,5 +113,5 @@ export const ensureIndicies = action(
 
 export function getBoxedValueOrValue<T>(value: IObservableValue<T> | T): T {
   // Magic to either get the boxed value or return the original value. We need to make sure to bind the this property
-  return get(value, 'get', () => value).bind(value)();
+  return get(value, "get", () => value).bind(value)();
 }
