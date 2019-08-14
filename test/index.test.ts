@@ -1,3 +1,9 @@
+import { configure } from 'mobx';
+
+configure({
+    enforceActions: 'observed',
+});
+
 import "./integration.test";
 import "./unit/decorators.test";
 import "./unit/index.test";
