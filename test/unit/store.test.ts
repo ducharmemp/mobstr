@@ -15,7 +15,7 @@ import {
   findOne,
   truncateCollection
 } from "../../src/store";
-import { primaryKey, relationship } from "../../src/decorators";
+import { primaryKey, relationship, unique } from "../../src/decorators";
 
 describe("#store", (): void => {
   describe("#addAll", (): void => {
@@ -139,6 +139,34 @@ describe("#store", (): void => {
       expect(findAll(store, Foo)).to.have.lengthOf(20);
       truncateCollection(store, Foo);
       expect(findAll(store, Foo)).to.have.lengthOf(0);
+    });
+
+    it('should truncate all entries when there is a constraint on a field', (): void => {
+      const store = createStore();
+      class Foo {
+        @unique(store)
+        @primaryKey
+        id = uuid();
+      }
+
+      addAll(store, range(20).map(() => new Foo()));
+      expect(findAll(store, Foo)).to.have.lengthOf(20);
+      truncateCollection(store, Foo);
+      expect(findAll(store, Foo)).to.have.lengthOf(0);
     })
+
+    it('should clear all entries in the collection map and index', (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey
+        id = uuid();
+      }
+
+      addAll(store, range(20).map(() => new Foo()));
+      expect(findAll(store, Foo)).to.have.lengthOf(20);
+      truncateCollection(store, Foo);
+      expect(store.collections['Foo'].size).to.be.eql(0);
+      expect(store.indicies['Foo']).to.be.empty;
+    });
   });
 });

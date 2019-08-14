@@ -1,4 +1,6 @@
-import { range } from "lodash";
+import { expect } from 'chai';
+
+import { range, countBy, entries } from "lodash";
 import { v4 as uuid } from "uuid";
 
 import createStore from "../dist/index";
@@ -12,7 +14,8 @@ describe("#performance", (): void => {
     check,
     notNull,
     notUndefined,
-    unique
+    unique,
+    findAll,
   } = createStore();
   const times = range(100000);
 
@@ -24,12 +27,13 @@ describe("#performance", (): void => {
   }
 
   class CheckedFoo {
+    @unique
     @primaryKey
     id = uuid();
 
     @notNull
     @notUndefined
-    age = 5;
+    age = Math.random();
   }
 
   let foos: Foo[];
@@ -39,6 +43,7 @@ describe("#performance", (): void => {
   before((): void => {
     foos = times.map(() => new Foo());
     checkedFoos = times.map(() => new CheckedFoo());
+    console.log(entries(countBy(checkedFoos, 'id')).filter(([key, value]) => value > 1));
     subset = foos.slice(0, 500);
     const triggerId = check(Foo, "number", value => value > 0);
     addAll(foos);
@@ -51,7 +56,14 @@ describe("#performance", (): void => {
   afterEach((): void => {
     truncateCollection(Foo);
     truncateCollection(CheckedFoo);
+    expect(findAll(Foo)).to.have.lengthOf(0);
+    expect(findAll(CheckedFoo)).to.have.lengthOf(0);
   });
+
+  after((): void => {
+    expect(findAll(Foo)).to.have.lengthOf(0);
+    expect(findAll(CheckedFoo)).to.have.lengthOf(0);
+  })
 
   it("should be performant in adding a 500 item subset of the items to a collection", (): void => {
     addAll(subset);

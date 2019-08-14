@@ -1,7 +1,7 @@
 /**
  * @module store
  */
-import { observable, action } from "mobx";
+import { observable, action, toJS } from "mobx";
 import { flatMap } from "lodash";
 
 import { Meta, Store, Constructor } from "./types";
@@ -58,9 +58,9 @@ export const addOne = action(
     );
 
     indicies.forEach(index => {
-      store.indicies[currentCollection as string].set(
+      store.indicies[currentCollection as string][index as string].set(
         (entity[index as keyof T] as unknown) as string,
-        entity
+        entity[currentMeta.key.get() as keyof T] as unknown as PropertyKey
       );
     });
   }
@@ -294,5 +294,6 @@ export const truncateCollection = action(
     const currentCollectionName = getMeta(entityClass).collectionName;
     // Trigger any observables watching the store for this collection
     store.collections[currentCollectionName as string].clear();
+    store.indicies[currentCollectionName as string] = {};
   }
 );

@@ -1,7 +1,7 @@
 /**
  * @module constraints
  */
-import { isArray } from "lodash";
+import { isArray, omit } from "lodash";
 
 import { createStore } from "./store";
 import {
@@ -22,6 +22,7 @@ import {
 } from "./utils";
 import { IntegrityError } from "./errors";
 import { indexed } from "./decorators";
+import { toJS } from "mobx";
 
 /**
  * Creates a CHECK constraint against a collection in the store. CHECK constraints
@@ -99,10 +100,13 @@ export function checkNotNull<T extends Constructor<{}>>(
  * to the collection (i.e. every time something is added to the collection)
  *
  * @example
+ *
+ * ```typescript
  * class Foo {
  *
  * }
  * notNull(Foo);
+ * ```
  *
  * @export
  * @param store
@@ -145,8 +149,8 @@ export function checkUnique<T extends Constructor<{}>>(
   ensureIndicies(store, entityClass);
 
   return check(store, entityClass, propertyName, propertyValue => {
-    return !store.indicies[currentCollection as string].has(
-      (propertyValue as unknown) as string
+    return !store.indicies[currentCollection as string][propertyName].has(
+      (propertyValue as unknown) as PropertyKey
     );
   });
 }

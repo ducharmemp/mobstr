@@ -68,18 +68,18 @@ export interface TriggerOptions {
  */
 export interface Meta {
   __meta__: {
-    key: IObservableValue<string | symbol | number | null>;
+    key: IObservableValue<PropertyKey | null>;
 
-    collectionName: string | symbol | number;
+    collectionName: PropertyKey;
     relationships: Record<
-      string | symbol,
+      PropertyKey,
       {
         type: any;
         keys: IObservableArray<string>;
         options: CascadeOptions;
       }
     >;
-    indicies: IObservableArray<string | symbol | number>;
+    indicies: IObservableArray<PropertyKey>;
   };
 }
 
@@ -87,14 +87,17 @@ export interface Meta {
  *
  */
 export interface Store extends IObservableObject {
-  collections: Record<
-    string | symbol | number,
-    Map<string | symbol | number, any>
-  >;
+  collections: Record<PropertyKey, Map<PropertyKey, any>>;
   primaryKeys: Map<string, any>;
   indicies: Record<
-    string | symbol | number,
-    Map<string | symbol | number, any>
+    PropertyKey, // Name of collection
+    Record<
+      PropertyKey, // Name of property
+      Map<
+        PropertyKey, // Value of property
+        PropertyKey // Primary Key
+      >
+    >
   >;
   triggers: Map<number, Lambda>;
   nextId: number;

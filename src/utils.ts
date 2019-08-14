@@ -107,7 +107,16 @@ export const ensureIndicies = action(
   (store: ReturnType<typeof createStore>, entityClass: any) => {
     const currentMeta = getMeta(entityClass);
     store.indicies[currentMeta.collectionName as string] =
-      store.indicies[currentMeta.collectionName as string] || observable.map();
+      store.indicies[currentMeta.collectionName as string] || {};
+    // Create all of the property indicies but only if they already exist
+    currentMeta.indicies.forEach(indexName => {
+      store.indicies[currentMeta.collectionName as string][
+        indexName as string
+      ] =
+        store.indicies[currentMeta.collectionName as string][
+          indexName as string
+        ] || observable.map();
+    });
   }
 );
 
