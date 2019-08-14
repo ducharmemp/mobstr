@@ -4,7 +4,7 @@ import sinon from "sinon";
 
 import { check, checkUnique, checkNotNull, checkNotUndefined } from "../../src/constraints";
 import { createStore, addOne } from "../../src/store";
-import { primaryKey, indexed } from "@src/decorators";
+import { primaryKey, indexed, unique } from "@src/decorators";
 import { IntegrityError } from "@src/errors";
 import { dropAllTriggers } from "@src/triggers";
 
@@ -124,6 +124,7 @@ describe("#constraints", (): void => {
     it("should check that the value is unique", (): void => {
       const store = createStore();
       class Foo {
+        @unique(store)
         @primaryKey
         id = "1234";
 

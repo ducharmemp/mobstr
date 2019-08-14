@@ -7,6 +7,7 @@ export class IntegrityError extends Error {
     /* istanbul ignore next */
     super(message);
     this.name = "IntegrityError";
+    this.message = message;
     /* istanbul ignore next */
     Object.setPrototypeOf(this, IntegrityError.prototype);
   }

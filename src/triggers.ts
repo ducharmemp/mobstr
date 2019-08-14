@@ -39,7 +39,8 @@ export const executeTrigger = action(
       !eventTypes.has(TriggerQueryEvent.All) &&
       !eventTypes.has(change.type as TriggerQueryEvent)
     ) {
-      return;
+      // To ignore the value, we need to return the change by itself, otherwise we issue a ROLLBACK
+      return change;
     }
     return trigger(change);
   }

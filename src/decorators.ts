@@ -28,10 +28,13 @@ import {
  * in the internal storage mechanism of ES6 Maps.
  *
  * @example
+ * 
+ * ```typescript
  * class FooModel {
  *  @primaryKey
  *  id: string = uuid();
  * }
+ * ```
  *
  * @export
  * @function
@@ -183,6 +186,7 @@ export function relationship(
 /**
  * Checks that a field will never receive `null` as a value
  *
+ * @export
  * @param store
  */
 export function notNull<T>(store: ReturnType<typeof createStore>) {
@@ -198,6 +202,7 @@ export function notNull<T>(store: ReturnType<typeof createStore>) {
 /**
  * Checks that a field will never receive `undefined` as a value
  *
+ * @export
  * @param store
  */
 export function notUndefined<T>(store: ReturnType<typeof createStore>) {
@@ -213,6 +218,7 @@ export function notUndefined<T>(store: ReturnType<typeof createStore>) {
 /**
  * Checks that the field has a unique value. Implies that an index will be created
  *
+ * @export
  * @param store
  */
 export function unique<T>(store: ReturnType<typeof createStore>) {
@@ -225,6 +231,7 @@ export function unique<T>(store: ReturnType<typeof createStore>) {
 /**
  * Defines a custom check function to be used while adding this object to the store.
  *
+ * @export
  * @param store
  */
 export function setCheck<T>(
