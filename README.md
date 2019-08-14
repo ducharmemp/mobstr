@@ -235,6 +235,7 @@ const {
     findOne,
     removeOne,
     truncateCollection,
+    notNull,
 } = createStore();
 
 class Employee {
@@ -246,6 +247,7 @@ class Company {
     @primaryKey
     id = uuid()
     
+    @notNull
     name;
     
     @observable
