@@ -53,7 +53,6 @@ export function check<K, T extends Constructor<K>>(
         getBoxedValueOrValue(newValue[propertyName])
       );
       if (!constraint(...propertyValues)) {
-        console.log("CONSTRAINT FAILED", propertyNames, propertyValues);
         throw new IntegrityError(
           `Check constraint failed on ${
             entityClass.name
