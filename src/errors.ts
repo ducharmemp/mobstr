@@ -1,14 +1,15 @@
+import { Constructor } from "./types";
+
 /**
  * @module errors
  */
-// All subclasses of IntegrityError must subclass Error properly as documented here: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
-export class IntegrityError extends Error {
-  public constructor(message: string) {
-    /* istanbul ignore next */
-    super(message);
-    this.name = "IntegrityError";
-    this.message = message;
-    /* istanbul ignore next */
-    Object.setPrototypeOf(this, IntegrityError.prototype);
-  }
+// Can't subclass Error here since we're transpiling to ES5
+function IntegrityErrorConstructor(this: any, message: string) {
+  this.name = "IntegrityError";
+  this.stack = new Error().stack;
+  this.message = message;
 }
+IntegrityErrorConstructor.prototype = Object.create(Error.prototype);
+IntegrityErrorConstructor.prototype.constructor = IntegrityErrorConstructor;
+
+export const IntegrityError = IntegrityErrorConstructor as unknown as Constructor<Error>;

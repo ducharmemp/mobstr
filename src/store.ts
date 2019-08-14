@@ -1,7 +1,7 @@
 /**
  * @module store
  */
-import { observable, action, toJS } from "mobx";
+import { observable, action } from "mobx";
 import { flatMap } from "lodash";
 
 import { Meta, Store, Constructor } from "./types";
@@ -60,7 +60,7 @@ export const addOne = action(
     indicies.forEach(index => {
       store.indicies[currentCollection as string][index as string].set(
         (entity[index as keyof T] as unknown) as string,
-        entity[currentMeta.key.get() as keyof T] as unknown as PropertyKey
+        (entity[currentMeta.key.get() as keyof T] as unknown) as PropertyKey
       );
     });
   }
@@ -169,7 +169,7 @@ export const findOne = action(
     const currentCollection = getMeta(entityClass).collectionName;
     return store.collections[currentCollection as string].get(
       primaryKey as string
-    );
+    ) as InstanceType<T>;
   }
 );
 
@@ -205,6 +205,7 @@ export const findAll = action(
     ensureMeta(entityClass);
     ensureCollection(store, entityClass);
     const currentCollection = getMeta(entityClass).collectionName;
+
     return Array.from(
       store.collections[currentCollection as string].values()
     ).filter(findClause);

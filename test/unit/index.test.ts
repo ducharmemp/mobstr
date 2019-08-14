@@ -1,12 +1,12 @@
 import { describe, it } from "mocha";
 import { expect } from "chai";
 
-import createStore from "../../src/index";
+import { initializeStore } from "../../src/index";
 
 describe("#index", (): void => {
   describe("#createStore", (): void => {
     it("should create a store with all expected values (less of a unit test and more of a sanity test)", (): void => {
-      expect(createStore()).to.have.all.keys([
+      expect(initializeStore()).to.have.all.keys([
         "store",
         "primaryKey",
         "relationship",
@@ -27,7 +27,9 @@ describe("#index", (): void => {
         "notNull",
         "notUndefined",
         "setCheck",
-        "unique"
+        "unique",
+        "dropAllConstraints",
+        "dropConstraint"
       ]);
     });
   });

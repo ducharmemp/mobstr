@@ -28,7 +28,7 @@ import {
  * in the internal storage mechanism of ES6 Maps.
  *
  * @example
- * 
+ *
  * ```typescript
  * class FooModel {
  *  @primaryKey
@@ -108,7 +108,7 @@ export function relationship(
   type: any,
   options: CascadeOptions = {}
 ) {
-  return function(target: any, propertyKey: PropertyKey): any {
+  return function<T>(target: T, propertyKey: PropertyKey): any {
     ensureMeta(target);
     ensureConstructorMeta(target);
     ensureCollection(store, target);
@@ -149,7 +149,8 @@ export function relationship(
             changes.removed.forEach(change => {
               currentRelationship.keys.replace(
                 currentRelationship.keys.filter(
-                  key => key !== change[getMeta(change).key.get() as string]
+                  key =>
+                    key !== change[getMeta(change).key.get() as string]
                 )
               );
               // FIXME: This would be the proper place to track cascades on the relationship.
@@ -157,8 +158,9 @@ export function relationship(
             });
           } else {
             addOne(store, changes.newValue);
-            currentRelationship.keys[changes.index] =
-              changes.newValue[getMeta(changes.newValue).key.get() as string];
+            currentRelationship.keys[changes.index] = changes.newValue[
+              getMeta(changes.newValue).key.get() as string
+            ];
           }
         });
 

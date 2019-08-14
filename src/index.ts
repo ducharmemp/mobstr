@@ -14,7 +14,8 @@ import {
 import {
   createCollectionTrigger,
   dropTrigger,
-  dropAllTriggers
+  dropAllTriggers,
+
 } from "./triggers";
 import {
   primaryKey,
@@ -28,7 +29,9 @@ import {
   checkNotNull,
   checkNotUndefined,
   checkUnique,
-  check
+  check,
+  dropAllConstraints,
+  dropConstraint,
 } from "./constraints";
 
 /**
@@ -36,7 +39,7 @@ import {
  * Note: calling this function multiple times will have no side effects, multiple stores will
  * be returned for use by the user.
  */
-export default function initialize() {
+export function initializeStore() {
   const store = createStore();
   return {
     store,
@@ -63,6 +66,11 @@ export default function initialize() {
     checkUnique: checkUnique.bind(null, store),
     checkNotNull: checkNotNull.bind(null, store),
     checkNotUndefined: checkNotUndefined.bind(null, store),
-    check: check.bind(null, store)
+    check: check.bind(null, store),
+    dropConstraint: dropConstraint.bind(null, store),
+    dropAllConstraints: dropAllConstraints.bind(null, store),
   };
 }
+
+export { CascadeOptions, Meta, Store, TriggerOptions, TriggerExecutionStrategy, TriggerQueryEvent } from './types';
+export { IntegrityError } from './errors';

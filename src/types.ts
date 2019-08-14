@@ -12,6 +12,11 @@ import {
  * @private
  */
 export type Constructor<T> = new (...args: any[]) => T;
+type CollectionName = PropertyKey;
+type PrimaryKey = PropertyKey;
+type IndexValue = PropertyKey; // TODO: Should this support more complex types?
+type IndexKey = PropertyKey;
+type TriggerId = number;
 
 /**
  *
@@ -87,18 +92,17 @@ export interface Meta {
  *
  */
 export interface Store extends IObservableObject {
-  collections: Record<PropertyKey, Map<PropertyKey, any>>;
-  primaryKeys: Map<string, any>;
+  collections: Record<CollectionName, Map<PrimaryKey, any>>;
   indicies: Record<
-    PropertyKey, // Name of collection
+    CollectionName,
     Record<
-      PropertyKey, // Name of property
+      IndexKey,
       Map<
-        PropertyKey, // Value of property
-        PropertyKey // Primary Key
+        IndexValue,
+        PrimaryKey
       >
     >
   >;
-  triggers: Map<number, Lambda>;
-  nextId: number;
+  triggers: Map<TriggerId, Lambda>;
+  nextId: TriggerId;
 }
