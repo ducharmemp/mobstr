@@ -73,12 +73,6 @@
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
-							<h3>Classes</h3>
-							<ul class="tsd-index-list">
-								<li class="tsd-kind-class tsd-is-external"><a href="classes/integrityerror.html" class="tsd-kind-icon">Integrity<wbr>Error</a></li>
-							</ul>
-						</section>
-						<section class="tsd-index-section tsd-is-external">
 							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/cascadeoptions.html" class="tsd-kind-icon">Cascade<wbr>Options</a></li>
@@ -96,6 +90,7 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Variables</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#integrityerror" class="tsd-kind-icon">Integrity<wbr>Error</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#addall" class="tsd-kind-icon">add<wbr>All</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#addone" class="tsd-kind-icon">add<wbr>One</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#createcollectiontrigger" class="tsd-kind-icon">create<wbr>Collection<wbr>Trigger</a></li>
@@ -130,7 +125,7 @@
 								<li class="tsd-kind-function tsd-has-type-parameter tsd-is-external"><a href="globals.html#getboxedvalueorvalue" class="tsd-kind-icon">get<wbr>Boxed<wbr>Value<wbr>OrValue</a></li>
 								<li class="tsd-kind-function tsd-is-external"><a href="globals.html#getmeta" class="tsd-kind-icon">get<wbr>Meta</a></li>
 								<li class="tsd-kind-function tsd-is-external"><a href="globals.html#indexed" class="tsd-kind-icon">indexed</a></li>
-								<li class="tsd-kind-function"><a href="globals.html#initialize" class="tsd-kind-icon">initialize</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#initializestore" class="tsd-kind-icon">initialize<wbr>Store</a></li>
 								<li class="tsd-kind-function tsd-has-type-parameter tsd-is-external"><a href="globals.html#notnull" class="tsd-kind-icon">not<wbr>Null</a></li>
 								<li class="tsd-kind-function tsd-has-type-parameter tsd-is-external"><a href="globals.html#notundefined" class="tsd-kind-icon">not<wbr>Undefined</a></li>
 								<li class="tsd-kind-function tsd-is-external"><a href="globals.html#primarykey" class="tsd-kind-icon">primary<wbr>Key</a></li>
@@ -150,7 +145,7 @@
 					<div class="tsd-signature tsd-kind-icon">Constructor&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/types.ts#L14">types.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/types.ts#L14">types.ts:14</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -171,12 +166,27 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Variables</h2>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
+					<a name="integrityerror" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> Integrity<wbr>Error</h3>
+					<div class="tsd-signature tsd-kind-icon">Integrity<wbr>Error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> =&nbsp;IntegrityErrorConstructor as unknown as Constructor&lt;Error&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/errors.ts#L15">errors.ts:15</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="addall" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> add<wbr>All</h3>
 					<div class="tsd-signature tsd-kind-icon">add<wbr>All<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T&gt;(store: ReturnType&lt;typeof createStore&gt;, entities: T[]) &#x3D;&gt; {entities.forEach(entity &#x3D;&gt; addOne(store, entity));})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L77">store.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L77">store.ts:77</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -198,10 +208,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="addone" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> add<wbr>One</h3>
-					<div class="tsd-signature tsd-kind-icon">add<wbr>One<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T&gt;(store: ReturnType&lt;typeof createStore&gt;, entity: T) &#x3D;&gt; {ensureMeta(entity);ensureConstructorMeta(entity);ensureCollection(store, entity);ensureIndicies(store, entity);const currentMeta &#x3D; getMeta(entity);const currentCollection &#x3D; currentMeta.collectionName;const currentKey &#x3D; currentMeta.key.get();const indicies &#x3D; currentMeta.indicies;store.collections[currentCollection as string].set((entity[currentKey as keyof T] as unknown) as string,entity);indicies.forEach(index &#x3D;&gt; {store.indicies[currentCollection as string][index as string].set((entity[index as keyof T] as unknown) as string,entity[currentMeta.key.get() as keyof T] as unknown as PropertyKey);});})</span></div>
+					<div class="tsd-signature tsd-kind-icon">add<wbr>One<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T&gt;(store: ReturnType&lt;typeof createStore&gt;, entity: T) &#x3D;&gt; {ensureMeta(entity);ensureConstructorMeta(entity);ensureCollection(store, entity);ensureIndicies(store, entity);const currentMeta &#x3D; getMeta(entity);const currentCollection &#x3D; currentMeta.collectionName;const currentKey &#x3D; currentMeta.key.get();const indicies &#x3D; currentMeta.indicies;store.collections[currentCollection as string].set((entity[currentKey as keyof T] as unknown) as string,entity);indicies.forEach(index &#x3D;&gt; {store.indicies[currentCollection as string][index as string].set((entity[index as keyof T] as unknown) as string,(entity[currentMeta.key.get() as keyof T] as unknown) as PropertyKey);});})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L44">store.ts:44</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L44">store.ts:44</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -229,7 +239,7 @@
 					<div class="tsd-signature tsd-kind-icon">create<wbr>Collection<wbr>Trigger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;&gt;(store: ReturnType&lt;typeof createStore&gt;,entityClass: T,trigger: IInterceptor&lt;IValueWillChange&lt;InstanceType&lt;T&gt;&gt;&gt; | Lambda,options: TriggerOptions &#x3D; {}) &#x3D;&gt; {ensureCollection(store, entityClass);const currentMeta &#x3D; getMeta(entityClass);const triggerId &#x3D; getNextId(store);const {eventTypes &#x3D; new Set([TriggerQueryEvent.All]),triggerExecutionStrategy &#x3D; TriggerExecutionStrategy.Observe} &#x3D; options;store.triggers.set(triggerId,wrapTrigger(store.collections[currentMeta.collectionName as string],trigger,eventTypes,triggerExecutionStrategy));return triggerId;})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/triggers.ts#L99">triggers.ts:99</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/triggers.ts#L99">triggers.ts:99</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -271,7 +281,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">create<wbr>Store<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((): Store &#x3D;&gt;observable({collections: {},primaryKeys: new Map(),indicies: {},triggers: new Map(),nextId: 0}))</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L24">store.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L24">store.ts:24</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -295,7 +305,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">drop<wbr>All<wbr>Constraints<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;dropAllTriggers</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/constraints.ts#L168">constraints.ts:168</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/constraints.ts#L167">constraints.ts:167</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -311,7 +321,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">drop<wbr>All<wbr>Triggers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((store: ReturnType&lt;typeof createStore&gt;) &#x3D;&gt; {Array.from(store.triggers.keys()).forEach(key &#x3D;&gt; dropTrigger(store, key));})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/triggers.ts#L150">triggers.ts:150</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/triggers.ts#L150">triggers.ts:150</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -335,7 +345,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">drop<wbr>Constraint<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;dropTrigger</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/constraints.ts#L162">constraints.ts:162</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/constraints.ts#L161">constraints.ts:161</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -351,7 +361,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">drop<wbr>Trigger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((store: ReturnType&lt;typeof createStore&gt;, triggerId: number) &#x3D;&gt; {// Call the disposer(store.triggers.get(triggerId) as Function)();store.triggers.delete(triggerId);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/triggers.ts#L134">triggers.ts:134</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/triggers.ts#L134">triggers.ts:134</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -376,7 +386,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">ensure<wbr>Collection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((store: ReturnType&lt;typeof createStore&gt;, entityClass: any) &#x3D;&gt; {const currentMeta &#x3D; getMeta(entityClass);store.collections[currentMeta.collectionName as string] &#x3D;store.collections[currentMeta.collectionName as string] ||observable.map();})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L92">utils.ts:92</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L92">utils.ts:92</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -392,7 +402,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">ensure<wbr>Indicies<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((store: ReturnType&lt;typeof createStore&gt;, entityClass: any) &#x3D;&gt; {const currentMeta &#x3D; getMeta(entityClass);store.indicies[currentMeta.collectionName as string] &#x3D;store.indicies[currentMeta.collectionName as string] || {};// Create all of the property indicies but only if they already existcurrentMeta.indicies.forEach(indexName &#x3D;&gt; {store.indicies[currentMeta.collectionName as string][indexName as string] &#x3D;store.indicies[currentMeta.collectionName as string][indexName as string] || observable.map();});})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L106">utils.ts:106</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L106">utils.ts:106</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -408,7 +418,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">execute<wbr>Trigger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((trigger: any,eventTypes: Set&lt;TriggerQueryEvent&gt;,change: IObjectWillChange | IObjectDidChange): any | null &#x3D;&gt; {if (!eventTypes.has(TriggerQueryEvent.All) &amp;&amp;!eventTypes.has(change.type as TriggerQueryEvent)) {// To ignore the value, we need to return the change by itself, otherwise we issue a ROLLBACKreturn change;}return trigger(change);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/triggers.ts#L32">triggers.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/triggers.ts#L32">triggers.ts:32</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -435,7 +445,7 @@ addOne(<span class="hljs-keyword">new</span> Foo());</code></pre>
 					<div class="tsd-signature tsd-kind-icon">find<wbr>All<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;&gt;(store: ReturnType&lt;typeof createStore&gt;,entityClass: T,findClause: (arg0: T) &#x3D;&gt; any &#x3D; (entry: T) &#x3D;&gt; entry): InstanceType&lt;T&gt;[] &#x3D;&gt; {ensureMeta(entityClass);ensureCollection(store, entityClass);const currentCollection &#x3D; getMeta(entityClass).collectionName;return Array.from(store.collections[currentCollection as string].values()).filter(findClause);})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L199">store.ts:199</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L199">store.ts:199</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -472,10 +482,10 @@ findAll(Foo) === foos;</code></pre>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="findone" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> find<wbr>One</h3>
-					<div class="tsd-signature tsd-kind-icon">find<wbr>One<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;&gt;(store: ReturnType&lt;typeof createStore&gt;,entityClass: T,primaryKey: ReturnType&lt;Meta[&quot;__meta__&quot;][&quot;key&quot;][&quot;get&quot;]&gt;): InstanceType&lt;T&gt; &#x3D;&gt; {ensureMeta(entityClass);ensureCollection(store, entityClass);const currentCollection &#x3D; getMeta(entityClass).collectionName;return store.collections[currentCollection as string].get(primaryKey as string);})</span></div>
+					<div class="tsd-signature tsd-kind-icon">find<wbr>One<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;&gt;(store: ReturnType&lt;typeof createStore&gt;,entityClass: T,primaryKey: ReturnType&lt;Meta[&quot;__meta__&quot;][&quot;key&quot;][&quot;get&quot;]&gt;): InstanceType&lt;T&gt; &#x3D;&gt; {ensureMeta(entityClass);ensureCollection(store, entityClass);const currentCollection &#x3D; getMeta(entityClass).collectionName;return store.collections[currentCollection as string].get(primaryKey as string) as InstanceType&lt;T&gt;;})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L161">store.ts:161</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L161">store.ts:161</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -519,7 +529,7 @@ findOne(Foo, foo.id);</code></pre>
 					<div class="tsd-signature tsd-kind-icon">get<wbr>Next<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action((store: ReturnType&lt;typeof createStore&gt;) &#x3D;&gt; {store.nextId +&#x3D; 1;return store.nextId;})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L82">utils.ts:82</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L82">utils.ts:82</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -529,7 +539,7 @@ findOne(Foo, foo.id);</code></pre>
 					<div class="tsd-signature tsd-kind-icon">join<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;, K extends Constructor&lt;{}&gt;&gt;(store: ReturnType&lt;typeof createStore&gt;,entityClass: T,joinClass: K): [InstanceType&lt;T&gt;, InstanceType&lt;K&gt;][] &#x3D;&gt; {ensureMeta(entityClass);ensureMeta(joinClass);ensureCollection(store, entityClass);ensureCollection(store, joinClass);const entityCollectionName &#x3D; getMeta(entityClass).collectionName;const entityCollection &#x3D; Array.from(store.collections[entityCollectionName as string].values());const childCollectionName &#x3D; getMeta(joinClass).collectionName;const childCollection &#x3D; store.collections[childCollectionName as string];return flatMap(entityCollection, (entity: any) &#x3D;&gt; {const joinRelationships &#x3D; Object.values(getMeta(entity).relationships).filter(({ type }) &#x3D;&gt; type &#x3D;&#x3D;&#x3D; joinClass);return flatMap(joinRelationships, ({ keys }) &#x3D;&gt;keys.map(key &#x3D;&gt; [entity, childCollection.get(key)]));});})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L249">store.ts:249</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L250">store.ts:250</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -581,7 +591,7 @@ join(Bar, Foo);</code></pre>
 					<div class="tsd-signature tsd-kind-icon">remove<wbr>All<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T&gt;(store: ReturnType&lt;typeof createStore&gt;, entities: T[]) &#x3D;&gt; {entities.forEach(removeOne.bind(null, store));})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L129">store.ts:129</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L129">store.ts:129</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -608,7 +618,7 @@ join(Bar, Foo);</code></pre>
 					<div class="tsd-signature tsd-kind-icon">remove<wbr>One<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T&gt;(store: ReturnType&lt;typeof createStore&gt;, entity: T) &#x3D;&gt; {ensureMeta(entity);ensureMeta(Object.getPrototypeOf(entity));ensureCollection(store, entity);const currentMeta &#x3D; getMeta(entity);const primaryKey &#x3D; currentMeta.key.get() as keyof T;const cascadeRelationshipKeys &#x3D; Object.values(currentMeta.relationships).filter(relationship &#x3D;&gt; relationship.options.cascade);const currentCollection &#x3D; currentMeta.collectionName;store.collections[currentCollection as string].delete(// TODO: Properly type this, we need to check this beforehand to make sure that we can handle composite keys(entity[primaryKey] as unknown) as string | number | symbol);// Clean up all references after the cascade. We do this after the initial delete to hopefully catch any circular relationshipscascadeRelationshipKeys.forEach(relationship &#x3D;&gt; {relationship.keys.map(key &#x3D;&gt; findOne(store, relationship.type, key)).forEach(entity &#x3D;&gt; removeOne(store, entity));});})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L93">store.ts:93</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L93">store.ts:93</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -635,7 +645,7 @@ join(Bar, Foo);</code></pre>
 					<div class="tsd-signature tsd-kind-icon">truncate<wbr>Collection<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;&gt;(store: ReturnType&lt;typeof createStore&gt;,entityClass: T) &#x3D;&gt; {ensureMeta(entityClass);const currentCollectionName &#x3D; getMeta(entityClass).collectionName;// Trigger any observables watching the store for this collectionstore.collections[currentCollectionName as string].clear();store.indicies[currentCollectionName as string] &#x3D; {};})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/store.ts#L288">store.ts:288</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/store.ts#L289">store.ts:289</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -661,7 +671,7 @@ join(Bar, Foo);</code></pre>
 					<div class="tsd-signature tsd-kind-icon">wrap<wbr>Trigger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">(Anonymous function)</span><span class="tsd-signature-symbol"> &amp; </span><span class="tsd-signature-type">IAction</span><span class="tsd-signature-symbol"> =&nbsp;action(&lt;T extends Constructor&lt;{}&gt;&gt;(target: Map&lt;PropertyKey, any&gt;,trigger: Lambda | IInterceptor&lt;IValueWillChange&lt;InstanceType&lt;T&gt;&gt;&gt;,eventTypes: Set&lt;TriggerQueryEvent&gt;,triggerStrategy: TriggerExecutionStrategy) &#x3D;&gt; {const wrapping &#x3D;triggerStrategy &#x3D;&#x3D;&#x3D; TriggerExecutionStrategy.Intercept? intercept: observe;return wrapping(target, executeTrigger.bind(null, trigger, eventTypes));})</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/triggers.ts#L59">triggers.ts:59</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/triggers.ts#L59">triggers.ts:59</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -697,7 +707,7 @@ join(Bar, Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/constraints.ts#L38">constraints.ts:38</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/constraints.ts#L37">constraints.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -770,7 +780,7 @@ join(Bar, Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/constraints.ts#L85">constraints.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/constraints.ts#L84">constraints.ts:84</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -816,7 +826,7 @@ join(Bar, Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/constraints.ts#L117">constraints.ts:117</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/constraints.ts#L116">constraints.ts:116</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -868,7 +878,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/constraints.ts#L140">constraints.ts:140</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/constraints.ts#L139">constraints.ts:139</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -914,7 +924,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L54">utils.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L54">utils.ts:54</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -945,7 +955,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L28">utils.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L28">utils.ts:28</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -980,7 +990,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L67">utils.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L67">utils.ts:67</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1032,7 +1042,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L123">utils.ts:123</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L123">utils.ts:123</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -1061,7 +1071,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/utils.ts#L17">utils.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/utils.ts#L17">utils.ts:17</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1092,7 +1102,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L62">decorators.ts:62</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L62">decorators.ts:62</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1121,16 +1131,16 @@ notNull(Foo);</code></pre>
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
-					<a name="initialize" class="tsd-anchor"></a>
-					<h3>initialize</h3>
+					<a name="initializestore" class="tsd-anchor"></a>
+					<h3>initialize<wbr>Store</h3>
 					<ul class="tsd-signatures tsd-kind-function">
-						<li class="tsd-signature tsd-kind-icon">initialize<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
+						<li class="tsd-signature tsd-kind-icon">initialize<wbr>Store<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/index.ts#L39">index.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/index.ts#L42">index.ts:42</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1156,7 +1166,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L192">decorators.ts:192</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L194">decorators.ts:194</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1196,7 +1206,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L208">decorators.ts:208</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L210">decorators.ts:210</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1236,7 +1246,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L45">decorators.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L45">decorators.ts:45</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1283,7 +1293,7 @@ notNull(Foo);</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L106">decorators.ts:106</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L106">decorators.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1348,7 +1358,7 @@ f.friends.push(<span class="hljs-keyword">new</span> BarModel());</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L237">decorators.ts:237</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L239">decorators.ts:239</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1409,7 +1419,7 @@ f.friends.push(<span class="hljs-keyword">new</span> BarModel());</code></pre>
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/beebfad/src/decorators.ts#L224">decorators.ts:224</a></li>
+									<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/f361acf/src/decorators.ts#L226">decorators.ts:226</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1457,9 +1467,6 @@ f.friends.push(<span class="hljs-keyword">new</span> BarModel());</code></pre>
 					<li class=" tsd-kind-enum tsd-is-external">
 						<a href="enums/triggerqueryevent.html" class="tsd-kind-icon">Trigger<wbr>Query<wbr>Event</a>
 					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/integrityerror.html" class="tsd-kind-icon">Integrity<wbr>Error</a>
-					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/cascadeoptions.html" class="tsd-kind-icon">Cascade<wbr>Options</a>
 					</li>
@@ -1474,6 +1481,9 @@ f.friends.push(<span class="hljs-keyword">new</span> BarModel());</code></pre>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-private tsd-is-external">
 						<a href="globals.html#constructor" class="tsd-kind-icon">Constructor</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#integrityerror" class="tsd-kind-icon">Integrity<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#addall" class="tsd-kind-icon">add<wbr>All</a>
@@ -1563,7 +1573,7 @@ f.friends.push(<span class="hljs-keyword">new</span> BarModel());</code></pre>
 						<a href="globals.html#indexed" class="tsd-kind-icon">indexed</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#initialize" class="tsd-kind-icon">initialize</a>
+						<a href="globals.html#initializestore" class="tsd-kind-icon">initialize<wbr>Store</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#notnull" class="tsd-kind-icon">not<wbr>Null</a>
