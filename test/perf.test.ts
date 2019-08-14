@@ -3,8 +3,9 @@ import { expect } from 'chai';
 import { range, countBy, entries } from "lodash";
 import { v4 as uuid } from "uuid";
 
-import createStore from "../dist/index";
+import { initializeStore, CascadeOptions, IntegrityError, TriggerExecutionStrategy } from "../dist/index.js";
 
+console.log(TriggerExecutionStrategy.Intercept)
 describe("#performance", (): void => {
   const {
     addAll,
@@ -16,7 +17,7 @@ describe("#performance", (): void => {
     notUndefined,
     unique,
     findAll,
-  } = createStore();
+  } = initializeStore();
   const times = range(100000);
 
   class Foo {

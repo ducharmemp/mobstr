@@ -1,7 +1,7 @@
 /**
  * @module constraints
  */
-import { isArray, omit } from "lodash";
+import { isArray } from "lodash";
 
 import { createStore } from "./store";
 import {
@@ -22,7 +22,6 @@ import {
 } from "./utils";
 import { IntegrityError } from "./errors";
 import { indexed } from "./decorators";
-import { toJS } from "mobx";
 
 /**
  * Creates a CHECK constraint against a collection in the store. CHECK constraints
