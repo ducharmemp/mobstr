@@ -4,7 +4,7 @@
 import { observable, action } from "mobx";
 import { flatMap } from "lodash";
 
-import { Meta, Store, Constructor } from "./types";
+import { Meta, Store, Constructor, PrimaryKey } from "./types";
 import {
   ensureMeta,
   getMeta,
@@ -49,7 +49,10 @@ export const addOne = action(
     ensureIndicies(store, entity);
     const currentMeta = getMeta(entity);
     const currentCollection = currentMeta.collectionName;
-    const currentKey = currentMeta.key.get();
+    const currentKeyValues = Array.from(currentMeta.keys.values()).map(
+      keyName =>
+        (entity[(keyName as unknown) as keyof T] as unknown) as PrimaryKey
+    );
     const indicies = currentMeta.indicies;
 
     store.collections[currentCollection as string].set(
@@ -96,7 +99,7 @@ export const removeOne = action(
     ensureMeta(Object.getPrototypeOf(entity));
     ensureCollection(store, entity);
     const currentMeta = getMeta(entity);
-    const primaryKey = currentMeta.key.get() as keyof T;
+    const primaryKey = currentMeta.keys.get() as keyof T;
     const cascadeRelationshipKeys = Object.values(
       currentMeta.relationships
     ).filter(relationship => relationship.options.cascade);

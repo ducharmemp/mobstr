@@ -4,7 +4,7 @@
 import { observable, action, IObservableValue } from "mobx";
 import { get } from "lodash";
 
-import { Meta } from "./types";
+import { Meta, PrimaryKey } from "./types";
 import { createStore } from "./store";
 
 /**
@@ -30,7 +30,7 @@ export function ensureMeta(target: any) {
     const metaAttribute: Meta["__meta__"] = {
       collectionName: target.name || target.constructor.name,
       indicies: observable.array([]),
-      key: observable.box(null),
+      keys: observable.set<PrimaryKey>(),
       // Spread the values already present in the prototype, we want to maintain the constructor name
       ...(getMeta(target) || {}),
       relationships: {}

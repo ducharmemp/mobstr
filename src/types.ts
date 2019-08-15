@@ -2,21 +2,21 @@
  * @module types
  */
 import {
-  IObservableValue,
   IObservableArray,
   IObservableObject,
-  Lambda
+  Lambda,
+  ObservableSet
 } from "mobx";
 
 /**
  * @private
  */
 export type Constructor<T> = new (...args: any[]) => T;
-type CollectionName = PropertyKey;
-type PrimaryKey = PropertyKey;
-type IndexValue = PropertyKey; // TODO: Should this support more complex types?
-type IndexKey = PropertyKey;
-type TriggerId = number;
+export type CollectionName = PropertyKey;
+export type PrimaryKey = Set<PropertyKey>;
+export type IndexValue = PropertyKey; // TODO: Should this support more complex types?
+export type IndexKey = PropertyKey;
+export type TriggerId = number;
 
 /**
  *
@@ -73,14 +73,14 @@ export interface TriggerOptions {
  */
 export interface Meta {
   __meta__: {
-    key: IObservableValue<PropertyKey | null>;
+    keys: ObservableSet<PrimaryKey>;
 
-    collectionName: PropertyKey;
+    collectionName: CollectionName;
     relationships: Record<
       PropertyKey,
       {
-        type: any;
-        keys: IObservableArray<string>;
+        type: Constructor<{}>;
+        keys: IObservableArray<PrimaryKey>;
         options: CascadeOptions;
       }
     >;
