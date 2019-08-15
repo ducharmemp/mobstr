@@ -3,6 +3,17 @@
 
 MobStr is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual book-keeping of object relationships. It also provides an opt-in approach to constraint checking, which can lead to better performance since we simply don't check every field if it's not marked with a check constraint.
 
+## Breaking Change for v1.0
+Microbundle/rollup doesn't play well with named and default exports mixing. Therefore, all exports will now be explicitly named. The following code:
+
+`import initialize from 'mobstr'` 
+
+Will need to be rewritten to:
+
+`import { initializeStore } from 'mobstr'`
+
+No other API changes are planned.
+
 ## Benefits
 * Simple and direct query API to find/delete entries from the data store
 * Declarative API for describing object models in a manner similar to other data stores
@@ -226,7 +237,7 @@ You can find some comprehensive toy examples in tests/integration.test.ts. Below
 
 ```js
 import { observable, computed } from 'mobx';
-import createStore from 'mobstr';
+import { initializeStore } from 'mobstr';
 
 const {
     relationship,
@@ -236,7 +247,7 @@ const {
     removeOne,
     truncateCollection,
     notNull,
-} = createStore();
+} = initializeStore();
 
 class Employee {
     @primaryKey
