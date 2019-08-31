@@ -1,7 +1,7 @@
 /**
  * @module constraints
  */
-import { isArray } from "lodash";
+import { castArray } from "lodash";
 
 import { createStore } from "./store";
 import {
@@ -40,9 +40,7 @@ export function check<K, T extends Constructor<K>>(
   propertyNames: (keyof InstanceType<T>)[] | (keyof InstanceType<T>),
   constraint: (...args: (InstanceType<T>[keyof InstanceType<T>])[]) => boolean
 ): number {
-  const arrayedPropertyNames = isArray(propertyNames)
-    ? propertyNames
-    : [propertyNames];
+  const arrayedPropertyNames = castArray(propertyNames);
   return createCollectionTrigger(
     store,
     entityClass,

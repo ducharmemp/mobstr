@@ -12,11 +12,11 @@ import {
  * @private
  */
 export type Constructor<T> = new (...args: any[]) => T;
-type CollectionName = PropertyKey;
-type PrimaryKey = PropertyKey;
-type IndexValue = PropertyKey; // TODO: Should this support more complex types?
-type IndexKey = PropertyKey;
-type TriggerId = number;
+export type CollectionName = PropertyKey;
+export type PrimaryKey = PropertyKey;
+export type IndexValue = PropertyKey; // TODO: Should this support more complex types?
+export type IndexKey = PropertyKey;
+export type TriggerId = number;
 
 /**
  *
@@ -99,7 +99,7 @@ export interface Store extends IObservableObject {
       IndexKey,
       Map<
         IndexValue,
-        PrimaryKey
+        PrimaryKey[]
       >
     >
   >;

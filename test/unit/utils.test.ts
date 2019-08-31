@@ -42,7 +42,7 @@ describe("#utils", (): void => {
   describe("#getMeta", (): void => {
     it("should return the metadata associated with a given object", (): void => {
       class Foo {
-        @primaryKey
+        @primaryKey({} as any)
         id = "name";
       }
 

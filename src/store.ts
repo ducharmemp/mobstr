@@ -2,15 +2,17 @@
  * @module store
  */
 import { observable, action } from "mobx";
-import { flatMap } from "lodash";
+import { flatMap, hasIn } from "lodash";
 
-import { Meta, Store, Constructor } from "./types";
+import { Meta, Store, Constructor, PrimaryKey } from "./types";
+import logger from './logger';
 import {
   ensureMeta,
   getMeta,
   ensureCollection,
   ensureIndicies,
-  ensureConstructorMeta
+  ensureConstructorMeta,
+  getOnlyOne
 } from "./utils";
 
 /**
@@ -58,10 +60,24 @@ export const addOne = action(
     );
 
     indicies.forEach(index => {
-      store.indicies[currentCollection as string][index as string].set(
-        (entity[index as keyof T] as unknown) as string,
-        (entity[currentMeta.key.get() as keyof T] as unknown) as PropertyKey
-      );
+      const currentPropertyValue = (entity[
+        index as keyof T
+      ] as unknown) as string;
+
+      const currentIndexedProperties =
+        store.indicies[currentCollection as string][index as string];
+
+      if (!currentIndexedProperties.has(currentPropertyValue)) {
+        currentIndexedProperties.set(currentPropertyValue, []);
+      }
+
+      const currentIndexedValues = currentIndexedProperties.get(
+        currentPropertyValue
+      ) as PrimaryKey[];
+
+      currentIndexedValues.push((entity[
+        currentMeta.key.get() as keyof T
+      ] as unknown) as PropertyKey);
     });
   }
 );
@@ -104,7 +120,7 @@ export const removeOne = action(
     const currentCollection = currentMeta.collectionName;
     store.collections[currentCollection as string].delete(
       // TODO: Properly type this, we need to check this beforehand to make sure that we can handle composite keys
-      (entity[primaryKey] as unknown) as string | number | symbol
+      (entity[primaryKey] as unknown) as PrimaryKey
     );
 
     // Clean up all references after the cascade. We do this after the initial delete to hopefully catch any circular relationships
@@ -174,6 +190,20 @@ export const findOne = action(
 );
 
 /**
+ *
+ */
+export const findOneBy = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    indexedProperty: keyof InstanceType<T>,
+    value: any
+  ): InstanceType<T> => {
+    return getOnlyOne(findAllBy(store, entityClass, indexedProperty, value));
+  }
+);
+
+/**
  * Finds all entities in the store by a given findClause that acts as a filter. Default
  * filter is the identity function, which ensures that all entities will be returned.
  *
@@ -209,6 +239,39 @@ export const findAll = action(
     return Array.from(
       store.collections[currentCollection as string].values()
     ).filter(findClause);
+  }
+);
+
+/**
+ *
+ */
+export const findAllBy = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    indexedProperty: keyof InstanceType<T>,
+    value: any
+  ): InstanceType<T>[] => {
+    ensureMeta(entityClass);
+    ensureCollection(store, entityClass);
+    ensureIndicies(store, entityClass);
+    const currentCollectionName = getMeta(entityClass).collectionName;
+    const currentCollection = store.indicies[currentCollectionName as string];
+    // Fall back to non-indexed lookup
+    if (!hasIn(currentCollection, indexedProperty)) {
+      logger.warn('Falling back to non-indexed filter for property');
+      return findAll(
+        store,
+        entityClass,
+        item => item[indexedProperty as keyof typeof item] === value
+      );
+    }
+
+    return (currentCollection[indexedProperty].get(
+      value as string
+    ) as PrimaryKey[]).map(primaryKey =>
+      findOne(store, entityClass, primaryKey)
+    );
   }
 );
 

@@ -58,7 +58,9 @@
   "author": "Matthew P DuCharme",
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
-    "lodash": "^4.17.15"
+    "bintrees": "^1.0.2",
+    "lodash": "^4.17.15",
+    "winston": "^3.2.1"
   },
   "peerDependencies": {
     "mobx": ">=5.13.0"

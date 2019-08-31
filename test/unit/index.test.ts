@@ -12,6 +12,8 @@ describe("#index", (): void => {
         "relationship",
         "findAll",
         "findOne",
+        "findAllBy",
+        "findOneBy",
         "addOne",
         "addAll",
         "removeOne",

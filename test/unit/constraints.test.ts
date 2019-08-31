@@ -13,7 +13,7 @@ describe("#constraints", (): void => {
     it("should allow the definition of a check constraint", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
 
         name = "";
@@ -27,7 +27,7 @@ describe("#constraints", (): void => {
     it("should allow single property names or multiple property names for a check constraint", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
 
         name = "";
@@ -51,7 +51,7 @@ describe("#constraints", (): void => {
     it("should allow the definition of a check constraint with multiple values", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
 
         name = "";
@@ -73,7 +73,7 @@ describe("#constraints", (): void => {
     it("should call the constraint when a value is added to the store", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
 
         name = "";
@@ -91,7 +91,7 @@ describe("#constraints", (): void => {
     it("should check that the value is not null", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
 
         name = null;
@@ -108,7 +108,7 @@ describe("#constraints", (): void => {
     it("should check that the value is not undefined", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
 
         name = undefined;
@@ -124,8 +124,7 @@ describe("#constraints", (): void => {
     it("should check that the value is unique", (): void => {
       const store = createStore();
       class Foo {
-        @unique(store)
-        @primaryKey
+        @primaryKey(store)
         id = "1234";
 
         @indexed
