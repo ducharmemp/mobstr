@@ -399,7 +399,7 @@ describe("#integration", () => {
     expect(() => addOne(store, new Foo())).to.throw;
   });
 
-  it('should allow indexed values of complex objects', (): void => {
+  it("should allow indexed values of complex objects", (): void => {
     const store = createStore();
 
     class Foo {
@@ -418,7 +418,7 @@ describe("#integration", () => {
     const f2 = new Foo([3, 4]);
     addOne(store, f);
     addOne(store, f2);
-    expect(findOneBy(store, Foo, 'names', [1, 2])).to.eql(f);
-    expect(findOneBy(store, Foo, 'names', [3, 4])).to.eql(f2);
+    expect(findOneBy(store, Foo, "names", [1, 2])).to.eql(f);
+    expect(findOneBy(store, Foo, "names", [3, 4])).to.eql(f2);
   });
 });

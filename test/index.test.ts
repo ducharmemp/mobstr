@@ -1,7 +1,7 @@
-import { configure } from 'mobx';
+import { configure } from "mobx";
 
 configure({
-    enforceActions: 'observed',
+  enforceActions: "observed"
 });
 
 import "./integration.test";

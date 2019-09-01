@@ -4,7 +4,14 @@
 import { observable, action } from "mobx";
 import { flatMap, hasIn, isEqual } from "lodash";
 
-import { Meta, Store, Constructor, PrimaryKey, RelationshipEntry } from "./types";
+import {
+  Meta,
+  Store,
+  Constructor,
+  PrimaryKey,
+  RelationshipEntry,
+  StoreOptions
+} from "./types";
 import logger from "./logger";
 import {
   ensureMeta,
@@ -25,13 +32,14 @@ import {
  * @returns
  */
 export const createStore = action(
-  (): Store =>
+  (options: StoreOptions = {}): Store =>
     observable({
       collections: {},
       primaryKeys: new Map(),
       indicies: {},
       triggers: new Map(),
-      nextId: 0
+      nextId: 0,
+      options
     })
 );
 
@@ -61,9 +69,7 @@ export const addOne = action(
     );
 
     indicies.forEach(index => {
-      const currentPropertyValue = getIndexKey(entity[
-        index as keyof T
-      ]);
+      const currentPropertyValue = getIndexKey(entity[index as keyof T]);
 
       const currentIndexedProperties =
         store.indicies[currentCollection as string][index as string];

@@ -42,14 +42,22 @@ export function check<K, T extends Constructor<K>>(
   constraint: (...args: (InstanceType<T>[keyof InstanceType<T>])[]) => boolean
 ): number {
   const arrayedPropertyNames = castArray(propertyNames);
+
   return createCollectionTrigger(
     store,
     entityClass,
     change => {
       const { newValue } = change;
+      const {
+        options: { disableConstraintChecks = false }
+      } = store;
       const propertyValues = arrayedPropertyNames.map(propertyName =>
         getBoxedValueOrValue(newValue[propertyName])
       );
+      if (disableConstraintChecks) {
+        return change;
+      }
+
       if (!constraint(...propertyValues)) {
         throw new IntegrityError(
           `Check constraint failed on ${
