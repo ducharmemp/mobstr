@@ -2,17 +2,18 @@
  * @module store
  */
 import { observable, action } from "mobx";
-import { flatMap, hasIn } from "lodash";
+import { flatMap, hasIn, isEqual } from "lodash";
 
-import { Meta, Store, Constructor, PrimaryKey } from "./types";
-import logger from './logger';
+import { Meta, Store, Constructor, PrimaryKey, RelationshipEntry } from "./types";
+import logger from "./logger";
 import {
   ensureMeta,
   getMeta,
   ensureCollection,
   ensureIndicies,
   ensureConstructorMeta,
-  getOnlyOne
+  getOnlyOne,
+  getIndexKey
 } from "./utils";
 
 /**
@@ -60,9 +61,9 @@ export const addOne = action(
     );
 
     indicies.forEach(index => {
-      const currentPropertyValue = (entity[
+      const currentPropertyValue = getIndexKey(entity[
         index as keyof T
-      ] as unknown) as string;
+      ]);
 
       const currentIndexedProperties =
         store.indicies[currentCollection as string][index as string];
@@ -126,7 +127,7 @@ export const removeOne = action(
     // Clean up all references after the cascade. We do this after the initial delete to hopefully catch any circular relationships
     cascadeRelationshipKeys.forEach(relationship => {
       relationship.keys
-        .map(key => findOne(store, relationship.type, key))
+        .map(key => findOne(store, relationship.type as Constructor<{}>, key))
         .forEach(entity => removeOne(store, entity));
     });
   }
@@ -249,7 +250,7 @@ export const findAllBy = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
-    indexedProperty: keyof InstanceType<T>,
+    indexedProperty: PropertyKey,
     value: any
   ): InstanceType<T>[] => {
     ensureMeta(entityClass);
@@ -259,16 +260,14 @@ export const findAllBy = action(
     const currentCollection = store.indicies[currentCollectionName as string];
     // Fall back to non-indexed lookup
     if (!hasIn(currentCollection, indexedProperty)) {
-      logger.warn('Falling back to non-indexed filter for property');
-      return findAll(
-        store,
-        entityClass,
-        item => item[indexedProperty as keyof typeof item] === value
+      logger.warn("Falling back to non-indexed filter for property");
+      return findAll(store, entityClass, item =>
+        isEqual(item[indexedProperty as keyof typeof item], value)
       );
     }
 
-    return (currentCollection[indexedProperty].get(
-      value as string
+    return (currentCollection[indexedProperty as string].get(
+      getIndexKey(value)
     ) as PrimaryKey[]).map(primaryKey =>
       findOne(store, entityClass, primaryKey)
     );
@@ -323,18 +322,18 @@ export const join = action(
     const entityCollectionName = getMeta(entityClass).collectionName;
     const entityCollection = Array.from(
       store.collections[entityCollectionName as string].values()
-    );
+    ) as InstanceType<T>[];
 
     const childCollectionName = getMeta(joinClass).collectionName;
     const childCollection = store.collections[childCollectionName as string];
 
-    return flatMap(entityCollection, (entity: any) => {
+    return flatMap(entityCollection, (entity: InstanceType<T>) => {
       const joinRelationships = Object.values(
         getMeta(entity).relationships
       ).filter(({ type }) => type === joinClass);
 
-      return flatMap(joinRelationships, ({ keys }) =>
-        keys.map(key => [entity, childCollection.get(key)])
+      return flatMap(joinRelationships, ({ keys }: RelationshipEntry) =>
+        keys.map((key: string) => [entity, childCollection.get(key)])
       );
     });
   }

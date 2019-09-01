@@ -10,6 +10,7 @@ describe("#index", (): void => {
         "store",
         "primaryKey",
         "relationship",
+        "indexed",
         "findAll",
         "findOne",
         "findAllBy",

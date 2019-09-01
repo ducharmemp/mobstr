@@ -22,7 +22,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
 
@@ -39,7 +39,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         name = "test";
@@ -70,7 +70,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
 
@@ -92,11 +92,11 @@ describe("#store", (): void => {
     it("should cascade delete any relationships with cascade=true", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
       class Baz {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @relationship(store, () => Bar)
@@ -131,7 +131,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @indexed
@@ -147,7 +147,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         name = 'test';
@@ -163,7 +163,7 @@ describe("#store", (): void => {
     it('should delete all entries in a collection', (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
 
@@ -177,7 +177,7 @@ describe("#store", (): void => {
       const store = createStore();
       class Foo {
         @unique(store)
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
 
@@ -190,7 +190,7 @@ describe("#store", (): void => {
     it('should clear all entries in the collection map and index', (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
 

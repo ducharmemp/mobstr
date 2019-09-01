@@ -2,7 +2,8 @@
  * @module utils
  */
 import { observable, action, IObservableValue } from "mobx";
-import { get } from "lodash";
+import { get, isObject } from "lodash";
+import hash from 'object-hash';
 
 import { Meta } from "./types";
 import { createStore } from "./store";
@@ -140,6 +141,7 @@ export function getOnlyOne<T>(values: T[]): T {
   return values[0];
 }
 
-export function createIndex<T>() {
-  
+export function getIndexKey<T>(value: T): PropertyKey {
+  if (!isObject(value)) { return value as unknown as PropertyKey; }
+  return hash(value);
 }

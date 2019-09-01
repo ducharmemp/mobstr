@@ -9,14 +9,16 @@ import {
   removeOne,
   join,
   findAll,
-  findOne
+  findOne,
+  findOneBy
 } from "../src/store";
 import {
   primaryKey,
   relationship,
   setCheck,
   notNull,
-  notUndefined
+  notUndefined,
+  indexed
 } from "../src/decorators";
 
 describe("#integration", () => {
@@ -26,7 +28,7 @@ describe("#integration", () => {
     class Bar {}
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -42,7 +44,7 @@ describe("#integration", () => {
     class Bar {}
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -58,12 +60,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -93,12 +95,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -117,12 +119,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -142,7 +144,7 @@ describe("#integration", () => {
     const store = createStore();
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
@@ -155,12 +157,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -181,12 +183,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -207,17 +209,17 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Baz {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -243,12 +245,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -273,12 +275,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -301,12 +303,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -330,12 +332,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -364,7 +366,7 @@ describe("#integration", () => {
     const store = createStore();
 
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id: string = uuid();
 
       @relationship(store, () => Foo, { cascade: true })
@@ -385,7 +387,7 @@ describe("#integration", () => {
   it("should allow multiple constraint decorators to be assigned to a single field", (): void => {
     const store = createStore();
     class Foo {
-      @primaryKey(store)
+      @primaryKey
       id = uuid();
 
       @notNull(store)
@@ -395,5 +397,28 @@ describe("#integration", () => {
     }
 
     expect(() => addOne(store, new Foo())).to.throw;
+  });
+
+  it('should allow indexed values of complex objects', (): void => {
+    const store = createStore();
+
+    class Foo {
+      @primaryKey
+      id = uuid();
+
+      @indexed
+      names: [number, number];
+
+      constructor(names: [number, number]) {
+        this.names = names;
+      }
+    }
+
+    const f = new Foo([1, 2]);
+    const f2 = new Foo([3, 4]);
+    addOne(store, f);
+    addOne(store, f2);
+    expect(findOneBy(store, Foo, 'names', [1, 2])).to.eql(f);
+    expect(findOneBy(store, Foo, 'names', [3, 4])).to.eql(f2);
   });
 });

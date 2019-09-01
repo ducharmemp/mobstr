@@ -18,7 +18,8 @@ import {
   getBoxedValueOrValue,
   getMeta,
   ensureCollection,
-  ensureIndicies
+  ensureIndicies,
+  getIndexKey
 } from "./utils";
 import { IntegrityError } from "./errors";
 import { indexed } from "./decorators";
@@ -147,7 +148,7 @@ export function checkUnique<T extends Constructor<{}>>(
 
   return check(store, entityClass, propertyName, propertyValue => {
     return !store.indicies[currentCollection as string][propertyName].has(
-      (propertyValue as unknown) as PropertyKey
+      getIndexKey(propertyValue)
     );
   });
 }

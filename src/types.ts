@@ -17,6 +17,11 @@ export type PrimaryKey = PropertyKey;
 export type IndexValue = PropertyKey; // TODO: Should this support more complex types?
 export type IndexKey = PropertyKey;
 export type TriggerId = number;
+export interface RelationshipEntry {
+  type: unknown;
+  keys: IObservableArray<string>;
+  options: CascadeOptions;
+}
 
 /**
  *
@@ -78,11 +83,7 @@ export interface Meta {
     collectionName: PropertyKey;
     relationships: Record<
       PropertyKey,
-      {
-        type: any;
-        keys: IObservableArray<string>;
-        options: CascadeOptions;
-      }
+      RelationshipEntry
     >;
     indicies: IObservableArray<PropertyKey>;
   };

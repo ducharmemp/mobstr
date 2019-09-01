@@ -24,7 +24,8 @@ import {
   notNull,
   notUndefined,
   setCheck,
-  unique
+  unique,
+  indexed
 } from "./decorators";
 import {
   checkNotNull,
@@ -45,7 +46,8 @@ export function initializeStore() {
   return {
     store,
     // Decorators
-    primaryKey: primaryKey.bind(null, store),
+    primaryKey,
+    indexed,
     relationship: relationship.bind(null, store),
     notNull: notNull(store),
     notUndefined: notUndefined(store),

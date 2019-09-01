@@ -27,7 +27,7 @@ describe("#decorators", (): void => {
   describe("#primaryKey", (): void => {
     it("should set an attribute to the __meta__.key", (): void => {
       class Foo {
-        @primaryKey({} as any)
+        @primaryKey
         attrib: number = 0;
       }
 
@@ -41,12 +41,12 @@ describe("#decorators", (): void => {
     it("should set a relationship to the __meta__.key", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey(store)
+        @primaryKey
         id: number = 0;
       }
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         attrib: number = 0;
 
         @relationship(store, () => Bar)
@@ -64,12 +64,12 @@ describe("#decorators", (): void => {
     it("should allow an options parameter to be passed into the relationship", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey(store)
+        @primaryKey
         id: number = 0;
       }
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         attrib: number = 0;
 
         // TODO: Fill out options with cascade options
@@ -87,12 +87,12 @@ describe("#decorators", (): void => {
     it("should allow a user to replace an entity in a relationship by index", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
       }
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @relationship(store, () => Bar)
@@ -112,7 +112,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @notNull(store)
@@ -126,7 +126,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @notNull(store)
@@ -144,7 +144,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @notUndefined(store)
@@ -160,7 +160,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @unique(store)
@@ -175,7 +175,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey(store)
+        @primaryKey
         id = uuid();
 
         @unique(store)

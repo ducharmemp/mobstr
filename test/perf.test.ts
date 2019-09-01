@@ -1,12 +1,10 @@
 import { expect } from 'chai';
 
-import { range, countBy, entries } from "lodash";
-import { v4 as uuid } from "uuid";
+import { range, uniqueId } from "lodash";
 
 import logger from '../src/logger';
-import { initializeStore, CascadeOptions, IntegrityError, TriggerExecutionStrategy } from "../dist/index.js";
+import { initializeStore } from "../dist/index.js";
 
-console.log(TriggerExecutionStrategy.Intercept)
 describe("#performance", (): void => {
   const {
     addAll,
@@ -18,12 +16,14 @@ describe("#performance", (): void => {
     notUndefined,
     unique,
     findAll,
+    findAllBy,
+    indexed
   } = initializeStore();
-  const times = range(100000);
+  const times = range(10000);
 
   class Foo {
     @primaryKey
-    id = uuid();
+    id = uniqueId();
 
     number = Math.random();
   }
@@ -31,10 +31,11 @@ describe("#performance", (): void => {
   class CheckedFoo {
     @unique
     @primaryKey
-    id = uuid();
+    id = uniqueId();
 
     @notNull
     @notUndefined
+    @indexed
     age = Math.random();
   }
 
@@ -45,7 +46,6 @@ describe("#performance", (): void => {
   before((): void => {
     foos = times.map(() => new Foo());
     checkedFoos = times.map(() => new CheckedFoo());
-    console.log(entries(countBy(checkedFoos, 'id')).filter(([key, value]) => value > 1));
     subset = foos.slice(0, 500);
     const triggerId = check(Foo, "number", value => value > 0);
     addAll(foos);
@@ -96,6 +96,13 @@ describe("#performance", (): void => {
   it("should be performant in adding 100k items with multiple decorator constraints", (): void => {
     logger.profile('allAllDecorator');
     addAll(checkedFoos);
+    logger.profile('allAllDecorator');
+  });
+
+  it("should be performant in adding 100k items with multiple decorator constraints and then finding all by an indexed value", (): void => {
+    logger.profile('allAllDecorator');
+    addAll(checkedFoos);
+    findAllBy(CheckedFoo, 'age' as any, checkedFoos[0].age)
     logger.profile('allAllDecorator');
   });
 });
