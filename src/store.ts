@@ -20,7 +20,8 @@ import {
   ensureIndicies,
   ensureConstructorMeta,
   getOnlyOne,
-  getIndexKey
+  getIndexKey,
+  invariant
 } from "./utils";
 
 /**
@@ -62,6 +63,10 @@ export const addOne = action(
     const currentCollection = currentMeta.collectionName;
     const currentKey = currentMeta.key.get();
     const indicies = currentMeta.indicies;
+    invariant(
+      () => !!currentKey,
+      "Primary key for model should not be falsy. This can lead to unexpected behavior"
+    );
 
     store.collections[currentCollection as string].set(
       (entity[currentKey as keyof T] as unknown) as string,
