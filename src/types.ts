@@ -31,6 +31,13 @@ export interface CascadeOptions {
 }
 
 /**
+ *
+ */
+export interface StoreOptions {
+  disableConstraintChecks?: boolean;
+}
+
+/**
  * Describes the order of execution for triggers.
  *
  * Equivalent to the following SQL:
@@ -81,10 +88,7 @@ export interface Meta {
     key: IObservableValue<PropertyKey | null>;
 
     collectionName: PropertyKey;
-    relationships: Record<
-      PropertyKey,
-      RelationshipEntry
-    >;
+    relationships: Record<PropertyKey, RelationshipEntry>;
     indicies: IObservableArray<PropertyKey>;
   };
 }
@@ -93,16 +97,11 @@ export interface Meta {
  *
  */
 export interface Store extends IObservableObject {
+  options: StoreOptions;
   collections: Record<CollectionName, Map<PrimaryKey, any>>;
   indicies: Record<
     CollectionName,
-    Record<
-      IndexKey,
-      Map<
-        IndexValue,
-        PrimaryKey[]
-      >
-    >
+    Record<IndexKey, Map<IndexValue, PrimaryKey[]>>
   >;
   triggers: Map<TriggerId, Lambda>;
   nextId: TriggerId;

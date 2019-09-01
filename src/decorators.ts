@@ -51,7 +51,6 @@ export function primaryKey<T>(target: any, propertyKey: PropertyKey) {
   getMeta(target).key.set(propertyKey);
 }
 
-
 /**
  * Creates an indexed value in the store. This will be used for fast lookups in the
  * case of specialized filters. Currently not implemented.
@@ -152,8 +151,7 @@ export function relationship(
             changes.removed.forEach(change => {
               currentRelationship.keys.replace(
                 currentRelationship.keys.filter(
-                  key =>
-                    key !== change[getMeta(change).key.get() as string]
+                  key => key !== change[getMeta(change).key.get() as string]
                 )
               );
               // FIXME: This would be the proper place to track cascades on the relationship.
@@ -161,9 +159,8 @@ export function relationship(
             });
           } else {
             addOne(store, changes.newValue);
-            currentRelationship.keys[changes.index] = changes.newValue[
-              getMeta(changes.newValue).key.get() as string
-            ];
+            currentRelationship.keys[changes.index] =
+              changes.newValue[getMeta(changes.newValue).key.get() as string];
           }
         });
 

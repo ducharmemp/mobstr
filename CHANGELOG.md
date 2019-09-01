@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+* Disabling of constraint checks via options argument to initializeStore
+* Complex indexed values
+    * Indexes can now be built against any object, not just primitives
+    * Indexes are built deterministically using object-hash, so there's no need
+    * Values can now be queried using index values or other properties using the findXBy functions. If a value hasn't been indexed then it falls back to a normal, slow filter and warns.
+* findAllBy and findOneBy
+    * Supports queries for non-primary key properties
+    * findOneBy throws an exception if no values are found or if many values are found
 
 ### Changed
 

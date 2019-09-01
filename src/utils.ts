@@ -3,7 +3,7 @@
  */
 import { observable, action, IObservableValue } from "mobx";
 import { get, isObject } from "lodash";
-import hash from 'object-hash';
+import hash from "object-hash";
 
 import { Meta } from "./types";
 import { createStore } from "./store";
@@ -123,8 +123,8 @@ export const ensureIndicies = action(
 );
 
 /**
- * 
- * @param value 
+ *
+ * @param value
  */
 export function getBoxedValueOrValue<T>(value: IObservableValue<T> | T): T {
   // Magic to either get the boxed value or return the original value. We need to make sure to bind the this property
@@ -132,16 +132,22 @@ export function getBoxedValueOrValue<T>(value: IObservableValue<T> | T): T {
 }
 
 /**
- * 
- * @param values 
+ *
+ * @param values
  */
 export function getOnlyOne<T>(values: T[]): T {
-  if (values.length === 0) { throw new NoResultsFound(`No results found for query`); }
-  if (values.length > 1) { throw new MultipleResultsFound(`Multiple results found for query`); }
+  if (values.length === 0) {
+    throw new NoResultsFound(`No results found for query`);
+  }
+  if (values.length > 1) {
+    throw new MultipleResultsFound(`Multiple results found for query`);
+  }
   return values[0];
 }
 
 export function getIndexKey<T>(value: T): PropertyKey {
-  if (!isObject(value)) { return value as unknown as PropertyKey; }
+  if (!isObject(value)) {
+    return (value as unknown) as PropertyKey;
+  }
   return hash(value);
 }
