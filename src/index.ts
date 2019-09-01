@@ -9,13 +9,14 @@ import {
   addAll,
   removeAll,
   findOne,
-  truncateCollection
+  truncateCollection,
+  findAllBy,
+  findOneBy
 } from "./store";
 import {
   createCollectionTrigger,
   dropTrigger,
   dropAllTriggers,
-
 } from "./triggers";
 import {
   primaryKey,
@@ -23,7 +24,8 @@ import {
   notNull,
   notUndefined,
   setCheck,
-  unique
+  unique,
+  indexed
 } from "./decorators";
 import {
   checkNotNull,
@@ -45,6 +47,7 @@ export function initializeStore() {
     store,
     // Decorators
     primaryKey,
+    indexed,
     relationship: relationship.bind(null, store),
     notNull: notNull(store),
     notUndefined: notUndefined(store),
@@ -53,6 +56,8 @@ export function initializeStore() {
     // Store methods
     findAll: findAll.bind(null, store),
     findOne: findOne.bind(null, store),
+    findAllBy: findAllBy.bind(null, store),
+    findOneBy: findOneBy.bind(null, store),
     addOne: addOne.bind(null, store),
     addAll: addAll.bind(null, store),
     removeOne: removeOne.bind(null, store),
@@ -73,4 +78,4 @@ export function initializeStore() {
 }
 
 export { CascadeOptions, Meta, Store, TriggerOptions, TriggerExecutionStrategy, TriggerQueryEvent } from './types';
-export { IntegrityError } from './errors';
+export { IntegrityError, MultipleResultsFound, NoResultsFound } from './errors';

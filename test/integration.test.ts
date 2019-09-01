@@ -9,14 +9,16 @@ import {
   removeOne,
   join,
   findAll,
-  findOne
+  findOne,
+  findOneBy
 } from "../src/store";
 import {
   primaryKey,
   relationship,
   setCheck,
   notNull,
-  notUndefined
+  notUndefined,
+  indexed
 } from "../src/decorators";
 
 describe("#integration", () => {
@@ -395,5 +397,28 @@ describe("#integration", () => {
     }
 
     expect(() => addOne(store, new Foo())).to.throw;
+  });
+
+  it('should allow indexed values of complex objects', (): void => {
+    const store = createStore();
+
+    class Foo {
+      @primaryKey
+      id = uuid();
+
+      @indexed
+      names: [number, number];
+
+      constructor(names: [number, number]) {
+        this.names = names;
+      }
+    }
+
+    const f = new Foo([1, 2]);
+    const f2 = new Foo([3, 4]);
+    addOne(store, f);
+    addOne(store, f2);
+    expect(findOneBy(store, Foo, 'names', [1, 2])).to.eql(f);
+    expect(findOneBy(store, Foo, 'names', [3, 4])).to.eql(f2);
   });
 });

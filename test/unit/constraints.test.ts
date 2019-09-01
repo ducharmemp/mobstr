@@ -124,7 +124,6 @@ describe("#constraints", (): void => {
     it("should check that the value is unique", (): void => {
       const store = createStore();
       class Foo {
-        @unique(store)
         @primaryKey
         id = "1234";
 

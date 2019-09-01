@@ -1,6 +1,3 @@
-/*
-TODO: Most of these cases are handled in integration, but I will fill out later for completeness
-*/
 import { v4 as uuid } from "uuid";
 import { describe, it } from "mocha";
 import { expect } from "chai";
@@ -13,9 +10,11 @@ import {
   createStore,
   removeOne,
   findOne,
-  truncateCollection
+  truncateCollection,
+  findOneBy,
+  addOne,
 } from "../../src/store";
-import { primaryKey, relationship, unique } from "../../src/decorators";
+import { primaryKey, relationship, unique, indexed } from "../../src/decorators";
 
 describe("#store", (): void => {
   describe("#addAll", (): void => {
@@ -124,6 +123,39 @@ describe("#store", (): void => {
       class Foo {}
       const store = createStore();
       expect(findOne(store, Foo, "")).to.be.undefined;
+    });
+  });
+
+  describe('#findOneBy', (): void => {
+    it('should find a class by an indexed value', () => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @indexed
+        name = 'test';
+      }
+
+      const f = new Foo();
+      addOne(store, f);
+      expect(findOneBy(store, Foo, 'name', 'test')).to.be.eql(f);
+    });
+
+    it('should find a class by a non-indexed value', () => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        name = 'test';
+      }
+
+      const f = new Foo();
+      addOne(store, f);
+      expect(findOneBy(store, Foo, 'name', 'test')).to.be.eql(f);
     });
   });
 

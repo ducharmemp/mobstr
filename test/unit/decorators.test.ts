@@ -170,5 +170,21 @@ describe("#decorators", (): void => {
       addOne(store, new Foo());
       expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
     });
+
+    it('should check that a given indexed column must have unique values', (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @unique(store)
+        @indexed
+        name = '1';
+      }
+
+      addOne(store, new Foo());
+      expect(() => addOne(store, new Foo())).to.throw(IntegrityError);
+    });
   });
 });

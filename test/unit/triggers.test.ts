@@ -5,7 +5,6 @@ import sinon from "sinon";
 import {
   createCollectionTrigger,
   dropTrigger,
-  executeTrigger
 } from "../../src/triggers";
 import { createStore, addOne, removeOne, findOne } from "../../src/store";
 import { primaryKey, indexed } from "../../src/decorators";

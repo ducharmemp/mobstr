@@ -42,12 +42,15 @@ import {
  * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
  */
-export function primaryKey(target: any, propertyKey: PropertyKey) {
+export function primaryKey<T>(target: any, propertyKey: PropertyKey) {
   ensureMeta(target);
   ensureConstructorMeta(target);
+  // !FIXME: This is breaking our tests. Are the tests wrong or is the API wrong?
+  // unique(store)(target, propertyKey);
   getMeta(target).indicies.push(propertyKey);
   getMeta(target).key.set(propertyKey);
 }
+
 
 /**
  * Creates an indexed value in the store. This will be used for fast lookups in the
