@@ -200,5 +200,33 @@ describe("#store", (): void => {
       expect(store.collections['Foo'].size).to.be.eql(0);
       expect(store.indicies['Foo']).to.be.empty;
     });
+
+    it('should delete all related entries when the parent collection is truncated', (): void => {
+      const store = createStore();
+      class Bar {
+        @primaryKey
+        id = uuid();
+      }
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @relationship(store, () => Bar, { cascade: true })
+        friends: Bar[] = [];
+
+        constructor() {
+          this.friends.push(new Bar(), new Bar(), new Bar());
+        }
+      }
+
+      const foos = range(20).map(() => new Foo());
+      addAll(store, foos);
+      expect(findAll(store, Foo)).to.have.lengthOf(20);
+      expect(findAll(store, Bar)).to.have.lengthOf(20 * 3);
+      truncateCollection(store, Foo, { cascade: true });
+      expect(findAll(store, Bar)).to.have.lengthOf(0);
+      expect(findAll(store, Foo)).to.have.lengthOf(0);
+    });
   });
 });

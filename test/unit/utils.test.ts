@@ -7,7 +7,8 @@ import {
   getMeta,
   ensureConstructorMeta,
   getOnlyOne,
-  getIndexKey
+  getIndexKey,
+  invariant
 } from "../../src/utils";
 import { primaryKey } from "../../src/decorators";
 import { NoResultsFound, MultipleResultsFound } from "../../src/errors";
@@ -95,6 +96,16 @@ describe("#utils", (): void => {
 
     it('should return a hash when provided an object', (): void => {
       expect(getIndexKey({ foo: 1 })).to.eql('398d5c982d815a5000ff5cee2fdbc114d24125e2');
+    });
+  });
+
+  describe("#invariant", () => {
+    it("should throw an error if the invariant wasn't met", (): void => {
+      expect(() => invariant(() => false, "Some message")).to.throw(Error, "Some message");
+    });
+
+    it("should not throw an error if the invariant was met", (): void => {
+      expect(() => invariant(() => true, "Some message")).to.not.throw;
     });
   });
 });

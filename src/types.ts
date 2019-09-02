@@ -18,7 +18,7 @@ export type IndexValue = PropertyKey; // TODO: Should this support more complex 
 export type IndexKey = PropertyKey;
 export type TriggerId = number;
 export interface RelationshipEntry {
-  type: unknown;
+  type: Constructor<{}>;
   keys: IObservableArray<string>;
   options: CascadeOptions;
 }
@@ -27,6 +27,11 @@ export interface RelationshipEntry {
  *
  */
 export interface CascadeOptions {
+  cascade?: boolean;
+  deleteOnRemoval?: boolean;
+}
+
+export interface TruncateOptions {
   cascade?: boolean;
 }
 

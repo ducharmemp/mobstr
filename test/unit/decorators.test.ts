@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 
 import { indexed, primaryKey, relationship, notNull, notUndefined, unique } from "../../src/decorators";
 import { Meta } from "../../src/types";
-import { createStore, addOne } from "../../src/store";
+import { createStore, addOne, findAll, truncateCollection } from "../../src/store";
 import { IntegrityError } from "@src/errors";
 
 describe("#decorators", (): void => {
@@ -61,7 +61,7 @@ describe("#decorators", (): void => {
         .that.is.eql(Bar);
     });
 
-    it("should allow an options parameter to be passed into the relationship", (): void => {
+    it("should allow an options parameter to allow cascades when the item is removed from the list", (): void => {
       const store = createStore();
       class Bar {
         @primaryKey
@@ -72,8 +72,7 @@ describe("#decorators", (): void => {
         @primaryKey
         attrib: number = 0;
 
-        // TODO: Fill out options with cascade options
-        @relationship(store, () => Bar, {})
+        @relationship(store, () => Bar, { deleteOnRemoval: true })
         friends: Bar[] = [];
       }
 
@@ -81,7 +80,12 @@ describe("#decorators", (): void => {
 
       expect(((f as unknown) as Meta).__meta__.relationships)
         .to.have.property("friends")
-        .that.has.property("options").that.is.empty;
+        .that.has.property("options").that.is.not.empty;
+      addOne(store, f);
+      f.friends.push(new Bar());
+      expect(findAll(store, Bar)).to.have.length(1);
+      f.friends.pop();
+      expect(findAll(store, Bar)).to.have.length(0);
     });
 
     it("should allow a user to replace an entity in a relationship by index", (): void => {
