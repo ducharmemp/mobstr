@@ -8,3 +8,4 @@ coverage
 .rts2_cache*
 processed.txt
 isolate*
+.size-snapshot.json

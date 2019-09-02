@@ -2,7 +2,9 @@
  * @module utils
  */
 import { observable, action, IObservableValue } from "mobx";
-import { get, isObject } from "lodash";
+import get from 'lodash.get';
+import isObject from 'lodash.isobject';
+import isArray from 'lodash.isarray';
 import hash from "object-hash";
 
 import { Meta } from "./types";
@@ -168,4 +170,8 @@ export function invariant(condition: () => boolean, message: string) {
   if (process.env.NODE_ENV !== "production" && !condition()) {
     throw new Error(message);
   }
+}
+
+export function castArray<T>(value: T | T[]): T[] {
+  return isArray(value) ? value : [value];
 }

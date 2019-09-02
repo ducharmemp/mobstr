@@ -1,7 +1,7 @@
 import { v4 as uuid } from "uuid";
 import { describe, it } from "mocha";
 import { expect } from "chai";
-import { range } from "lodash";
+import range from "lodash.range";
 
 import {
   addAll,
