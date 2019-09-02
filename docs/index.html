@@ -67,6 +67,14 @@
 				</a>
 				<p><a href="https://circleci.com/gh/ducharmemp/mobstr"><img src="https://circleci.com/gh/ducharmemp/mobstr.svg?style=svg" alt="CircleCI"></a> <a href="https://codecov.io/gh/ducharmemp/mobstr"><img src="https://codecov.io/gh/ducharmemp/mobstr/branch/master/graph/badge.svg" alt="CodeCov"></a> <a href="https://www.npmjs.com/package/@ducharmemp/mobstr" title="View this project on npm"><img src="https://img.shields.io/npm/v/@ducharmemp/mobstr" alt="npm version"></a></p>
 				<p>MobStr is a project designed to provide an ORM-like interface to a MobX store. The goal of this project is to achieve a low-overhead, normalized approach to modeling to allow developers to focus on domain modeling without having to deal with manual book-keeping of object relationships. It also provides an opt-in approach to constraint checking, which can lead to better performance since we simply don&#39;t check every field if it&#39;s not marked with a check constraint.</p>
+				<a href="#breaking-change-for-v10" id="breaking-change-for-v10" style="color: inherit; text-decoration: none;">
+					<h2>Breaking Change for v1.0</h2>
+				</a>
+				<p>Microbundle/rollup doesn&#39;t play well with named and default exports mixing. Therefore, all exports will now be explicitly named. The following code:</p>
+				<p><code>import initialize from &#39;mobstr&#39;</code> </p>
+				<p>Will need to be rewritten to:</p>
+				<p><code>import { initializeStore } from &#39;mobstr&#39;</code></p>
+				<p>No other API changes are planned.</p>
 				<a href="#benefits" id="benefits" style="color: inherit; text-decoration: none;">
 					<h2>Benefits</h2>
 				</a>
@@ -254,7 +262,7 @@ f.friends[<span class="hljs-number">0</span>].id <span class="hljs-comment">// T
 				</a>
 				<p>You can find some comprehensive toy examples in tests/integration.test.ts. Below is an example of real-world(ish) example using a fetch to get a company name and the a list of employees from that company.</p>
 				<pre><code class="language-js"><span class="hljs-keyword">import</span> { observable, computed } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobx'</span>;
-<span class="hljs-keyword">import</span> createStore <span class="hljs-keyword">from</span> <span class="hljs-string">'mobstr'</span>;
+<span class="hljs-keyword">import</span> { initializeStore } <span class="hljs-keyword">from</span> <span class="hljs-string">'mobstr'</span>;
 
 <span class="hljs-keyword">const</span> {
     relationship,
@@ -264,7 +272,7 @@ f.friends[<span class="hljs-number">0</span>].id <span class="hljs-comment">// T
     removeOne,
     truncateCollection,
     notNull,
-} = createStore();
+} = initializeStore();
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Employee</span> </span>{
     @primaryKey
@@ -393,16 +401,46 @@ function destroyCompany(companyId) {
 						<a href="interfaces/meta.html" class="tsd-kind-icon">Meta</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/relationshipentry.html" class="tsd-kind-icon">Relationship<wbr>Entry</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/store.html" class="tsd-kind-icon">Store</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/storeoptions.html" class="tsd-kind-icon">Store<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/triggeroptions.html" class="tsd-kind-icon">Trigger<wbr>Options</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/truncateoptions.html" class="tsd-kind-icon">Truncate<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#collectionname" class="tsd-kind-icon">Collection<wbr>Name</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-private tsd-is-external">
 						<a href="globals.html#constructor" class="tsd-kind-icon">Constructor</a>
 					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#indexkey" class="tsd-kind-icon">Index<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#indexvalue" class="tsd-kind-icon">Index<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#primarykey" class="tsd-kind-icon">Primary<wbr>Key</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#triggerid" class="tsd-kind-icon">Trigger<wbr>Id</a>
+					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#integrityerror" class="tsd-kind-icon">Integrity<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#multipleresultsfound" class="tsd-kind-icon">Multiple<wbr>Results<wbr>Found</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noresultsfound" class="tsd-kind-icon">No<wbr>Results<wbr>Found</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#addall" class="tsd-kind-icon">add<wbr>All</a>
@@ -441,7 +479,13 @@ function destroyCompany(companyId) {
 						<a href="globals.html#findall" class="tsd-kind-icon">find<wbr>All</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#findallby" class="tsd-kind-icon">find<wbr>All<wbr>By</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#findone" class="tsd-kind-icon">find<wbr>One</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#findoneby" class="tsd-kind-icon">find<wbr>One<wbr>By</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#getnextid" class="tsd-kind-icon">get<wbr>Next<wbr>Id</a>
@@ -485,8 +529,14 @@ function destroyCompany(companyId) {
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#getboxedvalueorvalue" class="tsd-kind-icon">get<wbr>Boxed<wbr>Value<wbr>OrValue</a>
 					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#getindexkey" class="tsd-kind-icon">get<wbr>Index<wbr>Key</a>
+					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#getmeta" class="tsd-kind-icon">get<wbr>Meta</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#getonlyone" class="tsd-kind-icon">get<wbr>Only<wbr>One</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#indexed" class="tsd-kind-icon">indexed</a>
@@ -494,16 +544,19 @@ function destroyCompany(companyId) {
 					<li class=" tsd-kind-function">
 						<a href="globals.html#initializestore" class="tsd-kind-icon">initialize<wbr>Store</a>
 					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#invariant" class="tsd-kind-icon">invariant</a>
+					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#notnull" class="tsd-kind-icon">not<wbr>Null</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#notundefined" class="tsd-kind-icon">not<wbr>Undefined</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#primarykey" class="tsd-kind-icon">primary<wbr>Key</a>
 					</li>
-					<li class=" tsd-kind-function tsd-is-external">
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#relationship" class="tsd-kind-icon">relationship</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">

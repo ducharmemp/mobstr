@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>TriggerOptions | @ducharmemp/mobstr</title>
+	<title>RelationshipEntry | @ducharmemp/mobstr</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,29 +54,21 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="triggeroptions.html">TriggerOptions</a>
+					<a href="relationshipentry.html">RelationshipEntry</a>
 				</li>
 			</ul>
-			<h1>Interface TriggerOptions</h1>
+			<h1>Interface RelationshipEntry</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>The trigger listener options. Controls the order of execution (before/after the event), as well
-						as the specific event type (add, delete)</p>
-					</div>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">TriggerOptions</span>
+						<span class="target">RelationshipEntry</span>
 					</li>
 				</ul>
 			</section>
@@ -87,8 +79,9 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="triggeroptions.html#eventtypes" class="tsd-kind-icon">event<wbr>Types</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="triggeroptions.html#triggerexecutionstrategy" class="tsd-kind-icon">trigger<wbr>Execution<wbr>Strategy</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="relationshipentry.html#keys" class="tsd-kind-icon">keys</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="relationshipentry.html#options" class="tsd-kind-icon">options</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="relationshipentry.html#type" class="tsd-kind-icon">type</a></li>
 							</ul>
 						</section>
 					</div>
@@ -97,22 +90,32 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="eventtypes" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> event<wbr>Types</h3>
-					<div class="tsd-signature tsd-kind-icon">event<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Set</span><span class="tsd-signature-symbol">&lt;</span><a href="../enums/triggerqueryevent.html" class="tsd-signature-type">TriggerQueryEvent</a><span class="tsd-signature-symbol">&gt;</span></div>
+					<a name="keys" class="tsd-anchor"></a>
+					<h3>keys</h3>
+					<div class="tsd-signature tsd-kind-icon">keys<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">IObservableArray</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/4bbaf82/src/types.ts#L84">types.ts:84</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/4bbaf82/src/types.ts#L22">types.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="triggerexecutionstrategy" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> trigger<wbr>Execution<wbr>Strategy</h3>
-					<div class="tsd-signature tsd-kind-icon">trigger<wbr>Execution<wbr>Strategy<span class="tsd-signature-symbol">:</span> <a href="../enums/triggerexecutionstrategy.html" class="tsd-signature-type">TriggerExecutionStrategy</a></div>
+					<a name="options" class="tsd-anchor"></a>
+					<h3>options</h3>
+					<div class="tsd-signature tsd-kind-icon">options<span class="tsd-signature-symbol">:</span> <a href="cascadeoptions.html" class="tsd-signature-type">CascadeOptions</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/4bbaf82/src/types.ts#L85">types.ts:85</a></li>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/4bbaf82/src/types.ts#L23">types.ts:23</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../globals.html#constructor" class="tsd-signature-type">Constructor</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">__type</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/ducharmemp/mobstr/blob/4bbaf82/src/types.ts#L21">types.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -131,13 +134,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="triggeroptions.html" class="tsd-kind-icon">Trigger<wbr>Options</a>
+						<a href="relationshipentry.html" class="tsd-kind-icon">Relationship<wbr>Entry</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="triggeroptions.html#eventtypes" class="tsd-kind-icon">event<wbr>Types</a>
+								<a href="relationshipentry.html#keys" class="tsd-kind-icon">keys</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="triggeroptions.html#triggerexecutionstrategy" class="tsd-kind-icon">trigger<wbr>Execution<wbr>Strategy</a>
+								<a href="relationshipentry.html#options" class="tsd-kind-icon">options</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="relationshipentry.html#type" class="tsd-kind-icon">type</a>
 							</li>
 						</ul>
 					</li>
