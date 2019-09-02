@@ -12,17 +12,34 @@ import {
  * @private
  */
 export type Constructor<T> = new (...args: any[]) => T;
-type CollectionName = PropertyKey;
-type PrimaryKey = PropertyKey;
-type IndexValue = PropertyKey; // TODO: Should this support more complex types?
-type IndexKey = PropertyKey;
-type TriggerId = number;
+export type CollectionName = PropertyKey;
+export type PrimaryKey = PropertyKey;
+export type IndexValue = PropertyKey; // TODO: Should this support more complex types?
+export type IndexKey = PropertyKey;
+export type TriggerId = number;
+export interface RelationshipEntry {
+  type: Constructor<{}>;
+  keys: IObservableArray<string>;
+  options: CascadeOptions;
+}
 
 /**
  *
  */
 export interface CascadeOptions {
   cascade?: boolean;
+  deleteOnRemoval?: boolean;
+}
+
+export interface TruncateOptions {
+  cascade?: boolean;
+}
+
+/**
+ *
+ */
+export interface StoreOptions {
+  disableConstraintChecks?: boolean;
 }
 
 /**
@@ -76,14 +93,7 @@ export interface Meta {
     key: IObservableValue<PropertyKey | null>;
 
     collectionName: PropertyKey;
-    relationships: Record<
-      PropertyKey,
-      {
-        type: any;
-        keys: IObservableArray<string>;
-        options: CascadeOptions;
-      }
-    >;
+    relationships: Record<PropertyKey, RelationshipEntry>;
     indicies: IObservableArray<PropertyKey>;
   };
 }
@@ -92,16 +102,11 @@ export interface Meta {
  *
  */
 export interface Store extends IObservableObject {
+  options: StoreOptions;
   collections: Record<CollectionName, Map<PrimaryKey, any>>;
   indicies: Record<
     CollectionName,
-    Record<
-      IndexKey,
-      Map<
-        IndexValue,
-        PrimaryKey
-      >
-    >
+    Record<IndexKey, Map<IndexValue, PrimaryKey[]>>
   >;
   triggers: Map<TriggerId, Lambda>;
   nextId: TriggerId;

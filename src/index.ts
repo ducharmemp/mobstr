@@ -9,13 +9,14 @@ import {
   addAll,
   removeAll,
   findOne,
-  truncateCollection
+  truncateCollection,
+  findAllBy,
+  findOneBy
 } from "./store";
 import {
   createCollectionTrigger,
   dropTrigger,
-  dropAllTriggers,
-
+  dropAllTriggers
 } from "./triggers";
 import {
   primaryKey,
@@ -23,7 +24,8 @@ import {
   notNull,
   notUndefined,
   setCheck,
-  unique
+  unique,
+  indexed
 } from "./decorators";
 import {
   checkNotNull,
@@ -31,20 +33,22 @@ import {
   checkUnique,
   check,
   dropAllConstraints,
-  dropConstraint,
+  dropConstraint
 } from "./constraints";
+import { StoreOptions } from "./types";
 
 /**
  * Intializes a store and provides helper methods bound to that store for convenience.
  * Note: calling this function multiple times will have no side effects, multiple stores will
  * be returned for use by the user.
  */
-export function initializeStore() {
-  const store = createStore();
+export function initializeStore(options: StoreOptions = {}) {
+  const store = createStore(options);
   return {
     store,
     // Decorators
     primaryKey,
+    indexed,
     relationship: relationship.bind(null, store),
     notNull: notNull(store),
     notUndefined: notUndefined(store),
@@ -53,6 +57,8 @@ export function initializeStore() {
     // Store methods
     findAll: findAll.bind(null, store),
     findOne: findOne.bind(null, store),
+    findAllBy: findAllBy.bind(null, store),
+    findOneBy: findOneBy.bind(null, store),
     addOne: addOne.bind(null, store),
     addAll: addAll.bind(null, store),
     removeOne: removeOne.bind(null, store),
@@ -68,9 +74,16 @@ export function initializeStore() {
     checkNotUndefined: checkNotUndefined.bind(null, store),
     check: check.bind(null, store),
     dropConstraint: dropConstraint.bind(null, store),
-    dropAllConstraints: dropAllConstraints.bind(null, store),
+    dropAllConstraints: dropAllConstraints.bind(null, store)
   };
 }
 
-export { CascadeOptions, Meta, Store, TriggerOptions, TriggerExecutionStrategy, TriggerQueryEvent } from './types';
-export { IntegrityError } from './errors';
+export {
+  CascadeOptions,
+  Meta,
+  Store,
+  TriggerOptions,
+  TriggerExecutionStrategy,
+  TriggerQueryEvent
+} from "./types";
+export { IntegrityError, MultipleResultsFound, NoResultsFound } from "./errors";

@@ -1,7 +1,7 @@
 /**
  * @module constraints
  */
-import { isArray } from "lodash";
+import { castArray } from "lodash";
 
 import { createStore } from "./store";
 import {
@@ -18,7 +18,8 @@ import {
   getBoxedValueOrValue,
   getMeta,
   ensureCollection,
-  ensureIndicies
+  ensureIndicies,
+  getIndexKey
 } from "./utils";
 import { IntegrityError } from "./errors";
 import { indexed } from "./decorators";
@@ -40,17 +41,23 @@ export function check<K, T extends Constructor<K>>(
   propertyNames: (keyof InstanceType<T>)[] | (keyof InstanceType<T>),
   constraint: (...args: (InstanceType<T>[keyof InstanceType<T>])[]) => boolean
 ): number {
-  const arrayedPropertyNames = isArray(propertyNames)
-    ? propertyNames
-    : [propertyNames];
+  const arrayedPropertyNames = castArray(propertyNames);
+
   return createCollectionTrigger(
     store,
     entityClass,
     change => {
       const { newValue } = change;
+      const {
+        options: { disableConstraintChecks = false }
+      } = store;
       const propertyValues = arrayedPropertyNames.map(propertyName =>
         getBoxedValueOrValue(newValue[propertyName])
       );
+      if (disableConstraintChecks) {
+        return change;
+      }
+
       if (!constraint(...propertyValues)) {
         throw new IntegrityError(
           `Check constraint failed on ${
@@ -149,7 +156,7 @@ export function checkUnique<T extends Constructor<{}>>(
 
   return check(store, entityClass, propertyName, propertyValue => {
     return !store.indicies[currentCollection as string][propertyName].has(
-      (propertyValue as unknown) as PropertyKey
+      getIndexKey(propertyValue)
     );
   });
 }

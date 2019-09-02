@@ -1,6 +1,3 @@
-/*
-TODO: Most of these cases are handled in integration, but I will fill out later for completeness
-*/
 import { v4 as uuid } from "uuid";
 import { describe, it } from "mocha";
 import { expect } from "chai";
@@ -13,9 +10,11 @@ import {
   createStore,
   removeOne,
   findOne,
-  truncateCollection
+  truncateCollection,
+  findOneBy,
+  addOne,
 } from "../../src/store";
-import { primaryKey, relationship, unique } from "../../src/decorators";
+import { primaryKey, relationship, unique, indexed } from "../../src/decorators";
 
 describe("#store", (): void => {
   describe("#addAll", (): void => {
@@ -127,6 +126,39 @@ describe("#store", (): void => {
     });
   });
 
+  describe('#findOneBy', (): void => {
+    it('should find a class by an indexed value', () => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @indexed
+        name = 'test';
+      }
+
+      const f = new Foo();
+      addOne(store, f);
+      expect(findOneBy(store, Foo, 'name', 'test')).to.be.eql(f);
+    });
+
+    it('should find a class by a non-indexed value', () => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        name = 'test';
+      }
+
+      const f = new Foo();
+      addOne(store, f);
+      expect(findOneBy(store, Foo, 'name', 'test')).to.be.eql(f);
+    });
+  });
+
   describe("#truncateCollection", (): void => {
     it('should delete all entries in a collection', (): void => {
       const store = createStore();
@@ -167,6 +199,34 @@ describe("#store", (): void => {
       truncateCollection(store, Foo);
       expect(store.collections['Foo'].size).to.be.eql(0);
       expect(store.indicies['Foo']).to.be.empty;
+    });
+
+    it('should delete all related entries when the parent collection is truncated', (): void => {
+      const store = createStore();
+      class Bar {
+        @primaryKey
+        id = uuid();
+      }
+
+      class Foo {
+        @primaryKey
+        id = uuid();
+
+        @relationship(store, () => Bar, { cascade: true })
+        friends: Bar[] = [];
+
+        constructor() {
+          this.friends.push(new Bar(), new Bar(), new Bar());
+        }
+      }
+
+      const foos = range(20).map(() => new Foo());
+      addAll(store, foos);
+      expect(findAll(store, Foo)).to.have.lengthOf(20);
+      expect(findAll(store, Bar)).to.have.lengthOf(20 * 3);
+      truncateCollection(store, Foo, { cascade: true });
+      expect(findAll(store, Bar)).to.have.lengthOf(0);
+      expect(findAll(store, Foo)).to.have.lengthOf(0);
     });
   });
 });

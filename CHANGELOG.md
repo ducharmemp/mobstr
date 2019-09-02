@@ -7,12 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+* Added cascade option to TRUNCATE TABLE
+* Added remove on deletion from relationship option to the relationship decorator
+* Disabling of constraint checks via options argument to initializeStore
+* Complex indexed values
+    * Indexes can now be built against any object, not just primitives
+    * Indexes are built deterministically using object-hash, so there's no need to keep references to objects (ES6 Map or Set for example).
+    * Values can now be queried using index values or other properties using the findXBy functions. If a value hasn't been indexed then it falls back to a normal, slow filter and warns.
+* findAllBy and findOneBy
+    * Supports queries for non-primary key properties
+    * findOneBy throws an exception if no values are found or if many values are found
 
-### Changed
 
-### Removed
-
-[1.0.0]: https://github.com/ducharmemp/mobstr/compare/v1.0.0-alpha.0...HEAD
+[1.0.0-alpha.0]: https://github.com/ducharmemp/mobstr/compare/v1.0.0-alpha.0...HEAD
 [0.3.2]: https://github.com/ducharmemp/mobstr/compare/v0.3.2...v1.0.0-alpha.0
 [0.3.1]: https://github.com/ducharmemp/mobstr/compare/v0.3.1...v0.3.2
 [0.3.0]: https://github.com/ducharmemp/mobstr/compare/v0.3.0...v0.3.1

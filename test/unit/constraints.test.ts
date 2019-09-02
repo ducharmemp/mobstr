@@ -85,6 +85,25 @@ describe("#constraints", (): void => {
       expect(fake.callCount).to.be.equal(1);
       dropAllTriggers(store);
     });
+
+    it('should disable constraint checks when the user specifies a disableConstraintCheck option', (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey
+        id = "";
+
+        name = "";
+      }
+
+      const fake = sinon.fake.returns(true);
+      check(store, Foo, "name", fake);
+      addOne(store, new Foo());
+      expect(fake.callCount).to.be.equal(1);
+      store.options.disableConstraintChecks = true;
+      addOne(store, new Foo());
+      expect(fake.callCount).to.be.equal(1);
+      dropAllTriggers(store);
+    });
   });
 
   describe("#notNull", (): void => {
@@ -124,7 +143,6 @@ describe("#constraints", (): void => {
     it("should check that the value is unique", (): void => {
       const store = createStore();
       class Foo {
-        @unique(store)
         @primaryKey
         id = "1234";
 

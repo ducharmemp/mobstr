@@ -2,15 +2,27 @@
  * @module store
  */
 import { observable, action } from "mobx";
-import { flatMap } from "lodash";
+import { flatMap, hasIn, isEqual } from "lodash";
 
-import { Meta, Store, Constructor } from "./types";
+import {
+  Meta,
+  Store,
+  Constructor,
+  PrimaryKey,
+  RelationshipEntry,
+  StoreOptions,
+  TruncateOptions
+} from "./types";
+import logger from "./logger";
 import {
   ensureMeta,
   getMeta,
   ensureCollection,
   ensureIndicies,
-  ensureConstructorMeta
+  ensureConstructorMeta,
+  getOnlyOne,
+  getIndexKey,
+  invariant
 } from "./utils";
 
 /**
@@ -22,13 +34,14 @@ import {
  * @returns
  */
 export const createStore = action(
-  (): Store =>
+  (options: StoreOptions = {}): Store =>
     observable({
       collections: {},
       primaryKeys: new Map(),
       indicies: {},
       triggers: new Map(),
-      nextId: 0
+      nextId: 0,
+      options
     })
 );
 
@@ -51,6 +64,10 @@ export const addOne = action(
     const currentCollection = currentMeta.collectionName;
     const currentKey = currentMeta.key.get();
     const indicies = currentMeta.indicies;
+    invariant(
+      () => !!currentKey,
+      "Primary key for model should not be falsy. This can lead to unexpected behavior"
+    );
 
     store.collections[currentCollection as string].set(
       (entity[currentKey as keyof T] as unknown) as string,
@@ -58,10 +75,22 @@ export const addOne = action(
     );
 
     indicies.forEach(index => {
-      store.indicies[currentCollection as string][index as string].set(
-        (entity[index as keyof T] as unknown) as string,
-        (entity[currentMeta.key.get() as keyof T] as unknown) as PropertyKey
-      );
+      const currentPropertyValue = getIndexKey(entity[index as keyof T]);
+
+      const currentIndexedProperties =
+        store.indicies[currentCollection as string][index as string];
+
+      if (!currentIndexedProperties.has(currentPropertyValue)) {
+        currentIndexedProperties.set(currentPropertyValue, []);
+      }
+
+      const currentIndexedValues = currentIndexedProperties.get(
+        currentPropertyValue
+      ) as PrimaryKey[];
+
+      currentIndexedValues.push((entity[
+        currentMeta.key.get() as keyof T
+      ] as unknown) as PropertyKey);
     });
   }
 );
@@ -104,13 +133,13 @@ export const removeOne = action(
     const currentCollection = currentMeta.collectionName;
     store.collections[currentCollection as string].delete(
       // TODO: Properly type this, we need to check this beforehand to make sure that we can handle composite keys
-      (entity[primaryKey] as unknown) as string | number | symbol
+      (entity[primaryKey] as unknown) as PrimaryKey
     );
 
     // Clean up all references after the cascade. We do this after the initial delete to hopefully catch any circular relationships
     cascadeRelationshipKeys.forEach(relationship => {
       relationship.keys
-        .map(key => findOne(store, relationship.type, key))
+        .map(key => findOne(store, relationship.type as Constructor<{}>, key))
         .forEach(entity => removeOne(store, entity));
     });
   }
@@ -174,6 +203,26 @@ export const findOne = action(
 );
 
 /**
+ * Finds a single instance by value. Throws if there are too many or too few entries retrieved. Single case of
+ * `findAllBy`
+ * 
+ * @param store
+ * @param entityClass
+ * @param indexedProperty
+ * @param value
+ */
+export const findOneBy = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    indexedProperty: keyof InstanceType<T>,
+    value: any
+  ): InstanceType<T> => {
+    return getOnlyOne(findAllBy(store, entityClass, indexedProperty, value));
+  }
+);
+
+/**
  * Finds all entities in the store by a given findClause that acts as a filter. Default
  * filter is the identity function, which ensures that all entities will be returned.
  *
@@ -209,6 +258,43 @@ export const findAll = action(
     return Array.from(
       store.collections[currentCollection as string].values()
     ).filter(findClause);
+  }
+);
+
+/**
+ * Finds all entries in the store by a given value. Similar to findAll, but without dependence on a primary key.
+ * Attempts to use indexes to find a particular value, falls back to non-indexed filter.
+ * 
+ * @param store
+ * @param entityClass
+ * @param indexedProperty
+ * @param value
+ */
+export const findAllBy = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    indexedProperty: PropertyKey,
+    value: any
+  ): InstanceType<T>[] => {
+    ensureMeta(entityClass);
+    ensureCollection(store, entityClass);
+    ensureIndicies(store, entityClass);
+    const currentCollectionName = getMeta(entityClass).collectionName;
+    const currentCollection = store.indicies[currentCollectionName as string];
+    // Fall back to non-indexed lookup
+    if (!hasIn(currentCollection, indexedProperty)) {
+      logger.warn("Falling back to non-indexed filter for property");
+      return findAll(store, entityClass, item =>
+        isEqual(item[indexedProperty as keyof typeof item], value)
+      );
+    }
+
+    return (currentCollection[indexedProperty as string].get(
+      getIndexKey(value)
+    ) as PrimaryKey[]).map(primaryKey =>
+      findOne(store, entityClass, primaryKey)
+    );
   }
 );
 
@@ -260,18 +346,18 @@ export const join = action(
     const entityCollectionName = getMeta(entityClass).collectionName;
     const entityCollection = Array.from(
       store.collections[entityCollectionName as string].values()
-    );
+    ) as InstanceType<T>[];
 
     const childCollectionName = getMeta(joinClass).collectionName;
     const childCollection = store.collections[childCollectionName as string];
 
-    return flatMap(entityCollection, (entity: any) => {
+    return flatMap(entityCollection, (entity: InstanceType<T>) => {
       const joinRelationships = Object.values(
         getMeta(entity).relationships
       ).filter(({ type }) => type === joinClass);
 
-      return flatMap(joinRelationships, ({ keys }) =>
-        keys.map(key => [entity, childCollection.get(key)])
+      return flatMap(joinRelationships, ({ keys }: RelationshipEntry) =>
+        keys.map((key: string) => [entity, childCollection.get(key)])
       );
     });
   }
@@ -281,6 +367,10 @@ export const join = action(
  * Truncates a given collection in the store and triggers any observables watching this particular collection.
  * This is essentially a very fast form of mass deletion.
  *
+ * This does not automatically cascade to subsequent tables, since that's a fairly slow operation. This will
+ * leave items in referenced tables. However, if the `cascade` option is included, then it will truncate *all*
+ * tables that are referenced by this table, regardless of cascade options on the relationship.
+ *
  * @export
  * @function
  * @param store
@@ -289,12 +379,36 @@ export const join = action(
 export const truncateCollection = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
-    entityClass: T
+    entityClass: T,
+    options: TruncateOptions = { cascade: false }
   ) => {
     ensureMeta(entityClass);
-    const currentCollectionName = getMeta(entityClass).collectionName;
+    const currentMeta = getMeta(entityClass);
+    const currentCollectionName = currentMeta.collectionName;
     // Trigger any observables watching the store for this collection
     store.collections[currentCollectionName as string].clear();
     store.indicies[currentCollectionName as string] = {};
+    if (!options.cascade) {
+      return;
+    }
+    Object.values(currentMeta.relationships).map(({ type }) => {
+      truncateCollection(store, type as Constructor<{}>, options);
+    });
   }
 );
+
+// export const createIndex = action(
+//   <T extends Constructor<{}>>(
+//     store: ReturnType<typeof createStore>,
+//     entityClass: T,
+//     properties: keyof InstanceType<T> | (keyof InstanceType<T>)[]
+//   ) => {
+//     const currentCollectionName = getMeta(entityClass).collectionName;
+//     const indexKey = getIndexKey(properties);
+//     store.indicies[currentCollectionName as string] =
+//       store.indicies[currentCollectionName as string] || {};
+//     store.indicies[currentCollectionName as string][indexKey as string] =
+//       store.indicies[currentCollectionName as string][indexKey as string] ||
+//       observable.map();
+//   }
+// );
