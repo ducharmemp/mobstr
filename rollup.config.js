@@ -7,6 +7,7 @@ const typescript = require("rollup-plugin-typescript2");
 const autoExternal = require("rollup-plugin-auto-external");
 const json = require("rollup-plugin-json");
 const { terser } = require("rollup-plugin-terser");
+const { sizeSnapshot } = require("rollup-plugin-size-snapshot");
 
 const pkg = require("./package.json");
 const fileName = path.parse(pkg.main).name;
@@ -47,6 +48,7 @@ module.exports = {
 
     // Resolve source maps to the original source
     sourceMaps(),
-    (process.env.NODE_ENV === 'production' && terser())
+    sizeSnapshot(),
+    terser({ compress: true }),
   ]
 };

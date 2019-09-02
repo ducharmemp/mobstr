@@ -2,7 +2,9 @@
  * @module store
  */
 import { observable, action } from "mobx";
-import { flatMap, hasIn, isEqual } from "lodash";
+import flatMap from 'lodash.flatmap';
+import hasIn from 'lodash.hasin';
+import isEqual from 'lodash.isequal';
 
 import {
   Meta,

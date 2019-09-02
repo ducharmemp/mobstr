@@ -1,8 +1,6 @@
 /**
  * @module constraints
  */
-import { castArray } from "lodash";
-
 import { createStore } from "./store";
 import {
   createCollectionTrigger,
@@ -19,7 +17,8 @@ import {
   getMeta,
   ensureCollection,
   ensureIndicies,
-  getIndexKey
+  getIndexKey,
+  castArray
 } from "./utils";
 import { IntegrityError } from "./errors";
 import { indexed } from "./decorators";

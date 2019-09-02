@@ -1,11 +1,17 @@
 import { expect } from "chai";
 
-import { range, uniqueId } from "lodash";
+import range from "lodash.range";
 
 import logger from "../src/logger";
 import { initializeStore } from "../dist/index.js";
 
 describe("#performance", (): void => {
+  let curId = 0;
+  function uniqueId() {
+    return curId += 1;
+  }
+
+
   const {
     store,
     addAll,
