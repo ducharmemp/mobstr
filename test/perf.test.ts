@@ -2,7 +2,6 @@ import { expect } from "chai";
 
 import range from "lodash.range";
 
-import logger from "../src/logger";
 import { initializeStore } from "../dist/index.js";
 
 describe("#performance", (): void => {
@@ -76,55 +75,39 @@ describe("#performance", (): void => {
   });
 
   it("should be performant in adding a 500 item subset of the items to a collection", (): void => {
-    logger.profile("500");
     addAll(subset);
-    logger.profile("500");
   });
 
   it("should be performant in adding 100k amounts of items to a collection", (): void => {
-    logger.profile("100k");
     addAll(foos);
-    logger.profile("100k");
   });
 
   it("should be performant in adding 100k items and then dropping a collection", (): void => {
-    logger.profile("addAllAndTruncate");
     addAll(foos);
     truncateCollection(Foo);
-    logger.profile("addAllAndTruncate");
   });
 
   it("should be performant in adding 100k items with a constraint", (): void => {
-    logger.profile("addAllConstraint");
     check(Foo, "number", value => value > 0);
     addAll(foos);
-    logger.profile("addAllConstraint");
   });
 
   it("should be performant in adding 100k items with multiple decorator constraints", (): void => {
-    logger.profile("allAllDecorator");
     addAll(checkedFoos);
-    logger.profile("allAllDecorator");
   });
 
   it("should be performant in adding 100k items with multiple decorator constraints and then finding all by an indexed value", (): void => {
-    logger.profile("allAllDecorator");
     addAll(checkedFoos);
     findAllBy(CheckedFoo, "age" as any, checkedFoos[0].age);
-    logger.profile("allAllDecorator");
   });
 
   it("should be (slightly) faster when constraints are turned off", () => {
-    logger.profile("disableConstraintChecks");
     store.options.disableConstraintChecks = true;
     addAll(checkedFoos);
-    logger.profile("disableConstraintChecks");
   });
 
   it("should be faster when constraints are turned off via drop all constraints", () => {
-    logger.profile("disableConstraintChecks");
     dropAllConstraints();
     addAll(checkedFoos);
-    logger.profile("disableConstraintChecks");
   });
 });

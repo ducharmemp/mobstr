@@ -1,8 +1,5 @@
 /* istanbul ignore file */
-import { createLogger, format, transports } from "winston";
+import * as loglevel from 'loglevel';
 
-export default createLogger({
-  level: process.env.NODE_ENV !== "production" ? "verbose" : "warn",
-  format: format.json(),
-  transports: [new transports.Console()]
-});
+loglevel.setLevel(process.env.NODE_ENV !== "production" ? loglevel.levels.TRACE : loglevel.levels.WARN);
+export default loglevel;
