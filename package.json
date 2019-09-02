@@ -1,6 +1,6 @@
 {
   "name": "@ducharmemp/mobstr",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Object relational mapper for MobX stores",
   "main": "dist/index.js",
   "source": "src/index.ts",
