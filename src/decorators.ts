@@ -2,7 +2,7 @@
  * @module decorators
  */
 import { observable, action } from "mobx";
-import { createStore, addOne } from "./store";
+import { createStore, addOne, removeOne } from "./store";
 import {
   ensureMeta,
   ensureConstructorMeta,
@@ -105,9 +105,9 @@ export function indexed(target: any, propertyKey: PropertyKey) {
  * @param {*} [options={}]
  * @returns
  */
-export function relationship(
+export function relationship<K>(
   store: ReturnType<typeof createStore>,
-  type: any,
+  type: (...args: any[]) => K,
   options: CascadeOptions = {}
 ) {
   return function<T>(target: T, propertyKey: PropertyKey): any {
@@ -116,6 +116,7 @@ export function relationship(
     ensureCollection(store, target);
     ensureMeta(type());
     ensureRelationship(target, propertyKey as string, type, options);
+    ensureRelationship((target as any).constructor, propertyKey as string, type, options);
 
     return observable({
       get(): ReturnType<typeof type>[] {
@@ -148,14 +149,16 @@ export function relationship(
                 );
               })
             );
-            changes.removed.forEach(change => {
+            changes.removed.forEach((change: any) => {
               currentRelationship.keys.replace(
                 currentRelationship.keys.filter(
                   key => key !== change[getMeta(change).key.get() as string]
                 )
               );
-              // FIXME: This would be the proper place to track cascades on the relationship.
-              // removeOne(store, change);
+
+              if (options.deleteOnRemoval === true) {
+                removeOne(store, change);
+              }
             });
           } else {
             addOne(store, changes.newValue);

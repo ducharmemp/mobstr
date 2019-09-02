@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+* Added cascade option to TRUNCATE TABLE
+* Added remove on deletion from relationship option to the relationship decorator
 * Disabling of constraint checks via options argument to initializeStore
 * Complex indexed values
     * Indexes can now be built against any object, not just primitives

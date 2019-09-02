@@ -10,7 +10,8 @@ import {
   Constructor,
   PrimaryKey,
   RelationshipEntry,
-  StoreOptions
+  StoreOptions,
+  TruncateOptions
 } from "./types";
 import logger from "./logger";
 import {
@@ -353,6 +354,10 @@ export const join = action(
 /**
  * Truncates a given collection in the store and triggers any observables watching this particular collection.
  * This is essentially a very fast form of mass deletion.
+ * 
+ * This does not automatically cascade to subsequent tables, since that's a fairly slow operation. This will
+ * leave items in referenced tables. However, if the `cascade` option is included, then it will truncate *all*
+ * tables that are referenced by this table, regardless of cascade options on the relationship.
  *
  * @export
  * @function
@@ -362,12 +367,18 @@ export const join = action(
 export const truncateCollection = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
-    entityClass: T
+    entityClass: T,
+    options: TruncateOptions = { cascade: false },
   ) => {
     ensureMeta(entityClass);
-    const currentCollectionName = getMeta(entityClass).collectionName;
+    const currentMeta = getMeta(entityClass)
+    const currentCollectionName = currentMeta.collectionName;
     // Trigger any observables watching the store for this collection
     store.collections[currentCollectionName as string].clear();
     store.indicies[currentCollectionName as string] = {};
+    if (!options.cascade) { return; }
+    Object.values(currentMeta.relationships).map(({ type }) => {
+      truncateCollection(store, type as Constructor<{}>, options);
+    });
   }
 );
