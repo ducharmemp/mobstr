@@ -4,13 +4,15 @@
   "description": "Object relational mapper for MobX stores",
   "main": "dist/index.js",
   "source": "src/index.ts",
+  "sideEffects": false,
   "keywords": [
     "orm",
     "mobx",
     "redux",
     "state",
     "store",
-    "database"
+    "database",
+    "reactive"
   ],
   "repository": {
     "type": "git",

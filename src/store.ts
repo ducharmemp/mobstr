@@ -203,7 +203,13 @@ export const findOne = action(
 );
 
 /**
- *
+ * Finds a single instance by value. Throws if there are too many or too few entries retrieved. Single case of
+ * `findAllBy`
+ * 
+ * @param store
+ * @param entityClass
+ * @param indexedProperty
+ * @param value
  */
 export const findOneBy = action(
   <T extends Constructor<{}>>(
@@ -256,7 +262,13 @@ export const findAll = action(
 );
 
 /**
- *
+ * Finds all entries in the store by a given value. Similar to findAll, but without dependence on a primary key.
+ * Attempts to use indexes to find a particular value, falls back to non-indexed filter.
+ * 
+ * @param store
+ * @param entityClass
+ * @param indexedProperty
+ * @param value
  */
 export const findAllBy = action(
   <T extends Constructor<{}>>(
@@ -354,7 +366,7 @@ export const join = action(
 /**
  * Truncates a given collection in the store and triggers any observables watching this particular collection.
  * This is essentially a very fast form of mass deletion.
- * 
+ *
  * This does not automatically cascade to subsequent tables, since that's a fairly slow operation. This will
  * leave items in referenced tables. However, if the `cascade` option is included, then it will truncate *all*
  * tables that are referenced by this table, regardless of cascade options on the relationship.
@@ -368,17 +380,35 @@ export const truncateCollection = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
-    options: TruncateOptions = { cascade: false },
+    options: TruncateOptions = { cascade: false }
   ) => {
     ensureMeta(entityClass);
-    const currentMeta = getMeta(entityClass)
+    const currentMeta = getMeta(entityClass);
     const currentCollectionName = currentMeta.collectionName;
     // Trigger any observables watching the store for this collection
     store.collections[currentCollectionName as string].clear();
     store.indicies[currentCollectionName as string] = {};
-    if (!options.cascade) { return; }
+    if (!options.cascade) {
+      return;
+    }
     Object.values(currentMeta.relationships).map(({ type }) => {
       truncateCollection(store, type as Constructor<{}>, options);
     });
   }
 );
+
+// export const createIndex = action(
+//   <T extends Constructor<{}>>(
+//     store: ReturnType<typeof createStore>,
+//     entityClass: T,
+//     properties: keyof InstanceType<T> | (keyof InstanceType<T>)[]
+//   ) => {
+//     const currentCollectionName = getMeta(entityClass).collectionName;
+//     const indexKey = getIndexKey(properties);
+//     store.indicies[currentCollectionName as string] =
+//       store.indicies[currentCollectionName as string] || {};
+//     store.indicies[currentCollectionName as string][indexKey as string] =
+//       store.indicies[currentCollectionName as string][indexKey as string] ||
+//       observable.map();
+//   }
+// );

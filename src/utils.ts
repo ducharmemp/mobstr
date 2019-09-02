@@ -150,8 +150,8 @@ export function getOnlyOne<T>(values: T[]): T {
 /**
  * Gets the key to use for indexing purposes. Primitives return as themselves,
  * more complex objects return as string hashes.
- * 
- * @param value 
+ *
+ * @param value
  */
 export function getIndexKey<T>(value: T): PropertyKey {
   if (!isObject(value)) {
@@ -165,7 +165,7 @@ export function getIndexKey<T>(value: T): PropertyKey {
  * the precondition was falsy. Includes NODE_ENV checks for dead code elimination.
  */
 export function invariant(condition: () => boolean, message: string) {
-  if (process.env.NODE_ENV !== 'production' && !condition()) {
+  if (process.env.NODE_ENV !== "production" && !condition()) {
     throw new Error(message);
   }
 }

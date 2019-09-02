@@ -1,3 +1,5 @@
+const path = require('path');
+
 const resolve = require("rollup-plugin-node-resolve");
 const commonjs = require("rollup-plugin-commonjs");
 const sourceMaps = require("rollup-plugin-sourcemaps");
@@ -7,17 +9,18 @@ const json = require("rollup-plugin-json");
 const { terser } = require("rollup-plugin-terser");
 
 const pkg = require("./package.json");
+const fileName = path.parse(pkg.main).name;
 
 module.exports = {
   input: `src/index.ts`,
   output: [
     {
-      file: pkg.main,
-      name: pkg.name,
-      format: "umd",
+      file: `dist/${fileName}.js`,
+      format: "cjs",
       sourcemap: true
     },
-    // { file: pkg.main, format: "es", sourcemap: true }
+    { file: `dist/${fileName}.mjs`, format: "es", sourcemap: true },
+    { file: `dist/${fileName}.umd.js`, name: pkg.main, format: "umd", sourcemap: true }
   ],
   // Indicate here external modules you don't wanna include in your bundle (i.e.: 'lodash')
   external: [

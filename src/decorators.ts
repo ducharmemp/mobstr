@@ -116,7 +116,12 @@ export function relationship<K>(
     ensureCollection(store, target);
     ensureMeta(type());
     ensureRelationship(target, propertyKey as string, type, options);
-    ensureRelationship((target as any).constructor, propertyKey as string, type, options);
+    ensureRelationship(
+      (target as any).constructor,
+      propertyKey as string,
+      type,
+      options
+    );
 
     return observable({
       get(): ReturnType<typeof type>[] {
