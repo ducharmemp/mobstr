@@ -17,10 +17,25 @@ export type PrimaryKey = PropertyKey;
 export type IndexValue = PropertyKey; // TODO: Should this support more complex types?
 export type IndexKey = PropertyKey;
 export type TriggerId = number;
+export type OneOrMany<T> = T | T[];
 export interface RelationshipEntry {
   type: Constructor<{}>;
-  keys: IObservableArray<string>;
+  values: Record<PrimaryKey, IObservableArray<string>>;
   options: CascadeOptions;
+}
+export interface ShapeEntry {
+  primaryKey: PropertyKey | null;
+  indicies: OneOrMany<PropertyKey>[];
+  foreignKeys: PropertyKey[];
+}
+export interface IndexEntry {
+  isPrimaryKey: boolean;
+  propertyNames: OneOrMany<IndexKey>[];
+  values: Map<IndexKey, PrimaryKey[]>;
+}
+export interface CollectionEntry {
+  primaryKeyPropertyName: PrimaryKey;
+  values: Map<PrimaryKey, any>;
 }
 
 /**
@@ -88,25 +103,16 @@ export interface TriggerOptions {
 /**
  *
  */
-export interface Meta {
-  __meta__: {
-    key: IObservableValue<PropertyKey | null>;
-
-    collectionName: PropertyKey;
-    relationships: Record<PropertyKey, RelationshipEntry>;
-    indicies: IObservableArray<PropertyKey>;
-  };
-}
-
-/**
- *
- */
 export interface Store extends IObservableObject {
   options: StoreOptions;
-  collections: Record<CollectionName, Map<PrimaryKey, any>>;
+  collections: Record<CollectionName, CollectionEntry>;
   indicies: Record<
     CollectionName,
-    Record<IndexKey, Map<IndexValue, PrimaryKey[]>>
+    Record<IndexKey, IndexEntry>
+  >;
+  foreignKeys: Record<
+    CollectionName,
+    Map<PropertyKey, RelationshipEntry>
   >;
   triggers: Map<TriggerId, Lambda>;
   nextId: TriggerId;

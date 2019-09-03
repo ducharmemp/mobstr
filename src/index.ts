@@ -80,7 +80,6 @@ export function initializeStore(options: StoreOptions = {}) {
 
 export {
   CascadeOptions,
-  Meta,
   Store,
   TriggerOptions,
   TriggerExecutionStrategy,

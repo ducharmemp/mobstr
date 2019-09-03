@@ -2,29 +2,27 @@
  * @module store
  */
 import { observable, action } from "mobx";
-import flatMap from 'lodash.flatmap';
-import hasIn from 'lodash.hasin';
-import isEqual from 'lodash.isequal';
+import flatMap from "lodash.flatmap";
+import hasIn from "lodash.hasin";
+import isEqual from "lodash.isequal";
 
 import {
-  Meta,
   Store,
   Constructor,
   PrimaryKey,
   RelationshipEntry,
   StoreOptions,
-  TruncateOptions
+  TruncateOptions,
+  OneOrMany,
+  CascadeOptions
 } from "./types";
 import logger from "./logger";
 import {
-  ensureMeta,
-  getMeta,
-  ensureCollection,
-  ensureIndicies,
-  ensureConstructorMeta,
   getOnlyOne,
   getIndexKey,
-  invariant
+  invariant,
+  getPropertyValues,
+  getCollectionName
 } from "./utils";
 
 /**
@@ -43,6 +41,7 @@ export const createStore = action(
       indicies: {},
       triggers: new Map(),
       nextId: 0,
+      foreignKeys: {},
       options
     })
 );
@@ -57,43 +56,35 @@ export const createStore = action(
  * @param {T} entity The entity itself. Note that this does not require the constructing class.
  */
 export const addOne = action(
-  <T>(store: ReturnType<typeof createStore>, entity: T) => {
-    ensureMeta(entity);
-    ensureConstructorMeta(entity);
-    ensureCollection(store, entity);
-    ensureIndicies(store, entity);
-    const currentMeta = getMeta(entity);
-    const currentCollection = currentMeta.collectionName;
-    const currentKey = currentMeta.key.get();
-    const indicies = currentMeta.indicies;
+  <T extends InstanceType<Constructor<any>>>(
+    store: ReturnType<typeof createStore>,
+    entity: T
+  ) => {
+    createCollection(store, entity.constructor as Constructor<T>);
+    const currentCollectionName = getCollectionName(
+      entity.constructor as Constructor<T>
+    );
+    const { values, primaryKeyPropertyName } = store.collections[
+      currentCollectionName
+    ];
+    const currentKeyValue = entity[primaryKeyPropertyName];
+    const indicies = store.indicies[currentCollectionName];
     invariant(
-      () => !!currentKey,
+      () => !!currentKeyValue,
       "Primary key for model should not be falsy. This can lead to unexpected behavior"
     );
 
-    store.collections[currentCollection as string].set(
-      (entity[currentKey as keyof T] as unknown) as string,
-      entity
-    );
-
-    indicies.forEach(index => {
-      const currentPropertyValue = getIndexKey(entity[index as keyof T]);
-
-      const currentIndexedProperties =
-        store.indicies[currentCollection as string][index as string];
-
-      if (!currentIndexedProperties.has(currentPropertyValue)) {
-        currentIndexedProperties.set(currentPropertyValue, []);
-      }
-
-      const currentIndexedValues = currentIndexedProperties.get(
-        currentPropertyValue
-      ) as PrimaryKey[];
-
-      currentIndexedValues.push((entity[
-        currentMeta.key.get() as keyof T
-      ] as unknown) as PropertyKey);
-    });
+    values.set(currentKeyValue, entity);
+    Object.entries(indicies).forEach(
+      ([ indexKey, { propertyNames, values } ]) => {
+        const propertyValues = getPropertyValues(entity, propertyNames as OneOrMany<keyof T>);
+        const currentPropertyValue = getIndexKey(propertyValues);
+        if(!values.has(indexKey)) {
+          values.set(indexKey, []);
+        }
+        values.get(indexKey)!.push(currentPropertyValue);
+      });
+    
   }
 );
 
@@ -122,26 +113,35 @@ export const addAll = action(
  * @param entity
  */
 export const removeOne = action(
-  <T>(store: ReturnType<typeof createStore>, entity: T) => {
-    ensureMeta(entity);
-    ensureMeta(Object.getPrototypeOf(entity));
-    ensureCollection(store, entity);
-    const currentMeta = getMeta(entity);
-    const primaryKey = currentMeta.key.get() as keyof T;
-    const cascadeRelationshipKeys = Object.values(
-      currentMeta.relationships
+  <T extends InstanceType<Constructor<{}>>>(
+    store: ReturnType<typeof createStore>,
+    entity: T
+  ) => {
+    createCollection(store, entity.constructor as Constructor<T>);
+    const currentCollectionName = getCollectionName(
+      entity.constructor as Constructor<T>
+    );
+    const { primaryKeyPropertyName } = store.collections[currentCollectionName];
+    const cascadeRelationshipKeys = Array.from(
+      store.foreignKeys[currentCollectionName].values()
     ).filter(relationship => relationship.options.cascade);
 
-    const currentCollection = currentMeta.collectionName;
-    store.collections[currentCollection as string].delete(
+    store.collections[currentCollectionName].values.delete(
       // TODO: Properly type this, we need to check this beforehand to make sure that we can handle composite keys
-      (entity[primaryKey] as unknown) as PrimaryKey
+      (entity[primaryKeyPropertyName as keyof T] as unknown) as PrimaryKey
     );
 
     // Clean up all references after the cascade. We do this after the initial delete to hopefully catch any circular relationships
     cascadeRelationshipKeys.forEach(relationship => {
-      relationship.keys
-        .map(key => findOne(store, relationship.type as Constructor<{}>, key))
+      Object.values(relationship.values)
+        .flat(1)
+        .map(key =>
+          findOne(
+            store,
+            relationship.type as Constructor<{}>,
+            key as keyof typeof relationship.type
+          )
+        )
         .forEach(entity => removeOne(store, entity));
     });
   }
@@ -160,6 +160,35 @@ export const removeOne = action(
 export const removeAll = action(
   <T>(store: ReturnType<typeof createStore>, entities: T[]) => {
     entities.forEach(removeOne.bind(null, store));
+  }
+);
+
+/**
+ * Removes a single entry from the database that matches the given value.
+ * Throws if multiple entries are found or if no entries are found.
+ */
+export const removeOneBy = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    propertyKey: keyof InstanceType<T>,
+    value: any
+  ) => {
+    removeOne(store, findOneBy(store, entityClass, propertyKey, value));
+  }
+);
+
+/**
+ * Removes all entries that match a given value.
+ */
+export const removeAllBy = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    propertyKey: keyof InstanceType<T>,
+    value: any
+  ) => {
+    removeAll(store, findAllBy(store, entityClass, propertyKey, value));
   }
 );
 
@@ -193,12 +222,11 @@ export const findOne = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
-    primaryKey: ReturnType<Meta["__meta__"]["key"]["get"]>
+    primaryKey: any
   ): InstanceType<T> => {
-    ensureMeta(entityClass);
-    ensureCollection(store, entityClass);
-    const currentCollection = getMeta(entityClass).collectionName;
-    return store.collections[currentCollection as string].get(
+    createCollection(store, entityClass);
+    const currentCollection = getCollectionName(entityClass);
+    return store.collections[currentCollection].values.get(
       primaryKey as string
     ) as InstanceType<T>;
   }
@@ -207,7 +235,7 @@ export const findOne = action(
 /**
  * Finds a single instance by value. Throws if there are too many or too few entries retrieved. Single case of
  * `findAllBy`
- * 
+ *
  * @param store
  * @param entityClass
  * @param indexedProperty
@@ -251,14 +279,14 @@ export const findAll = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
-    findClause: (arg0: T) => any = (entry: T) => entry
+    findClause: (arg0: InstanceType<T>) => any = (entry: InstanceType<T>) =>
+      entry
   ): InstanceType<T>[] => {
-    ensureMeta(entityClass);
-    ensureCollection(store, entityClass);
-    const currentCollection = getMeta(entityClass).collectionName;
+    createCollection(store, entityClass);
+    const currentCollection = getCollectionName(entityClass);
 
     return Array.from(
-      store.collections[currentCollection as string].values()
+      store.collections[currentCollection].values.values()
     ).filter(findClause);
   }
 );
@@ -266,7 +294,7 @@ export const findAll = action(
 /**
  * Finds all entries in the store by a given value. Similar to findAll, but without dependence on a primary key.
  * Attempts to use indexes to find a particular value, falls back to non-indexed filter.
- * 
+ *
  * @param store
  * @param entityClass
  * @param indexedProperty
@@ -276,27 +304,29 @@ export const findAllBy = action(
   <T extends Constructor<{}>>(
     store: ReturnType<typeof createStore>,
     entityClass: T,
-    indexedProperty: PropertyKey,
-    value: any
+    indexedProperty: OneOrMany<keyof InstanceType<T>>,
+    value: OneOrMany<any>
   ): InstanceType<T>[] => {
-    ensureMeta(entityClass);
-    ensureCollection(store, entityClass);
-    ensureIndicies(store, entityClass);
-    const currentCollectionName = getMeta(entityClass).collectionName;
-    const currentCollection = store.indicies[currentCollectionName as string];
+    createCollection(store, entityClass);
+    const currentCollectionName = getCollectionName(entityClass);
+    const currentCollection = store.indicies[currentCollectionName];
+    const indexedPropertyKey = getIndexKey(indexedProperty);
     // Fall back to non-indexed lookup
-    if (!hasIn(currentCollection, indexedProperty)) {
+    if (!hasIn(currentCollection, indexedPropertyKey)) {
       logger.warn("Falling back to non-indexed filter for property");
-      return findAll(store, entityClass, item =>
-        isEqual(item[indexedProperty as keyof typeof item], value)
-      );
+      return findAll(store, entityClass, item => {
+        const indexedPropertyValues = getPropertyValues(item, indexedProperty);
+        return isEqual(indexedPropertyValues, value);
+      });
     }
 
-    return (currentCollection[indexedProperty as string].get(
+    return (currentCollection[indexedPropertyKey].values.get(
       getIndexKey(value)
-    ) as PrimaryKey[]).map(primaryKey =>
-      findOne(store, entityClass, primaryKey)
-    );
+    ) as PrimaryKey[])
+      .map(primaryKey =>
+        findOne(store, entityClass, primaryKey as keyof InstanceType<T>)
+      )
+      .filter(entity => !!entity);
   }
 );
 
@@ -341,25 +371,31 @@ export const join = action(
     entityClass: T,
     joinClass: K
   ): [InstanceType<T>, InstanceType<K>][] => {
-    ensureMeta(entityClass);
-    ensureMeta(joinClass);
-    ensureCollection(store, entityClass);
-    ensureCollection(store, joinClass);
-    const entityCollectionName = getMeta(entityClass).collectionName;
-    const entityCollection = Array.from(
-      store.collections[entityCollectionName as string].values()
-    ) as InstanceType<T>[];
+    createCollection(store, entityClass);
+    createCollection(store, joinClass);
+    const entityCollectionName = getCollectionName(entityClass);
+    const { values, primaryKeyPropertyName } = store.collections[
+      entityCollectionName
+    ];
+    const entityCollection = Array.from(values.values()) as InstanceType<T>[];
 
-    const childCollectionName = getMeta(joinClass).collectionName;
-    const childCollection = store.collections[childCollectionName as string];
+    const childCollectionName = getCollectionName(joinClass);
+    const childCollection = store.collections[childCollectionName];
 
     return flatMap(entityCollection, (entity: InstanceType<T>) => {
-      const joinRelationships = Object.values(
-        getMeta(entity).relationships
+      const foreignKeyReference = store.foreignKeys[entityCollectionName];
+      const currentPrimaryKeyValue = getIndexKey(
+        entity[primaryKeyPropertyName as keyof typeof entity]
+      );
+      const joinRelationships: RelationshipEntry[] = Object.values(
+        foreignKeyReference
       ).filter(({ type }) => type === joinClass);
 
-      return flatMap(joinRelationships, ({ keys }: RelationshipEntry) =>
-        keys.map((key: string) => [entity, childCollection.get(key)])
+      return flatMap(joinRelationships, ({ values }: RelationshipEntry) =>
+        values[currentPrimaryKeyValue].map((key: string) => [
+          entity,
+          childCollection.values.get(key)
+        ])
       );
     });
   }
@@ -384,33 +420,82 @@ export const truncateCollection = action(
     entityClass: T,
     options: TruncateOptions = { cascade: false }
   ) => {
-    ensureMeta(entityClass);
-    const currentMeta = getMeta(entityClass);
-    const currentCollectionName = currentMeta.collectionName;
+    const currentCollectionName = getCollectionName(entityClass);
     // Trigger any observables watching the store for this collection
-    store.collections[currentCollectionName as string].clear();
-    store.indicies[currentCollectionName as string] = {};
+    store.collections[currentCollectionName].values.clear();
+    store.indicies[currentCollectionName] = {};
     if (!options.cascade) {
       return;
     }
-    Object.values(currentMeta.relationships).map(({ type }) => {
+    Object.values(store.foreignKeys[currentCollectionName]).map(({ type }) => {
       truncateCollection(store, type as Constructor<{}>, options);
     });
   }
 );
 
-// export const createIndex = action(
-//   <T extends Constructor<{}>>(
-//     store: ReturnType<typeof createStore>,
-//     entityClass: T,
-//     properties: keyof InstanceType<T> | (keyof InstanceType<T>)[]
-//   ) => {
-//     const currentCollectionName = getMeta(entityClass).collectionName;
-//     const indexKey = getIndexKey(properties);
-//     store.indicies[currentCollectionName as string] =
-//       store.indicies[currentCollectionName as string] || {};
-//     store.indicies[currentCollectionName as string][indexKey as string] =
-//       store.indicies[currentCollectionName as string][indexKey as string] ||
-//       observable.map();
-//   }
-// );
+/**
+ *
+ */
+export const createCollection = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+  ) => {
+    const currentCollectionName = getCollectionName(entityClass);
+    store.collections[currentCollectionName] =
+      store.collections[currentCollectionName] || {
+        primaryKeyPropertyName: null,
+        values: new Map()
+      };
+
+    store.indicies[currentCollectionName] = store.indicies[currentCollectionName] || {};
+    store.foreignKeys[currentCollectionName] = store.foreignKeys[currentCollectionName] || new Map();
+  }
+);
+
+/**
+ *
+ */
+export const createIndex = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    properties: OneOrMany<keyof InstanceType<T>>,
+    isPrimaryKey: boolean = false
+  ) => {
+    const currentCollectionName = getCollectionName(entityClass);
+    const indexKey = getIndexKey(properties);
+
+    store.indicies[currentCollectionName] =
+      store.indicies[currentCollectionName] || {};
+
+    store.indicies[currentCollectionName][indexKey] = store.indicies[
+      currentCollectionName
+    ][indexKey] || {
+      isPrimaryKey,
+      propertyNames: [],
+      values: new Map()
+    };
+
+    store.indicies[currentCollectionName][indexKey].propertyNames.push(
+      properties
+    );
+  }
+);
+
+export const createForeignKey = action(
+  <T extends Constructor<{}>, C extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    childClass: C,
+    propertyName: keyof InstanceType<T>,
+    options: CascadeOptions = {}
+  ) => {
+    store.foreignKeys[getCollectionName(entityClass)] = store.foreignKeys[getCollectionName(entityClass)] || new Map();
+    store.foreignKeys[getCollectionName(entityClass)].set(propertyName, {
+      options,
+      type: childClass,
+      values: {}
+    })
+  }
+);

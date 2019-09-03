@@ -11,8 +11,8 @@ import {
   IObjectDidChange,
   IValueWillChange
 } from "mobx";
-import { createStore } from "./store";
-import { getMeta, getNextId, ensureCollection } from "./utils";
+import { createStore, createCollection } from "./store";
+import { getNextId, getCollectionName} from "./utils";
 import {
   Constructor,
   TriggerQueryEvent,
@@ -103,8 +103,8 @@ export const createCollectionTrigger = action(
     trigger: IInterceptor<IValueWillChange<InstanceType<T>>> | Lambda,
     options: TriggerOptions = {}
   ) => {
-    ensureCollection(store, entityClass);
-    const currentMeta = getMeta(entityClass);
+    createCollection(store, entityClass);
+    const currentCollectionName = getCollectionName(entityClass);
     const triggerId = getNextId(store);
     const {
       eventTypes = new Set([TriggerQueryEvent.All]),
@@ -113,7 +113,7 @@ export const createCollectionTrigger = action(
     store.triggers.set(
       triggerId,
       wrapTrigger(
-        store.collections[currentMeta.collectionName as string],
+        store.collections[currentCollectionName].values,
         trigger,
         eventTypes,
         triggerExecutionStrategy

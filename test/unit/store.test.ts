@@ -13,8 +13,13 @@ import {
   truncateCollection,
   findOneBy,
   addOne,
+  removeOneBy,
+  findAllBy,
+  removeAllBy,
+  createIndex,
 } from "../../src/store";
 import { primaryKey, relationship, unique, indexed } from "../../src/decorators";
+import { NoResultsFound } from "../../src/errors";
 
 describe("#store", (): void => {
   describe("#addAll", (): void => {
@@ -22,7 +27,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
@@ -39,7 +44,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         name = "test";
@@ -70,7 +75,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
@@ -92,11 +97,11 @@ describe("#store", (): void => {
     it("should cascade delete any relationships with cascade=true", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
       class Baz {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @relationship(store, () => Bar)
@@ -131,10 +136,10 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
-        @indexed
+        @indexed(store)
         name = 'test';
       }
 
@@ -147,7 +152,7 @@ describe("#store", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         name = 'test';
@@ -163,7 +168,7 @@ describe("#store", (): void => {
     it('should delete all entries in a collection', (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
@@ -177,7 +182,7 @@ describe("#store", (): void => {
       const store = createStore();
       class Foo {
         @unique(store)
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
@@ -190,26 +195,26 @@ describe("#store", (): void => {
     it('should clear all entries in the collection map and index', (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
       addAll(store, range(20).map(() => new Foo()));
       expect(findAll(store, Foo)).to.have.lengthOf(20);
       truncateCollection(store, Foo);
-      expect(store.collections['Foo'].size).to.be.eql(0);
+      expect(store.collections['Foo'].values.size).to.be.eql(0);
       expect(store.indicies['Foo']).to.be.empty;
     });
 
     it('should delete all related entries when the parent collection is truncated', (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @relationship(store, () => Bar, { cascade: true })
@@ -229,4 +234,104 @@ describe("#store", (): void => {
       expect(findAll(store, Foo)).to.have.lengthOf(0);
     });
   });
+
+  describe("#removeOneBy", (): void => {
+    it("should remove an entity with a specific property value", (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey(store)
+        id = uuid();
+
+        name = 'bob';
+      }
+
+      addOne(store, new Foo());
+      removeOneBy(store, Foo, 'name', 'bob');
+      expect(findAll(store, Foo)).to.have.length(0);
+    });
+
+    it("should remove any item by an indexed value", (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey(store)
+        id = uuid();
+
+        @indexed(store)
+        name = 'bob';
+      }
+
+      addOne(store, new Foo());
+      removeOneBy(store, Foo, 'name', 'bob');
+      expect(findAllBy(store, Foo, 'name', 'bob')).to.have.length(0);
+    });
+
+    it("should throw an exception if no entities are found that match a value", (): void => {
+      const store = createStore();
+
+      class Foo {
+        @primaryKey(store)
+        id = uuid();
+
+        @indexed(store)
+        name = 'bob';
+      }
+
+      expect(() => findOneBy(store, Foo, 'name', 'bob')).to.throw(NoResultsFound)
+    });
+  });
+
+  describe("#removeAllBy", (): void => {
+   it("should remove all entities that match a specific value", (): void => {
+    const store = createStore();
+
+    class Foo {
+      @primaryKey(store)
+      id = uuid();
+
+      name = 'bob';
+    }
+
+    addAll(store, [new Foo(), new Foo(), new Foo()]);
+    removeAllBy(store, Foo, 'name', 'bob');
+    expect(findAll(store, Foo)).to.have.length(0);
+   });
+
+   it("should remove all entities that match a specific indexed value", (): void => {
+    const store = createStore();
+
+    class Foo {
+      @primaryKey(store)
+      id = uuid();
+
+      @indexed(store)
+      name = 'bob';
+    }
+
+    addAll(store, [new Foo(), new Foo(), new Foo()]);
+    removeAllBy(store, Foo, 'name', 'bob');
+    expect(findAll(store, Foo)).to.have.length(0);
+   });
+  });
+
+  describe("#createIndex", (): void => {
+    it("should create an index on a given table", (): void => {
+
+    });
+
+    it('should create an index on a given table for many properties', (): void => {
+      const store = createStore();
+      class Foo {
+        @primaryKey(store)
+        id = uuid();
+
+        name = 'bob';
+
+        age = 42;
+      }
+
+      createIndex(store, Foo, ['name', 'age']);
+      addOne(store, new Foo());
+      expect(findAllBy(store, Foo, ['name', 'age'], ['bob', 42])).to.have.length(1);
+    });
+  })
 });

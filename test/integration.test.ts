@@ -28,7 +28,7 @@ describe("#integration", () => {
     class Bar {}
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -44,7 +44,7 @@ describe("#integration", () => {
     class Bar {}
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -60,12 +60,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -95,12 +95,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -119,12 +119,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -144,7 +144,7 @@ describe("#integration", () => {
     const store = createStore();
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
@@ -157,12 +157,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -183,12 +183,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -209,17 +209,17 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Baz {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -245,12 +245,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -275,12 +275,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -303,12 +303,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -332,12 +332,12 @@ describe("#integration", () => {
     const store = createStore();
 
     class Bar {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
     }
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, (type: any) => Bar)
@@ -366,7 +366,7 @@ describe("#integration", () => {
     const store = createStore();
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id: string = uuid();
 
       @relationship(store, () => Foo, { cascade: true })
@@ -387,12 +387,12 @@ describe("#integration", () => {
   it("should allow multiple constraint decorators to be assigned to a single field", (): void => {
     const store = createStore();
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id = uuid();
 
       @notNull(store)
       @notUndefined(store)
-      @setCheck(store, value => value > 5)
+      @setCheck(store, (value: number) => value > 5)
       age = 5;
     }
 
@@ -403,10 +403,10 @@ describe("#integration", () => {
     const store = createStore();
 
     class Foo {
-      @primaryKey
+      @primaryKey(store)
       id = uuid();
 
-      @indexed
+      @indexed(store)
       names: [number, number];
 
       constructor(names: [number, number]) {

@@ -1,7 +1,7 @@
 /**
  * @module constraints
  */
-import { createStore } from "./store";
+import { createStore, createIndex } from "./store";
 import {
   createCollectionTrigger,
   dropTrigger,
@@ -14,14 +14,12 @@ import {
 } from "./types";
 import {
   getBoxedValueOrValue,
-  getMeta,
-  ensureCollection,
-  ensureIndicies,
   getIndexKey,
-  castArray
+  castArray,
+  getCollectionName
 } from "./utils";
 import { IntegrityError } from "./errors";
-import { indexed } from "./decorators";
+import { action } from "mobx";
 
 /**
  * Creates a CHECK constraint against a collection in the store. CHECK constraints
@@ -34,48 +32,53 @@ import { indexed } from "./decorators";
  * @param constraint
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function check<K, T extends Constructor<K>>(
-  store: ReturnType<typeof createStore>,
-  entityClass: T,
-  propertyNames: (keyof InstanceType<T>)[] | (keyof InstanceType<T>),
-  constraint: (...args: (InstanceType<T>[keyof InstanceType<T>])[]) => boolean
-): number {
-  const arrayedPropertyNames = castArray(propertyNames);
+export const check = action(
+  <K, T extends Constructor<K>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    propertyNames: (keyof InstanceType<T>)[] | (keyof InstanceType<T>),
+    constraint: (...args: (InstanceType<T>[keyof InstanceType<T>])[]) => boolean
+  ): number => {
+    const arrayedPropertyNames = castArray(propertyNames);
 
-  return createCollectionTrigger(
-    store,
-    entityClass,
-    change => {
-      const { newValue } = change;
-      const {
-        options: { disableConstraintChecks = false }
-      } = store;
-      const propertyValues = arrayedPropertyNames.map(propertyName =>
-        getBoxedValueOrValue(newValue[propertyName])
-      );
-      if (disableConstraintChecks) {
-        return change;
-      }
-
-      if (!constraint(...propertyValues)) {
-        throw new IntegrityError(
-          `Check constraint failed on ${
-            entityClass.name
-          } field(s): ${arrayedPropertyNames.join(
-            ", "
-          )} with values ${propertyValues.join(", ")}`
+    return createCollectionTrigger(
+      store,
+      entityClass,
+      change => {
+        const { newValue } = change;
+        const {
+          options: { disableConstraintChecks = false }
+        } = store;
+        const propertyValues = arrayedPropertyNames.map(propertyName =>
+          getBoxedValueOrValue(newValue[propertyName])
         );
+        if (disableConstraintChecks) {
+          return change;
+        }
+
+        if (!constraint(...propertyValues)) {
+          throw new IntegrityError(
+            `Check constraint failed on ${
+              entityClass.name
+            } field(s): ${arrayedPropertyNames.join(
+              ", "
+            )} with values ${propertyValues.join(", ")}`
+          );
+        }
+        return change;
+      },
+      {
+        triggerExecutionStrategy: TriggerExecutionStrategy.Intercept,
+        // Have to do update here due to "update" events being fired on the same observable
+        // i.e. a Map.set on the same key actually fires an "update" event instead of an "add"
+        eventTypes: new Set([
+          TriggerQueryEvent.Insert,
+          TriggerQueryEvent.Update
+        ])
       }
-      return change;
-    },
-    {
-      triggerExecutionStrategy: TriggerExecutionStrategy.Intercept,
-      // Have to do update here due to "update" events being fired on the same observable
-      // i.e. a Map.set on the same key actually fires an "update" event instead of an "add"
-      eventTypes: new Set([TriggerQueryEvent.Insert, TriggerQueryEvent.Update])
-    }
-  );
-}
+    );
+  }
+);
 
 /**
  * Ensures that a given column in a row is not nullable. This constraint runs on every update
@@ -87,18 +90,20 @@ export function check<K, T extends Constructor<K>>(
  * @param propertyName
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function checkNotNull<T extends Constructor<{}>>(
-  store: ReturnType<typeof createStore>,
-  entityClass: T,
-  propertyName: keyof InstanceType<T>
-): number {
-  return check(
-    store,
-    entityClass,
-    propertyName,
-    propertyValue => propertyValue !== null
-  );
-}
+export const checkNotNull = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    propertyName: keyof InstanceType<T>
+  ): number => {
+    return check(
+      store,
+      entityClass,
+      propertyName,
+      propertyValue => propertyValue !== null
+    );
+  }
+);
 
 /**
  * Ensures that a given property is not undefined. This constraint runs on every update
@@ -119,18 +124,20 @@ export function checkNotNull<T extends Constructor<{}>>(
  * @param propertyName
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function checkNotUndefined<T extends Constructor<{}>>(
-  store: ReturnType<typeof createStore>,
-  entityClass: T,
-  propertyName: keyof InstanceType<T>
-): number {
-  return check(
-    store,
-    entityClass,
-    propertyName,
-    propertyValue => propertyValue !== undefined
-  );
-}
+export const checkNotUndefined = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    propertyName: keyof InstanceType<T>
+  ): number => {
+    return check(
+      store,
+      entityClass,
+      propertyName,
+      propertyValue => propertyValue !== undefined
+    );
+  }
+);
 
 /**
  * Creates a unique constraint on a field in a given object. This implies that
@@ -142,23 +149,22 @@ export function checkNotUndefined<T extends Constructor<{}>>(
  * @param propertyName
  * @returns {number} The ID of the trigger, for reference when deleting
  */
-export function checkUnique<T extends Constructor<{}>>(
-  store: ReturnType<typeof createStore>,
-  entityClass: T,
-  propertyName: keyof InstanceType<T>
-): number {
-  const currentCollection = getMeta(entityClass).collectionName;
-  indexed(entityClass, propertyName as string);
+export const checkUnique = action(
+  <T extends Constructor<{}>>(
+    store: ReturnType<typeof createStore>,
+    entityClass: T,
+    propertyName: keyof InstanceType<T>
+  ): number => {
+    const currentCollection = getCollectionName(entityClass);
+    createIndex(store, entityClass, propertyName);
 
-  ensureCollection(store, entityClass);
-  ensureIndicies(store, entityClass);
-
-  return check(store, entityClass, propertyName, propertyValue => {
-    return !store.indicies[currentCollection as string][propertyName].has(
-      getIndexKey(propertyValue)
-    );
-  });
-}
+    return check(store, entityClass, propertyName, propertyValue => {
+      return !store.indicies[currentCollection][propertyName].values.has(
+        getIndexKey(propertyValue)
+      );
+    });
+  }
+);
 
 /**
  * Syntactic sugar functions over dropping a given constraint from the store.

@@ -2,22 +2,22 @@
  * @module decorators
  */
 import { observable, action } from "mobx";
-import { createStore, addOne, removeOne } from "./store";
 import {
-  ensureMeta,
-  ensureConstructorMeta,
-  ensureRelationship,
-  ensureCollection,
-  getMeta,
-  ensureIndicies
-} from "./utils";
-import { CascadeOptions } from "./types";
+  createStore,
+  addOne,
+  removeOne,
+  createIndex,
+  createCollection,
+  createForeignKey
+} from "./store";
+import { CascadeOptions, Constructor } from "./types";
 import {
   checkNotNull,
   checkNotUndefined,
   checkUnique,
   check
 } from "./constraints";
+import { getCollectionName } from "./utils";
 
 /**
  * Defines a primary key for the current target. This primary key will be used for uniquely
@@ -42,18 +42,23 @@ import {
  * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
  */
-export function primaryKey<T>(target: any, propertyKey: PropertyKey) {
-  ensureMeta(target);
-  ensureConstructorMeta(target);
-  // !FIXME: This is breaking our tests. Are the tests wrong or is the API wrong?
-  // unique(store)(target, propertyKey);
-  getMeta(target).indicies.push(propertyKey);
-  getMeta(target).key.set(propertyKey);
+export function primaryKey(store: ReturnType<typeof createStore>) {
+  return action(function<T extends InstanceType<Constructor<{}>>>(
+    target: T,
+    propertyKey: keyof T
+  ) {
+    createCollection(store, target.constructor as Constructor<T>);
+    store.collections[
+      getCollectionName(target.constructor as Constructor<T>)
+    ].primaryKeyPropertyName = propertyKey;
+    checkUnique(store, target.constructor as Constructor<T>, propertyKey);
+    createIndex(store, target.constructor as Constructor<T>, propertyKey, true);
+  });
 }
 
 /**
- * Creates an indexed value in the store. This will be used for fast lookups in the
- * case of specialized filters. Currently not implemented.
+ * Creates an indexed value in the store. This will be used for fast lookups when scanning
+ * using findAllBy and findOneBy
  *
  * @export
  * @function
@@ -61,10 +66,14 @@ export function primaryKey<T>(target: any, propertyKey: PropertyKey) {
  * @param {PropertyKey} propertyKey
  * @param {PropertyDescriptor} [descriptor]
  */
-export function indexed(target: any, propertyKey: PropertyKey) {
-  ensureMeta(target);
-  ensureConstructorMeta(target);
-  getMeta(target).indicies.push(propertyKey);
+export function indexed(store: ReturnType<typeof createStore>) {
+  return action(function<T extends InstanceType<Constructor<{}>>>(
+    target: T,
+    propertyKey: keyof T
+  ) {
+    createCollection(store, target.constructor as Constructor<T>);
+    createIndex(store, target.constructor as Constructor<T>, propertyKey);
+  });
 }
 
 /**
@@ -107,38 +116,48 @@ export function indexed(target: any, propertyKey: PropertyKey) {
  */
 export function relationship<K>(
   store: ReturnType<typeof createStore>,
-  type: (...args: any[]) => K,
+  type: (...args: any[]) => Constructor<K>,
   options: CascadeOptions = {}
 ) {
-  return function<T>(target: T, propertyKey: PropertyKey): any {
-    ensureMeta(target);
-    ensureConstructorMeta(target);
-    ensureCollection(store, target);
-    ensureMeta(type());
-    ensureRelationship(target, propertyKey as string, type, options);
-    ensureRelationship(
-      (target as any).constructor,
-      propertyKey as string,
-      type,
-      options
+  return action(function<T extends InstanceType<Constructor<{}>>>(
+    target: T,
+    propertyKey: keyof T
+  ): any {
+    createCollection(store, target.constructor as Constructor<T>);
+    createCollection(store, type().constructor as Constructor<K>);
+    createForeignKey(
+      store,
+      target.constructor as Constructor<T>,
+      type.constructor as Constructor<K>,
+      propertyKey
     );
 
     return observable({
-      get(): ReturnType<typeof type>[] {
-        ensureMeta(this);
-        ensureRelationship(this, propertyKey as string, type, options);
-
-        const currentRelationship = getMeta(this).relationships[
-          propertyKey as string
+      get(this: T): ReturnType<typeof type>[] {
+        const currentCollectionName = getCollectionName(
+          target.constructor as Constructor<T>
+        );
+        const { primaryKeyPropertyName } = store.collections[
+          currentCollectionName
         ];
-        const propertyCollectionName = getMeta(currentRelationship.type)
-          .collectionName;
+        const currentPrimaryKeyValue = (this[
+          primaryKeyPropertyName as keyof T
+        ] as unknown) as PropertyKey;
+        const currentRelationship = store.foreignKeys[
+          currentCollectionName
+        ].get(primaryKeyPropertyName);
+
+        const propertyCollectionName = getCollectionName(
+          currentRelationship!.type
+        );
         const propertyCollection =
           store.collections[propertyCollectionName as string];
 
         const returnRelationship = observable(
-          currentRelationship.keys
-            .map(currentPrimaryKey => propertyCollection.get(currentPrimaryKey))
+          currentRelationship!.values[currentPrimaryKeyValue as string]
+            .map(currentPrimaryKey =>
+              propertyCollection.values.get(currentPrimaryKey)
+            )
             .filter(value => !!value)
         );
 
@@ -149,16 +168,18 @@ export function relationship<K>(
             changes.added.map(
               action((change: any) => {
                 addOne(store, change);
-                currentRelationship.keys.push(
-                  change[getMeta(change).key.get() as string]
-                );
+                currentRelationship!.values[
+                  currentPrimaryKeyValue as string
+                ].push(change[primaryKeyPropertyName]);
               })
             );
             changes.removed.forEach((change: any) => {
-              currentRelationship.keys.replace(
-                currentRelationship.keys.filter(
-                  key => key !== change[getMeta(change).key.get() as string]
-                )
+              currentRelationship!.values[
+                propertyKey as string
+              ].replace(
+                currentRelationship!.values[
+                  currentPrimaryKeyValue as string
+                ].filter(key => key !== change[primaryKeyPropertyName])
               );
 
               if (options.deleteOnRemoval === true) {
@@ -167,30 +188,35 @@ export function relationship<K>(
             });
           } else {
             addOne(store, changes.newValue);
-            currentRelationship.keys[changes.index] =
-              changes.newValue[getMeta(changes.newValue).key.get() as string];
+            currentRelationship!.values[currentPrimaryKeyValue as string][
+              changes.index
+            ] = changes.newValue[propertyKey];
           }
         });
 
         return returnRelationship;
       },
 
-      set(values: any[]) {
-        ensureMeta(this);
-        ensureConstructorMeta(this);
-        ensureCollection(store, this);
-        ensureRelationship(this, propertyKey as string, type, options);
-
-        const currentRelationship = getMeta(this).relationships[
-          propertyKey as string
+      set(this: T, values: any[]) {
+        const currentCollectionName = getCollectionName(
+          target.constructor as Constructor<T>
+        );
+        const { primaryKeyPropertyName } = store.collections[
+          currentCollectionName
         ];
+        const currentPrimaryKeyValue = (this[
+          primaryKeyPropertyName as keyof T
+        ] as unknown) as PropertyKey;
+        const currentRelationship = store.foreignKeys[
+          currentCollectionName
+        ].get(propertyKey)!.values[currentPrimaryKeyValue as string];
         values.map(value => addOne(store, value));
-        currentRelationship.keys = observable.array(
-          values.map(value => value[getMeta(value).key.get() as string])
+        currentRelationship.replace(
+          observable.array(values.map(value => value[propertyKey]))
         );
       }
     });
-  };
+  });
 }
 
 /**
@@ -199,14 +225,13 @@ export function relationship<K>(
  * @export
  * @param store
  */
-export function notNull<T>(store: ReturnType<typeof createStore>) {
-  return function(target: any, propertyKey: PropertyKey) {
-    ensureMeta(target);
-    ensureConstructorMeta(target);
-    ensureCollection(store, target.constructor);
-    ensureIndicies(store, target.constructor);
-    checkNotNull(store, target.constructor, propertyKey);
-  };
+export function notNull(store: ReturnType<typeof createStore>) {
+  return action(function<T extends InstanceType<Constructor<{}>>>(
+    target: T,
+    propertyKey: keyof T
+  ) {
+    checkNotNull(store, target.constructor as Constructor<T>, propertyKey);
+  });
 }
 
 /**
@@ -216,13 +241,9 @@ export function notNull<T>(store: ReturnType<typeof createStore>) {
  * @param store
  */
 export function notUndefined<T>(store: ReturnType<typeof createStore>) {
-  return function(target: any, propertyKey: PropertyKey) {
-    ensureMeta(target);
-    ensureConstructorMeta(target);
-    ensureCollection(store, target.constructor);
-    ensureIndicies(store, target.constructor);
+  return action(function(target: any, propertyKey: PropertyKey) {
     checkNotUndefined(store, target.constructor, propertyKey);
-  };
+  });
 }
 
 /**
@@ -231,11 +252,14 @@ export function notUndefined<T>(store: ReturnType<typeof createStore>) {
  * @export
  * @param store
  */
-export function unique<T>(store: ReturnType<typeof createStore>) {
-  return function(target: any, propertyKey: PropertyKey) {
-    indexed(target, propertyKey); // FIXME: Shouldn't this have already been done in checkUnique?
-    checkUnique(store, target.constructor, propertyKey);
-  };
+export function unique(store: ReturnType<typeof createStore>) {
+  return action(function<T extends InstanceType<Constructor<{}>>>(
+    target: T,
+    propertyKey: keyof T
+  ) {
+    checkUnique(store, target.constructor as Constructor<T>, propertyKey);
+    createIndex(store, target.constructor as Constructor<T>, propertyKey);
+  });
 }
 
 /**
@@ -244,15 +268,19 @@ export function unique<T>(store: ReturnType<typeof createStore>) {
  * @export
  * @param store
  */
-export function setCheck<T>(
+export function setCheck(
   store: ReturnType<typeof createStore>,
-  checkConstraint: (...args: (keyof T)[]) => boolean
+  checkConstraint: (...args: any[]) => boolean
 ) {
-  return function(target: any, propertyKey: PropertyKey) {
-    ensureMeta(target);
-    ensureConstructorMeta(target);
-    ensureCollection(store, target.constructor);
-    ensureIndicies(store, target.constructor);
-    check(store, target.constructor, propertyKey, checkConstraint);
-  };
+  return action(function<T extends InstanceType<Constructor<{}>>>(
+    target: T,
+    propertyKey: keyof T
+  ) {
+    check(
+      store,
+      target.constructor as Constructor<T>,
+      propertyKey,
+      checkConstraint
+    );
+  });
 }

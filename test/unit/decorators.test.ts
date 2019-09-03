@@ -3,15 +3,15 @@ import { expect } from "chai";
 import { v4 as uuid } from 'uuid';
 
 import { indexed, primaryKey, relationship, notNull, notUndefined, unique } from "../../src/decorators";
-import { Meta } from "../../src/types";
 import { createStore, addOne, findAll, truncateCollection } from "../../src/store";
 import { IntegrityError } from "@src/errors";
 
 describe("#decorators", (): void => {
   describe("#indexed", (): void => {
     it("should add an attribute to the __meta__.indicies", (): void => {
+      const store = createStore();
       class Foo {
-        @indexed
+        @indexed(store)
         attrib: number = 0;
       }
 
@@ -25,15 +25,17 @@ describe("#decorators", (): void => {
   });
 
   describe("#primaryKey", (): void => {
-    it("should set an attribute to the __meta__.key", (): void => {
+    it("should create an entry in the indicies of the store", (): void => {
+      const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         attrib: number = 0;
       }
 
       const f = new Foo();
 
-      expect(((f as unknown) as Meta).__meta__.key.get()).to.equal("attrib");
+      expect(store.indicies.Foo.attrib.isPrimaryKey).to.be.true;
+      expect(store.indicies.Foo.attrib.propertyNames).to.eql('attrib');
     });
   });
 
@@ -41,12 +43,12 @@ describe("#decorators", (): void => {
     it("should set a relationship to the __meta__.key", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey
+        @primaryKey(store)
         id: number = 0;
       }
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         attrib: number = 0;
 
         @relationship(store, () => Bar)
@@ -55,7 +57,7 @@ describe("#decorators", (): void => {
 
       const f = new Foo();
 
-      expect(((f as unknown) as Meta).__meta__.relationships)
+      expect((f as any).__meta__.relationships)
         .to.have.property("friends")
         .that.has.property("type")
         .that.is.eql(Bar);
@@ -64,12 +66,12 @@ describe("#decorators", (): void => {
     it("should allow an options parameter to allow cascades when the item is removed from the list", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey
+        @primaryKey(store)
         id: number = 0;
       }
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         attrib: number = 0;
 
         @relationship(store, () => Bar, { deleteOnRemoval: true })
@@ -78,7 +80,7 @@ describe("#decorators", (): void => {
 
       const f = new Foo();
 
-      expect(((f as unknown) as Meta).__meta__.relationships)
+      expect((f as any).__meta__.relationships)
         .to.have.property("friends")
         .that.has.property("options").that.is.not.empty;
       addOne(store, f);
@@ -91,12 +93,12 @@ describe("#decorators", (): void => {
     it("should allow a user to replace an entity in a relationship by index", (): void => {
       const store = createStore();
       class Bar {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
       }
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @relationship(store, () => Bar)
@@ -116,7 +118,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @notNull(store)
@@ -130,7 +132,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @notNull(store)
@@ -148,7 +150,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @notUndefined(store)
@@ -164,7 +166,7 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @unique(store)
@@ -179,11 +181,11 @@ describe("#decorators", (): void => {
       const store = createStore();
 
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = uuid();
 
         @unique(store)
-        @indexed
+        @indexed(store)
         name = '1';
       }
 

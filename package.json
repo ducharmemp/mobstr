@@ -47,7 +47,7 @@
   },
   "scripts": {
     "test:setup": "mocha --timeout=10000 -r ts-node/register -r tsconfig-paths/register -r source-map-support/register",
-    "test": "nyc npm run test:setup -- test/index.test.ts",
+    "test": "nyc npm run test:setup -- test/index.test.ts --bail false",
     "test:ci": "npm run test -- --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/mocha/test-results.xml --exit --full-trace --bail",
     "test:prof": "npm run clean && npm run build && NODE_ENV=production node --prof $(which npm) run test:setup -- test/perf.test.ts && node --prof-process isolate* > processed.txt && rm isolate*",
     "format": "prettier src/** test/** --write",
@@ -57,7 +57,7 @@
     "build": "NODE_ENV=production rollup --config rollup.config.js",
     "build:docs": "typedoc --options ./typedocconfig.js",
     "clean": "rm -rf dist && rm -rf .rts2*",
-    "preversion": "npm run clean && npm run build && npm run build:docs && npm test && git add .",
+    "preversion": "npm run clean && npm run format && npm run build && npm run build:docs && npm test && git add .",
     "postpublish": "git push --tags && git push origin master"
   },
   "author": "Matthew P DuCharme",

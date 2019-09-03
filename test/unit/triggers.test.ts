@@ -15,7 +15,7 @@ describe("#triggers", (): void => {
     it("should create a trigger in the store scoped to a collection", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
       }
 
@@ -28,7 +28,7 @@ describe("#triggers", (): void => {
     it("should allow observations to a collection", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
       }
       
@@ -42,7 +42,7 @@ describe("#triggers", (): void => {
     it("should allow observations to a collection only on deletes", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
       }
 
@@ -61,7 +61,7 @@ describe("#triggers", (): void => {
     it("should allow intercepts on a collection", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
       }
 
@@ -77,10 +77,10 @@ describe("#triggers", (): void => {
     it("should allow intercepts to rewrite the value", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "1234";
 
-        @indexed
+        @indexed(store)
         name = 'foo'
       }
 
@@ -100,7 +100,7 @@ describe("#triggers", (): void => {
     it("should delete a trigger from the database", (): void => {
       const store = createStore();
       class Foo {
-        @primaryKey
+        @primaryKey(store)
         id = "";
       }
 
